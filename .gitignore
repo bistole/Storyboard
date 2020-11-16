@@ -16,4 +16,5 @@
 .dart_tool/
 .packages
 .idea
+coverage/
 build/
