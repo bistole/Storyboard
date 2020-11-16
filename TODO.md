@@ -20,7 +20,6 @@ API
 - Update
 - Delete
 
-
 DONE
 ====
 
@@ -33,5 +32,3 @@ UI
 
 Widget test [DONE]
 - Coverage [DONE]
-
-
