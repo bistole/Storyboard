@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Storyboard/backend"
 	"fmt"
 	"image"
 	_ "image/png"
@@ -16,6 +17,10 @@ import (
 var vmArguments string
 
 func main() {
+
+	// Run backend server
+	backend.Start()
+
 	// DO NOT EDIT, add options in options.go
 	mainOptions := []flutter.Option{
 		flutter.OptionVMArguments(strings.Split(vmArguments, ";")),

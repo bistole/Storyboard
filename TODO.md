@@ -1,18 +1,18 @@
 NOW
 ===
 
+Server
+- Temp Text List
+- Temp Add Text
+- Temp Update Text
+- Temp Delete Text
+
 TODO
 ====
 
 UI
 - Update Text
 - Delete Text
-
-Server
-- Temp Text List
-- Temp Add Text
-- Temp Update Text
-- Temp Delete Text
 
 API
 - Query List
