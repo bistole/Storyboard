@@ -19,11 +19,7 @@ var vmArguments string
 func main() {
 
 	// Run backend server
-	err1 := backend.Start()
-	if err1 != nil {
-		fmt.Println(err1)
-		os.Exit(1)
-	}
+	backend.Start()
 
 	// DO NOT EDIT, add options in options.go
 	mainOptions := []flutter.Option{

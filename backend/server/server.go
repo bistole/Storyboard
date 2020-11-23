@@ -1,10 +1,13 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -151,8 +154,24 @@ func deleteTask(w http.ResponseWriter, r *http.Request) {
 	buildSuccResponse(w, true)
 }
 
-// Server to build RESTful API Server
-func Server() error {
+// RestfulServer is wrapper for http server and wait group
+type RestfulServer struct {
+	Server *http.Server
+	Wg     *sync.WaitGroup
+}
+
+var restful *RestfulServer
+
+// Start to build RESTful API Server
+func Start() bool {
+	if restful != nil {
+		return false
+	}
+
+	restful = &RestfulServer{}
+	restful.Wg = &sync.WaitGroup{}
+	restful.Wg.Add(1)
+
 	r := mux.NewRouter()
 	r.HandleFunc("/tasks", getTasks).Methods("GET")
 	r.HandleFunc("/tasks", createTask).Methods("POST")
@@ -160,6 +179,31 @@ func Server() error {
 	r.HandleFunc("/tasks/{id}", updateTask).Methods("POST")
 	r.HandleFunc("/tasks/{id}", deleteTask).Methods("DELETE")
 
-	err := http.ListenAndServe(":3000", r)
-	return err
+	restful.Server = &http.Server{Addr: ":3000", Handler: r}
+
+	go func() {
+		defer restful.Wg.Done()
+		if err := restful.Server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("ListenAndServe(): %v", err)
+		}
+	}()
+
+	return true
+}
+
+// Stop the RESTful server
+func Stop() bool {
+	if restful == nil {
+		return false
+	}
+
+	ctx, cancelFunc := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelFunc()
+	if err := restful.Server.Shutdown(ctx); err != nil {
+		panic(err)
+	}
+	restful.Wg.Wait()
+	restful = nil
+	fmt.Println("Stopped")
+	return true
 }

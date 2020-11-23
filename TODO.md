@@ -7,8 +7,8 @@ Server
 - Temp Update Text [DONE]
 - Temp Delete Text [DONE]
 
-Add sqlite for backend support
-Fork go process to run backend and frontend same
+Add sqlite for backend support 
+Run backend and frontend at same time [DONE]
 
 TODO
 ====
@@ -25,6 +25,9 @@ UI
 
 DONE
 ====
+
+Deployment
+- Build to App
 
 UI
 - Add Text [DONE]

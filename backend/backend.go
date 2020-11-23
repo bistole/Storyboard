@@ -6,9 +6,13 @@ import (
 )
 
 // Start to create a standalone RESTful API server
-func Start() error {
+func Start() {
 	fmt.Println("Hello, Hover")
+	go server.Start()
+}
 
-	err := server.Server()
-	return err
+// Stop standalone RESTful API server
+func Stop() {
+	fmt.Println("Goodbye, Hover")
+	server.Stop()
 }
