@@ -1,9 +1,14 @@
 package backend
 
-import "fmt"
+import (
+	"Storyboard/backend/server"
+	"fmt"
+)
 
-// Hello is an example
-func Start() string {
+// Start to create a standalone RESTful API server
+func Start() error {
 	fmt.Println("Hello, Hover")
-	return "Hello, World"
+
+	err := server.Server()
+	return err
 }

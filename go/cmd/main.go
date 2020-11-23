@@ -19,16 +19,20 @@ var vmArguments string
 func main() {
 
 	// Run backend server
-	backend.Start()
+	err1 := backend.Start()
+	if err1 != nil {
+		fmt.Println(err1)
+		os.Exit(1)
+	}
 
 	// DO NOT EDIT, add options in options.go
 	mainOptions := []flutter.Option{
 		flutter.OptionVMArguments(strings.Split(vmArguments, ";")),
 		flutter.WindowIcon(iconProvider),
 	}
-	err := flutter.Run(append(options, mainOptions...)...)
-	if err != nil {
-		fmt.Println(err)
+	err2 := flutter.Run(append(options, mainOptions...)...)
+	if err2 != nil {
+		fmt.Println(err2)
 		os.Exit(1)
 	}
 }

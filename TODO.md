@@ -2,23 +2,26 @@ NOW
 ===
 
 Server
-- Temp Text List
-- Temp Add Text
-- Temp Update Text
-- Temp Delete Text
+- Temp Text List [DONE]
+- Temp Add Text [DONE]
+- Temp Update Text [DONE]
+- Temp Delete Text [DONE]
+
+Add sqlite for backend support
+Fork go process to run backend and frontend same
 
 TODO
 ====
 
-UI
-- Update Text
-- Delete Text
-
-API
+front-end API
 - Query List
 - Add 
 - Update
 - Delete
+
+UI
+- Update Text
+- Delete Text
 
 DONE
 ====
