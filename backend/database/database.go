@@ -12,7 +12,7 @@ import (
 )
 
 // AppName is the name of application, temporary
-const AppName = "Storyboard_Go"
+const AppName = "Storyboard"
 
 var connDB *sql.DB = nil
 
