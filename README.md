@@ -5,6 +5,7 @@ Environment
 ===========
 
 export PATH=$HOME/Flutter/flutter/bin:/usr/local/go/bin:$HOME/go/bin:$PATH
+
 export CGO_ENABLED=1
 
 UI TEST
