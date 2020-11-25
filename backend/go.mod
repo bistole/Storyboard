@@ -1,0 +1,10 @@
+module Storyboard/backend
+
+go 1.15
+
+require (
+	github.com/adrg/xdg v0.2.3
+	github.com/google/uuid v1.1.2
+	github.com/gorilla/mux v1.8.0
+	github.com/mattn/go-sqlite3 v1.14.5
+)

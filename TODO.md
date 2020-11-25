@@ -1,32 +1,52 @@
 NOW
 ===
 
-UI
-- Add Text [DONE]
-- List Text [DONE]
-- Test case [INPROGRESS]
-  - Adding succ [DONE]
-  - Adding cancelled
-
-Widget test
-- Coverage [?]
-
+Create redux-like data storage in front-end
+Split func to small widget
 
 TODO
 ====
 
+Test-cases
+- Frontend
+- Backend
+
+Server Send Event
+- Keepalive 
+
+Authenticate
+
+Deployment
+- Build to App
+
+DONE
+====
+
 UI
-- Update Text
-- Delete Text
+- Add Text [DONE]
+- List Text [DONE]
+- Test case [DONE]
+  - Adding succ [DONE]
+  - Adding cancelled [DONE]
+
+Widget test [DONE]
+- Coverage [DONE]
 
 Server
-- Temp Text List
-- Temp Add Text
-- Temp Update Text
-- Temp Delete Text
+- Temp Text List [DONE]
+- Temp Add Text [DONE]
+- Temp Update Text [DONE]
+- Temp Delete Text [DONE]
 
-API
-- Query List
-- Add 
-- Update
-- Delete
+Add sqlite for backend support [DONE]
+Run backend and frontend at same time [DONE]
+
+Front-end API
+- Query List [DONE]
+- Add [DONE]
+- Update [DONE]
+- Delete [DONE]
+
+UI
+- Update Text [DONE]
+- Delete Text [DONE]
