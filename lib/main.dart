@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'home/page.dart';
+import 'view/home/page.dart';
 
 void main() {
   runApp(StoryBoardApp());
@@ -12,16 +12,13 @@ class StoryBoardApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
+          primarySwatch: Colors.blue,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
             primary: Colors.green,
-          )
-        )
-      ),
+          ))),
       home: HomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
-

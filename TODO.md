@@ -1,18 +1,15 @@
 NOW
 ===
 
-front-end API
-- Query List
-- Add 
-- Update
-- Delete
+Create redux-like data storage in front-end
+Split func to small widget
 
 TODO
 ====
 
-UI
-- Update Text
-- Delete Text
+Test-cases
+- Frontend
+- Backend
 
 Server Send Event
 - Keepalive 
@@ -43,3 +40,13 @@ Server
 
 Add sqlite for backend support [DONE]
 Run backend and frontend at same time [DONE]
+
+Front-end API
+- Query List [DONE]
+- Add [DONE]
+- Update [DONE]
+- Delete [DONE]
+
+UI
+- Update Text [DONE]
+- Delete Text [DONE]
