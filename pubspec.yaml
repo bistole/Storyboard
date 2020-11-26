@@ -23,6 +23,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  redux: ^3.0.0
+  flutter_redux: ^0.5.2
+  redux_persist: ^0.8.4
   http: ^0.12.2
   intl: ^0.16.1
 
