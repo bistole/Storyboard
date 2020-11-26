@@ -50,7 +50,6 @@ Future<void> updateTask(Store<AppState> store, Task task) async {
       store.dispatch(new UpdateTaskAction(task: task));
     }
   }
-  throw Exception('Failed to update task');
 }
 
 Future<void> deleteTask(Store<AppState> store, Task task) async {

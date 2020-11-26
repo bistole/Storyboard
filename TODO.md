@@ -1,19 +1,18 @@
 NOW
 ===
 
-Create redux-like data storage in front-end [DONE]
-Make persist on redux [DONE]
-Split func to small widget
-
-TODO
-====
+- Sort Tasks in front-end by updatedAt
 
 Test-cases
 - Frontend
 - Backend
 
+TODO
+====
+
 Server Send Event
-- Keepalive 
+- Keepalive
+- Only sync updated events
 
 Authenticate
 
@@ -51,3 +50,8 @@ Front-end API
 UI
 - Update Text [DONE]
 - Delete Text [DONE]
+
+Create redux-like data storage in front-end [DONE]
+Make persist on redux [DONE]
+Split func to small widget [DONE]
+

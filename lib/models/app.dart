@@ -1,30 +1,35 @@
+import 'package:Storyboard/models/status.dart';
 import 'package:flutter/material.dart';
 import 'task.dart';
 
 @immutable
 class AppState {
+  final Status status;
   final List<Task> tasks;
 
   AppState({
+    this.status,
     this.tasks = const [],
   });
 
   AppState copyWith({
+    Status status,
     List<Task> tasks,
   }) {
-    return AppState(tasks: tasks);
+    return AppState(status: status, tasks: tasks);
   }
 
   @override
-  int get hashCode => tasks.hashCode;
+  int get hashCode => status.hashCode ^ tasks.hashCode;
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || (other is AppState && tasks == other.tasks);
+      identical(this, other) ||
+      (other is AppState && status == other.status && tasks == other.tasks);
 
   @override
   String toString() {
-    return 'AppState{tasks: $tasks}';
+    return 'AppState{status: $status, tasks: $tasks}';
   }
 
   static AppState fromJson(dynamic json) {
@@ -34,7 +39,7 @@ class AppState {
         tasks.add(Task.fromJson(json['tasks'][i]));
       }
     }
-    return AppState(tasks: tasks);
+    return AppState(status: Status.noParam(StatusKey.ListTask), tasks: tasks);
   }
 
   dynamic toJson() {

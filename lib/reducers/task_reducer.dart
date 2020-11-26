@@ -20,7 +20,8 @@ List<Task> _createTask(List<Task> tasks, CreateTaskAction action) {
 
 List<Task> _updateTask(List<Task> tasks, UpdateTaskAction action) {
   return tasks
-      .map((task) => task.uuid == action.task.uuid ? action.task : task);
+      .map((task) => task.uuid == action.task.uuid ? action.task : task)
+      .toList();
 }
 
 List<Task> _deleteTask(List<Task> tasks, DeleteTaskAction action) {

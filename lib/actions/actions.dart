@@ -1,3 +1,4 @@
+import 'package:Storyboard/models/status.dart';
 import 'package:Storyboard/models/task.dart';
 
 class FetchTasksAction {
@@ -41,5 +42,28 @@ class DeleteTaskAction {
   @override
   String toString() {
     return 'DeleteTaskAction{uuid: $uuid}';
+  }
+}
+
+class ChangeStatusAction {
+  final StatusKey status;
+
+  ChangeStatusAction({this.status});
+
+  @override
+  String toString() {
+    return 'ChangeStatusAction{status: $status}';
+  }
+}
+
+class ChangeStatusWithUUIDAction {
+  final StatusKey status;
+  final String uuid;
+
+  ChangeStatusWithUUIDAction({this.status, this.uuid});
+
+  @override
+  String toString() {
+    return 'ChangeStatusWithUUIDAction{status: $status, uuid: $uuid}';
   }
 }
