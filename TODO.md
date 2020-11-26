@@ -2,8 +2,7 @@ NOW
 ===
 
 Create redux-like data storage in front-end [DONE]
-Make persist on redux [IN_PROGRESS]
-
+Make persist on redux [DONE]
 Split func to small widget
 
 TODO

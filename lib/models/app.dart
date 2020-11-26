@@ -29,7 +29,7 @@ class AppState {
 
   static AppState fromJson(dynamic json) {
     List<Task> tasks = new List();
-    if (json['tasks']) {
+    if (json is Map && json['tasks'] is List) {
       for (int i = 0; i < json['tasks'].length; i++) {
         tasks.add(Task.fromJson(json['tasks'][i]));
       }

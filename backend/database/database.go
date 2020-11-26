@@ -1,6 +1,7 @@
 package database
 
 import (
+	"Storyboard/backend/config"
 	"Storyboard/backend/dao"
 	"database/sql"
 	"fmt"
@@ -11,9 +12,6 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// AppName is the name of application, temporary
-const AppName = "Storyboard"
-
 var connDB *sql.DB = nil
 
 // InitDatabase to init database
@@ -22,11 +20,11 @@ func InitDatabase() bool {
 		return true
 	}
 
-	fullPath := path.Join(xdg.DataHome, AppName, "foo.db")
+	fullPath := path.Join(xdg.DataHome, config.VendorName, config.AppName, "foo.db")
 	fmt.Printf("Create Database: %s\n", fullPath)
 	_, err := os.Stat(fullPath)
 	if os.IsNotExist(err) {
-		os.MkdirAll(path.Join(xdg.DataHome, AppName), 0755)
+		os.MkdirAll(path.Join(xdg.DataHome, config.VendorName, config.AppName), 0755)
 		os.Create(fullPath)
 	}
 
