@@ -1,6 +1,10 @@
 NOW
 ===
 
+- Add _ts to trace the updates on backend
+  - backend [DONE]
+  - frontend
+
 - Sort Tasks in front-end by updatedAt
 
 Test-cases

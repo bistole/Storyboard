@@ -49,7 +49,9 @@ func buildSuccTasksResponse(w http.ResponseWriter, tasks []dao.Task) {
 
 // GetTasks is a restful API handler to get tasks
 func GetTasks(w http.ResponseWriter, r *http.Request) {
-	tasks := database.GetTasks(20, 0)
+	ts := ConvertQueryParamToInt(r, "ts", 0)
+	limit := ConvertQueryParamToInt(r, "c", 20)
+	tasks := database.GetTasks(int64(ts), limit, 0)
 	buildSuccTasksResponse(w, tasks)
 }
 
@@ -69,10 +71,12 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 
 	ret := database.CreateTask(task)
 	if ret {
-		buildSuccTaskResponse(w, task)
-	} else {
-		buildSuccResponse(w, false)
+		task := database.GetTask(task.UUID)
+		if task != nil {
+			buildSuccTaskResponse(w, *task)
+		}
 	}
+	buildSuccResponse(w, false)
 }
 
 // GetTask is a restful API handler to get task
@@ -83,9 +87,9 @@ func GetTask(w http.ResponseWriter, r *http.Request) {
 	task := database.GetTask(id)
 	if task == nil {
 		buildSuccResponse(w, false)
-	} else {
-		buildSuccTaskResponse(w, *task)
+		return
 	}
+	buildSuccTaskResponse(w, *task)
 }
 
 // UpdateTask is a restful API handler to update task
@@ -109,10 +113,13 @@ func UpdateTask(w http.ResponseWriter, r *http.Request) {
 	ret := database.UpdateTask(updatedTask)
 
 	if ret {
-		buildSuccTaskResponse(w, updatedTask)
-	} else {
-		buildSuccResponse(w, false)
+		task := database.GetTask(id)
+		if task != nil {
+			buildSuccTaskResponse(w, *task)
+			return
+		}
 	}
+	buildSuccResponse(w, false)
 }
 
 // DeleteTask is a restful API handler to delete task
@@ -120,5 +127,12 @@ func DeleteTask(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	ret := database.DeleteTask(id)
+	if ret {
+		task := database.GetTask(id)
+		if task != nil {
+			buildSuccTaskResponse(w, *task)
+			return
+		}
+	}
 	buildSuccResponse(w, ret)
 }
