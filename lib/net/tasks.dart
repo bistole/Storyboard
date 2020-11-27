@@ -14,8 +14,8 @@ Future<void> fetchTasks(Store<AppState> store) async {
   if (response.statusCode == 200) {
     Map<String, dynamic> object = jsonDecode(response.body);
     if (object['succ'] == true && object['tasks'] != null) {
-      var tasks = buildTaskList(object['tasks']);
-      store.dispatch(new FetchTasksAction(tasks: tasks));
+      var taskList = buildTaskList(object['tasks']);
+      store.dispatch(new FetchTasksAction(taskList: taskList));
     }
   }
 }
@@ -57,8 +57,9 @@ Future<void> deleteTask(Store<AppState> store, Task task) async {
 
   if (response.statusCode == 200) {
     Map<String, dynamic> object = jsonDecode(response.body);
-    if (object['succ'] == true) {
-      store.dispatch(new DeleteTaskAction(uuid: task.uuid));
+    if (object['succ'] == true && object['task'] != null) {
+      var task = Task.fromJson(object['task']);
+      store.dispatch(new DeleteTaskAction(task: task));
     }
   }
 }

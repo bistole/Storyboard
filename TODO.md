@@ -1,10 +1,6 @@
 NOW
 ===
 
-- Add _ts to trace the updates on backend
-  - backend [DONE]
-  - frontend
-
 - Sort Tasks in front-end by updatedAt
 
 Test-cases
@@ -17,6 +13,7 @@ TODO
 Server Send Event
 - Keepalive
 - Only sync updated events
+- Use timer to trigger fetchTasks after launch
 
 Authenticate
 
@@ -58,4 +55,8 @@ UI
 Create redux-like data storage in front-end [DONE]
 Make persist on redux [DONE]
 Split func to small widget [DONE]
+
+- Add _ts to trace the updates on backend [DONE]
+  - backend [DONE]
+  - frontend [DONE]
 

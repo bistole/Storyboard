@@ -10,9 +10,9 @@ import 'update_task_widget.dart';
 import 'task_widget.dart';
 
 class ReduxActions {
-  final List<Task> tasks;
+  final List<Task> taskList;
   final Status status;
-  ReduxActions({this.status, this.tasks});
+  ReduxActions({this.status, this.taskList});
 }
 
 class HomePage extends StatelessWidget {
@@ -23,8 +23,9 @@ class HomePage extends StatelessWidget {
   List<Widget> buildList(ReduxActions redux) {
     var children = List<Widget>();
     children.add(CreateTaskWidget());
-    redux.tasks.forEach((task) {
-      Widget w = redux.status.status == StatusKey.EditingTask
+    redux.taskList.forEach((task) {
+      Widget w = redux.status.status == StatusKey.EditingTask &&
+              redux.status.param1 == task.uuid
           ? UpdateTaskWidget(task: task)
           : TaskWidget(task: task);
       children.insert(1, w);
@@ -40,9 +41,15 @@ class HomePage extends StatelessWidget {
       ),
       body: StoreConnector<AppState, ReduxActions>(
         converter: (store) {
+          List<Task> taskList = List();
+          store.state.tasks.forEach((uuid, task) {
+            if (task.deleted == 0) {
+              taskList.add(task);
+            }
+          });
           return ReduxActions(
             status: store.state.status,
-            tasks: store.state.tasks,
+            taskList: taskList,
           );
         },
         builder: (context, ReduxActions redux) {

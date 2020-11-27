@@ -28,6 +28,7 @@ Future<Store<AppState>> initStore() async {
     middleware: [persistor.createMiddleware()],
   );
 
+  // TODO: Use timer to trigger fetchTasks after launch
   await fetchTasks(store);
   return store;
 }
@@ -55,12 +56,14 @@ class StoryBoardApp extends StatelessWidget {
           child: new MaterialApp(
             title: 'Flutter Demo',
             theme: ThemeData(
-                primarySwatch: Colors.blue,
-                visualDensity: VisualDensity.adaptivePlatformDensity,
-                textButtonTheme: TextButtonThemeData(
-                    style: TextButton.styleFrom(
+              primarySwatch: Colors.blue,
+              visualDensity: VisualDensity.adaptivePlatformDensity,
+              textButtonTheme: TextButtonThemeData(
+                style: TextButton.styleFrom(
                   primary: Colors.green,
-                ))),
+                ),
+              ),
+            ),
             home: HomePage(title: 'Flutter Demo Home Page'),
           ),
         );

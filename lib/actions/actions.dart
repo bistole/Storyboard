@@ -2,13 +2,13 @@ import 'package:Storyboard/models/status.dart';
 import 'package:Storyboard/models/task.dart';
 
 class FetchTasksAction {
-  final List<Task> tasks;
+  final List<Task> taskList;
 
-  FetchTasksAction({this.tasks});
+  FetchTasksAction({this.taskList});
 
   @override
   String toString() {
-    return 'FetchTasksAction{tasks: $tasks}';
+    return 'FetchTasksAction{taskList: $taskList}';
   }
 }
 
@@ -35,13 +35,13 @@ class UpdateTaskAction {
 }
 
 class DeleteTaskAction {
-  final String uuid;
+  final Task task;
 
-  DeleteTaskAction({this.uuid});
+  DeleteTaskAction({this.task});
 
   @override
   String toString() {
-    return 'DeleteTaskAction{uuid: $uuid}';
+    return 'DeleteTaskAction{task: $task}';
   }
 }
 

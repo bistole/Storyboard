@@ -5,16 +5,16 @@ import 'task.dart';
 @immutable
 class AppState {
   final Status status;
-  final List<Task> tasks;
+  final Map<String, Task> tasks;
 
   AppState({
     this.status,
-    this.tasks = const [],
+    this.tasks = const <String, Task>{},
   });
 
   AppState copyWith({
     Status status,
-    List<Task> tasks,
+    Map<String, Task> tasks,
   }) {
     return AppState(status: status, tasks: tasks);
   }
@@ -33,20 +33,21 @@ class AppState {
   }
 
   static AppState fromJson(dynamic json) {
-    List<Task> tasks = new List();
-    if (json is Map && json['tasks'] is List) {
-      for (int i = 0; i < json['tasks'].length; i++) {
-        tasks.add(Task.fromJson(json['tasks'][i]));
-      }
+    var tasks = <String, Task>{};
+    if (json is Map && json['tasks'] is Map) {
+      json['tasks'].forEach((uuid, jsonTask) {
+        var task = Task.fromJson(jsonTask);
+        tasks[task.uuid] = task;
+      });
     }
     return AppState(status: Status.noParam(StatusKey.ListTask), tasks: tasks);
   }
 
   dynamic toJson() {
-    List<dynamic> ret = new List();
-    for (int i = 0; i < tasks.length; i++) {
-      ret.add(tasks[i].toJson());
-    }
+    Map<String, dynamic> ret = <String, dynamic>{};
+    tasks.forEach((uuid, task) {
+      ret[uuid] = task.toJson();
+    });
     return {"tasks": tasks};
   }
 }

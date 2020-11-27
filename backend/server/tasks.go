@@ -74,6 +74,7 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 		task := database.GetTask(task.UUID)
 		if task != nil {
 			buildSuccTaskResponse(w, *task)
+			return
 		}
 	}
 	buildSuccResponse(w, false)
