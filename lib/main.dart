@@ -28,8 +28,10 @@ Future<Store<AppState>> initStore() async {
     middleware: [persistor.createMiddleware()],
   );
 
-  // TODO: Use timer to trigger fetchTasks after launch
-  await fetchTasks(store);
+  // Use timer to trigger fetchTasks after launch
+  Future.delayed(Duration(seconds: 30), () {
+    fetchTasks(store);
+  });
   return store;
 }
 
@@ -46,8 +48,8 @@ class StoryBoardApp extends StatelessWidget {
     return FutureBuilder<Store<AppState>>(
       future: initStore(),
       builder: (context, AsyncSnapshot<Store<AppState>> snapshot) {
+        print('triggered builder');
         if (!snapshot.hasData) {
-          // TODO: too ugly
           return CircularProgressIndicator();
         }
 
