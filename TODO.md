@@ -1,7 +1,7 @@
 NOW
 ===
 
-- Sort Tasks in front-end by updatedAt
+- Sort Tasks in front-end by updatedAt [DONE]
 
 Test-cases
 - Frontend
@@ -13,7 +13,7 @@ TODO
 Server Send Event
 - Keepalive
 - Only sync updated events
-- Use timer to trigger fetchTasks after launch
+- Trigger fetchTasks from last time by sync updated events
 
 Authenticate
 

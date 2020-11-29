@@ -48,7 +48,6 @@ class StoryBoardApp extends StatelessWidget {
     return FutureBuilder<Store<AppState>>(
       future: initStore(),
       builder: (context, AsyncSnapshot<Store<AppState>> snapshot) {
-        print('triggered builder');
         if (!snapshot.hasData) {
           return CircularProgressIndicator();
         }

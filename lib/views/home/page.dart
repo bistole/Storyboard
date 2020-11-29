@@ -23,13 +23,21 @@ class HomePage extends StatelessWidget {
   List<Widget> buildList(ReduxActions redux) {
     var children = List<Widget>();
     children.add(CreateTaskWidget());
-    redux.taskList.forEach((task) {
+
+    var updatedTaskList = List<Task>.from(redux.taskList);
+    updatedTaskList.sort((Task a, Task b) {
+      return a.updatedAt == b.updatedAt
+          ? 0
+          : (a.updatedAt > b.updatedAt ? 1 : -1);
+    });
+    updatedTaskList.forEach((task) {
       Widget w = redux.status.status == StatusKey.EditingTask &&
               redux.status.param1 == task.uuid
           ? UpdateTaskWidget(task: task)
           : TaskWidget(task: task);
       children.insert(1, w);
     });
+
     return children;
   }
 
