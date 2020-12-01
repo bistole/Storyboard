@@ -5,68 +5,118 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import '../../../lib/views/home/page.dart';
+import 'dart:convert';
+
+import 'package:Storyboard/models/app.dart';
+import 'package:Storyboard/models/status.dart';
+import 'package:Storyboard/models/task.dart';
+import 'package:Storyboard/net/config.dart';
+import 'package:Storyboard/reducers/app_reducer.dart';
+import 'package:Storyboard/views/home/page.dart';
+
+import 'package:http/http.dart' as http;
+import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
+
+class MockClient extends Mock implements http.Client {
+  @override
+  String toString() {
+    return "I am the mock";
+  }
+}
 
 void main() {
+  Store<AppState> store;
+
   Widget buildTestableWidget(Widget widget) {
-    return MaterialApp(home: widget);
+    store = Store<AppState>(
+      appReducer,
+      initialState: AppState(
+        status: Status.noParam(StatusKey.ListTask),
+        tasks: <String, Task>{},
+      ),
+    );
+    return new StoreProvider(
+      store: store,
+      child: new MaterialApp(
+        home: widget,
+      ),
+    );
   }
 
-  testWidgets('add item', (WidgetTester tester) async {
-    // home page
-    var widget = buildTestableWidget(HomePage(title: 'title'));
-    await tester.pumpWidget(widget);
+  group(
+    "add item",
+    () {
+      testWidgets('add item succ', (WidgetTester tester) async {
+        // Setup HTTP Response
+        final client = MockClient();
+        setHTTPClient(client);
 
-    // Add Button here
-    expect(find.byType(TextButton), findsOneWidget);
-    expect(find.text('ADD'), findsOneWidget);
+        final uuid = '04deb797-7ca0-4cd3-b4ef-c1e01aeea130';
+        final responseBody = jsonEncode({
+          'succ': true,
+          'task': {
+            'uuid': uuid,
+            'title': 'new Title',
+            'deleted': 0,
+            'updatedAt': 1606506017,
+            'createdAt': 1606506017,
+            '_ts': 1606506017000,
+          },
+        });
+        when(client.post(
+          startsWith(URLPrefix),
+          headers: anyNamed('headers'),
+          body: anyNamed('body'),
+          encoding: anyNamed('encoding'),
+        )).thenAnswer((_) async {
+          return http.Response(responseBody, 200);
+        });
 
-    // Tap 'ADD' button
-    await tester.tap(find.text('ADD'));
-    await tester.pump();
+        // home page
+        var widget = buildTestableWidget(HomePage(title: 'title'));
+        await tester.pumpWidget(widget);
 
-    // Find TextField
-    expect(find.byType(TextField), findsOneWidget);
+        // Add Button here
+        expect(find.byType(TextButton), findsOneWidget);
+        expect(find.text('ADD'), findsOneWidget);
 
-    // Input one item and submit
-    await tester.enterText(find.byType(TextField), 'Add new list');
-    await tester.testTextInput.receiveAction(TextInputAction.done);
-    await tester.pump();
+        // Tap 'ADD' button
+        await tester.tap(find.text('ADD'));
+        await tester.pump();
 
-    // check new line found
-    expect(find.byType(TextField), findsNothing);
-    expect(find.text('ADD'), findsOneWidget);
-    expect(find.text('Add new list'), findsOneWidget);
-  });
+        // Find TextField
+        expect(find.byType(TextField), findsOneWidget);
 
-  testWidgets('Cancel adding item', (WidgetTester tester) async {
-    // home page
-    var widget = buildTestableWidget(HomePage(title: 'title'));
-    await tester.pumpWidget(widget);
+        // Input one item and submit
+        await tester.enterText(find.byType(TextField), 'Add new list');
+        await tester.testTextInput.receiveAction(TextInputAction.done);
+        await tester.pump();
 
-    // Add Button here
-    expect(find.byType(TextButton), findsOneWidget);
-    expect(find.text('ADD'), findsOneWidget);
+        // Verify http request is correct
+        var captured = verify(client.post(
+          captureAny,
+          headers: anyNamed("headers"),
+          body: captureAnyNamed("body"),
+          encoding: anyNamed("encoding"),
+        )).captured;
 
-    // Tap 'ADD' button
-    await tester.tap(find.text('ADD'));
-    await tester.pump();
+        expect(captured[0], "http://localhost:3000/tasks");
+        expect(captured[1], '{"title":"Add new list"}');
 
-    // Find TextField
-    expect(find.byType(TextField), findsOneWidget);
+        // Verify the redux state is correct
+        expect(store.state.status.status, StatusKey.ListTask);
+        expect(store.state.tasks.length, 1);
+        expect(store.state.tasks[uuid], isNotNull);
 
-    // Cancel
-    await tester.enterText(
-        find.byType(TextField), 'new list will be cancelled');
-    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-    await tester.pump();
-
-    // check no new line found
-    expect(find.byType(TextField), findsNothing);
-    expect(find.text('ADD'), findsOneWidget);
-    expect(find.text('new list will be cancelled'), findsNothing);
-  });
+        // verify the UI is correct
+        expect(find.byType(TextField), findsNothing);
+        expect(find.text('ADD'), findsOneWidget);
+        expect(find.text('new Title'), findsOneWidget);
+      });
+    },
+  );
 }
