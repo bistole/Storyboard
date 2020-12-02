@@ -8,7 +8,7 @@ class Status {
   final dynamic param1;
   final dynamic param2;
 
-  Status(this.status, this.param1, this.param2);
+  Status({this.status, this.param1, this.param2});
 
   Status.noParam(StatusKey key)
       : status = key,
@@ -19,6 +19,14 @@ class Status {
       : status = key,
         param1 = param1,
         param2 = null;
+
+  Status copyWith({StatusKey status, dynamic param1, dynamic param2}) {
+    return Status(
+      status: status ?? this.status,
+      param1: param1 ?? this.param1,
+      param2: param2 ?? this.param2,
+    );
+  }
 
   @override
   int get hashCode => status.hashCode ^ param1.hashCode ^ param2.hashCode;
@@ -33,6 +41,6 @@ class Status {
 
   @override
   String toString() {
-    return 'AppState{status: $status, param1: $param1, param2: $param2}';
+    return 'Status{status: $status, param1: $param1, param2: $param2}';
   }
 }

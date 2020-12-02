@@ -1,8 +1,8 @@
 class Task {
   final String uuid;
-  String title;
-  int deleted;
-  int updatedAt;
+  final String title;
+  final int deleted;
+  final int updatedAt;
   final int createdAt;
   final int ts;
 
@@ -14,6 +14,29 @@ class Task {
     this.createdAt,
     this.ts,
   });
+
+  Task copyWith({
+    String uuid,
+    String title,
+    int deleted,
+    int updatedAt,
+    int createdAt,
+    int ts,
+  }) {
+    return Task(
+      uuid: uuid ?? this.uuid,
+      title: title ?? this.title,
+      deleted: deleted ?? this.deleted,
+      updatedAt: updatedAt ?? this.updatedAt,
+      createdAt: createdAt ?? this.createdAt,
+      ts: ts ?? this.ts,
+    );
+  }
+
+  @override
+  String toString() {
+    return "Task{uuid: $uuid, title: $title, deleted: $deleted, updatedAt: $updatedAt, createdAt: $createdAt}";
+  }
 
   factory Task.fromJson(Map<String, dynamic> json) {
     return Task(

@@ -16,7 +16,10 @@ class AppState {
     Status status,
     Map<String, Task> tasks,
   }) {
-    return AppState(status: status, tasks: tasks);
+    return AppState(
+      status: status ?? this.status,
+      tasks: tasks ?? this.tasks,
+    );
   }
 
   @override

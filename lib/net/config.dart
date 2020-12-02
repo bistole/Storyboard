@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 
 const URLPrefix = "http://localhost:3000";
 
-http.Client _internal = null;
+http.Client _internal;
 
 // GetHTTPClient return http client.
 http.Client getHTTPClient() {

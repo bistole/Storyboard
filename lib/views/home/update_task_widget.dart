@@ -26,8 +26,11 @@ class UpdateTaskWidget extends StatelessWidget {
       converter: (store) {
         return ReduxActions(
           update: (String value) {
-            task.title = value;
-            updateTask(store, task);
+            var updatedTask = task.copyWith(
+              title: value,
+              updatedAt: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+            );
+            updateTask(store, updatedTask);
             store.dispatch(new ChangeStatusAction(status: StatusKey.ListTask));
           },
           cancel: () {
