@@ -12,8 +12,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
+type taskCtrl struct{}
+
+// TaskCtrl is task controller
+var TaskCtrl taskCtrl = taskCtrl{}
+
 // Response for task
-func buildSuccResponse(w http.ResponseWriter, succ bool) {
+func (t taskCtrl) buildSuccResponse(w http.ResponseWriter, succ bool) {
 	type Succ struct {
 		Succ bool `json:"succ"`
 	}
@@ -23,7 +28,7 @@ func buildSuccResponse(w http.ResponseWriter, succ bool) {
 	json.NewEncoder(w).Encode(response)
 }
 
-func buildSuccTaskResponse(w http.ResponseWriter, task dao.Task) {
+func (t taskCtrl) buildSuccTaskResponse(w http.ResponseWriter, task dao.Task) {
 	type SuccTask struct {
 		Succ bool     `json:"succ"`
 		Task dao.Task `json:"task"`
@@ -35,7 +40,7 @@ func buildSuccTaskResponse(w http.ResponseWriter, task dao.Task) {
 	json.NewEncoder(w).Encode(response)
 }
 
-func buildSuccTasksResponse(w http.ResponseWriter, tasks []dao.Task) {
+func (t taskCtrl) buildSuccTasksResponse(w http.ResponseWriter, tasks []dao.Task) {
 	type SuccTasks struct {
 		Succ  bool       `json:"succ"`
 		Tasks []dao.Task `json:"tasks"`
@@ -48,15 +53,15 @@ func buildSuccTasksResponse(w http.ResponseWriter, tasks []dao.Task) {
 }
 
 // GetTasks is a restful API handler to get tasks
-func GetTasks(w http.ResponseWriter, r *http.Request) {
+func (t taskCtrl) GetTasks(w http.ResponseWriter, r *http.Request) {
 	ts := ConvertQueryParamToInt(r, "ts", 0)
 	limit := ConvertQueryParamToInt(r, "c", 20)
-	tasks := database.GetTasks(int64(ts), limit, 0)
-	buildSuccTasksResponse(w, tasks)
+	tasks := database.TaskRepo.GetTasks(int64(ts), limit, 0)
+	t.buildSuccTasksResponse(w, tasks)
 }
 
 // CreateTask is a restful API handler to create task
-func CreateTask(w http.ResponseWriter, r *http.Request) {
+func (t taskCtrl) CreateTask(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := ioutil.ReadAll(r.Body)
 
 	var task dao.Task
@@ -69,38 +74,38 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 	task.CreatedAt = time.Now().Unix()
 	task.UpdatedAt = time.Now().Unix()
 
-	ret := database.CreateTask(task)
+	ret := database.TaskRepo.CreateTask(task)
 	if ret {
-		task := database.GetTask(task.UUID)
+		task := database.TaskRepo.GetTask(task.UUID)
 		if task != nil {
-			buildSuccTaskResponse(w, *task)
+			t.buildSuccTaskResponse(w, *task)
 			return
 		}
 	}
-	buildSuccResponse(w, false)
+	t.buildSuccResponse(w, false)
 }
 
 // GetTask is a restful API handler to get task
-func GetTask(w http.ResponseWriter, r *http.Request) {
+func (t taskCtrl) GetTask(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	task := database.GetTask(id)
+	task := database.TaskRepo.GetTask(id)
 	if task == nil {
-		buildSuccResponse(w, false)
+		t.buildSuccResponse(w, false)
 		return
 	}
-	buildSuccTaskResponse(w, *task)
+	t.buildSuccTaskResponse(w, *task)
 }
 
 // UpdateTask is a restful API handler to update task
-func UpdateTask(w http.ResponseWriter, r *http.Request) {
+func (t taskCtrl) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	task := database.GetTask(id)
+	task := database.TaskRepo.GetTask(id)
 	if task == nil {
-		buildSuccResponse(w, false)
+		t.buildSuccResponse(w, false)
 		return
 	}
 
@@ -111,29 +116,29 @@ func UpdateTask(w http.ResponseWriter, r *http.Request) {
 	updatedTask.UUID = id
 	updatedTask.UpdatedAt = time.Now().Unix()
 	updatedTask.CreatedAt = task.CreatedAt
-	ret := database.UpdateTask(updatedTask)
+	ret := database.TaskRepo.UpdateTask(updatedTask)
 
 	if ret {
-		task := database.GetTask(id)
+		task := database.TaskRepo.GetTask(id)
 		if task != nil {
-			buildSuccTaskResponse(w, *task)
+			t.buildSuccTaskResponse(w, *task)
 			return
 		}
 	}
-	buildSuccResponse(w, false)
+	t.buildSuccResponse(w, false)
 }
 
 // DeleteTask is a restful API handler to delete task
-func DeleteTask(w http.ResponseWriter, r *http.Request) {
+func (t taskCtrl) DeleteTask(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	ret := database.DeleteTask(id)
+	ret := database.TaskRepo.DeleteTask(id)
 	if ret {
-		task := database.GetTask(id)
+		task := database.TaskRepo.GetTask(id)
 		if task != nil {
-			buildSuccTaskResponse(w, *task)
+			t.buildSuccTaskResponse(w, *task)
 			return
 		}
 	}
-	buildSuccResponse(w, ret)
+	t.buildSuccResponse(w, ret)
 }

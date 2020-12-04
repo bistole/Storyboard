@@ -1,6 +1,6 @@
 package dao
 
-// Task DAO
+// Task is data object of Task
 type Task struct {
 	UUID      string `json:"uuid"`
 	Title     string `json:"title"`

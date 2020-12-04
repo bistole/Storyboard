@@ -6,14 +6,20 @@ import (
 	"fmt"
 )
 
+type taskRepo struct{}
+
+// TaskRepo is repo for task
+var TaskRepo = taskRepo{}
+
 // CreateTask in DB
-func CreateTask(task dao.Task) bool {
-	stmt, err := GetDB().Prepare("INSERT INTO `tasks` (" +
+func (t taskRepo) CreateTask(task dao.Task) bool {
+	db := DBWrapper.GetConnection()
+	stmt, err := db.Prepare("INSERT INTO `tasks` (" +
 		"uuid, title, updatedAt, createdAt, _ts" +
 		") VALUES (:uuid, :title, :updatedAt, :createdAt, :ts)")
-	ProcessError(err)
+	DBWrapper.ProcessError(err)
 
-	ts := GetTS()
+	ts := DBWrapper.GetTS()
 
 	result, err := stmt.Exec(
 		sql.Named("uuid", task.UUID),
@@ -22,24 +28,25 @@ func CreateTask(task dao.Task) bool {
 		sql.Named("createdAt", task.CreatedAt),
 		sql.Named("ts", ts),
 	)
-	ProcessError(err)
+	DBWrapper.ProcessError(err)
 
 	lastID, err := result.LastInsertId()
-	ProcessError(err)
+	DBWrapper.ProcessError(err)
 
 	return lastID > 0
 }
 
 // UpdateTask in DB
-func UpdateTask(task dao.Task) bool {
-	stmt, err := GetDB().Prepare("UPDATE `tasks` SET " +
+func (t taskRepo) UpdateTask(task dao.Task) bool {
+	db := DBWrapper.GetConnection()
+	stmt, err := db.Prepare("UPDATE `tasks` SET " +
 		"`title` = :title, " +
 		"`updatedAt` = :updatedAt, " +
 		"`_ts` = :ts " +
 		"WHERE `uuid` = :uuid ")
-	ProcessError(err)
+	DBWrapper.ProcessError(err)
 
-	ts := GetTS()
+	ts := DBWrapper.GetTS()
 
 	result, err := stmt.Exec(
 		sql.Named("title", task.Title),
@@ -49,21 +56,22 @@ func UpdateTask(task dao.Task) bool {
 	)
 
 	affectRow, err := result.RowsAffected()
-	ProcessError(err)
+	DBWrapper.ProcessError(err)
 
 	fmt.Printf("Updated: %t\n", affectRow > 0)
 	return affectRow > 0
 }
 
 // DeleteTask in DB
-func DeleteTask(UUID string) bool {
-	stmt, err := GetDB().Prepare("UPDATE `tasks` SET " +
+func (t taskRepo) DeleteTask(UUID string) bool {
+	db := DBWrapper.GetConnection()
+	stmt, err := db.Prepare("UPDATE `tasks` SET " +
 		"`deleted` = 1," +
 		"`_ts` = :ts " +
 		"WHERE `uuid` = :uuid ")
-	ProcessError(err)
+	DBWrapper.ProcessError(err)
 
-	ts := GetTS()
+	ts := DBWrapper.GetTS()
 
 	result, err := stmt.Exec(
 		sql.Named("uuid", UUID),
@@ -71,17 +79,18 @@ func DeleteTask(UUID string) bool {
 	)
 
 	affectRow, err := result.RowsAffected()
-	ProcessError(err)
+	DBWrapper.ProcessError(err)
 
 	fmt.Printf("Updated: %t\n", affectRow > 0)
 	return affectRow > 0
 }
 
 // GetTask in DB
-func GetTask(UUID string) *dao.Task {
-	stmt, err := GetDB().Prepare("SELECT uuid, title, deleted, updatedAt, createdAt, _ts " +
+func (t taskRepo) GetTask(UUID string) *dao.Task {
+	db := DBWrapper.GetConnection()
+	stmt, err := db.Prepare("SELECT uuid, title, deleted, updatedAt, createdAt, _ts " +
 		"FROM `tasks` WHERE `uuid` = :uuid ")
-	ProcessError(err)
+	DBWrapper.ProcessError(err)
 
 	row := stmt.QueryRow(sql.Named("uuid", UUID))
 
@@ -97,17 +106,18 @@ func GetTask(UUID string) *dao.Task {
 }
 
 // GetTasks in DB
-func GetTasks(ts int64, limit int, offset int) []dao.Task {
-	stmt, err := GetDB().Prepare("SELECT uuid, title, deleted, updatedAt, createdAt, _ts " +
+func (t taskRepo) GetTasks(ts int64, limit int, offset int) []dao.Task {
+	db := DBWrapper.GetConnection()
+	stmt, err := db.Prepare("SELECT uuid, title, deleted, updatedAt, createdAt, _ts " +
 		"FROM `tasks` WHERE `_ts` >= :ts ORDER BY `_ts` ASC LIMIT :limit OFFSET :offset")
-	ProcessError(err)
+	DBWrapper.ProcessError(err)
 
 	rows, err := stmt.Query(
 		sql.Named("ts", ts),
 		sql.Named("limit", limit),
 		sql.Named("offset", offset),
 	)
-	ProcessError(err)
+	DBWrapper.ProcessError(err)
 
 	var tasks []dao.Task = make([]dao.Task, 0, limit)
 	for rows.Next() {

@@ -4,7 +4,7 @@ NOW
 - Sort Tasks in front-end by updatedAt [DONE]
 
 Test-cases
-- Frontend
+- Frontend [DONE]
 - Backend
 
 TODO

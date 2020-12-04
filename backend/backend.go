@@ -8,11 +8,11 @@ import (
 // Start to create a standalone RESTful API server
 func Start() {
 	fmt.Println("Hello, Hover")
-	go server.Start()
+	go server.RestfulServer.Start()
 }
 
 // Stop standalone RESTful API server
 func Stop() {
 	fmt.Println("Goodbye, Hover")
-	server.Stop()
+	server.RestfulServer.Stop()
 }
