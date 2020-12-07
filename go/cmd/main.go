@@ -19,7 +19,8 @@ var vmArguments string
 func main() {
 
 	// Run backend server
-	backend.Start()
+	var bk = backend.NewBackend()
+	bk.Start()
 
 	// DO NOT EDIT, add options in options.go
 	mainOptions := []flutter.Option{

@@ -1,37 +1,32 @@
 package server
 
 import (
-	"Storyboard/backend/dao"
-	"Storyboard/backend/database"
+	"Storyboard/backend/interfaces"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
 type taskCtrl struct{}
 
-// TaskCtrl is task controller
-var TaskCtrl taskCtrl = taskCtrl{}
-
-// Response for task
-func (t taskCtrl) buildSuccResponse(w http.ResponseWriter, succ bool) {
+func (rs RESTServer) buildErrorResponse(w http.ResponseWriter, err error) {
 	type Succ struct {
-		Succ bool `json:"succ"`
+		Succ  bool   `json:"succ"`
+		Error string `jsson:"error"`
 	}
 	var response Succ
-	response.Succ = succ
+	response.Succ = false
+	response.Error = err.Error()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
 
-func (t taskCtrl) buildSuccTaskResponse(w http.ResponseWriter, task dao.Task) {
+func (rs RESTServer) buildSuccTaskResponse(w http.ResponseWriter, task interfaces.Task) {
 	type SuccTask struct {
-		Succ bool     `json:"succ"`
-		Task dao.Task `json:"task"`
+		Succ bool            `json:"succ"`
+		Task interfaces.Task `json:"task"`
 	}
 	var response SuccTask
 	response.Succ = true
@@ -40,10 +35,10 @@ func (t taskCtrl) buildSuccTaskResponse(w http.ResponseWriter, task dao.Task) {
 	json.NewEncoder(w).Encode(response)
 }
 
-func (t taskCtrl) buildSuccTasksResponse(w http.ResponseWriter, tasks []dao.Task) {
+func (rs RESTServer) buildSuccTasksResponse(w http.ResponseWriter, tasks []interfaces.Task) {
 	type SuccTasks struct {
-		Succ  bool       `json:"succ"`
-		Tasks []dao.Task `json:"tasks"`
+		Succ  bool              `json:"succ"`
+		Tasks []interfaces.Task `json:"tasks"`
 	}
 	var response SuccTasks
 	response.Succ = true
@@ -52,93 +47,75 @@ func (t taskCtrl) buildSuccTasksResponse(w http.ResponseWriter, tasks []dao.Task
 	json.NewEncoder(w).Encode(response)
 }
 
+// TaskCtrl is task controller
+var TaskCtrl taskCtrl = taskCtrl{}
+
 // GetTasks is a restful API handler to get tasks
-func (t taskCtrl) GetTasks(w http.ResponseWriter, r *http.Request) {
+func (rs RESTServer) GetTasks(w http.ResponseWriter, r *http.Request) {
 	ts := ConvertQueryParamToInt(r, "ts", 0)
 	limit := ConvertQueryParamToInt(r, "c", 20)
-	tasks := database.TaskRepo.GetTasks(int64(ts), limit, 0)
-	t.buildSuccTasksResponse(w, tasks)
+	tasks, err := rs.TaskRepo.GetTasksByTS(int64(ts), limit, 0)
+	if err != nil {
+		rs.buildErrorResponse(w, err)
+		return
+	}
+	rs.buildSuccTasksResponse(w, tasks)
 }
 
 // CreateTask is a restful API handler to create task
-func (t taskCtrl) CreateTask(w http.ResponseWriter, r *http.Request) {
+func (rs RESTServer) CreateTask(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := ioutil.ReadAll(r.Body)
 
-	var task dao.Task
 	// decode json
-	json.Unmarshal(reqBody, &task)
+	var inTask interfaces.Task
+	json.Unmarshal(reqBody, &inTask)
 
-	// create uuid
-	UUID, _ := uuid.NewRandom()
-	task.UUID = UUID.String()
-	task.CreatedAt = time.Now().Unix()
-	task.UpdatedAt = time.Now().Unix()
-
-	ret := database.TaskRepo.CreateTask(task)
-	if ret {
-		task := database.TaskRepo.GetTask(task.UUID)
-		if task != nil {
-			t.buildSuccTaskResponse(w, *task)
-			return
-		}
+	outTask, err := rs.TaskRepo.CreateTask(inTask)
+	if err != nil {
+		rs.buildErrorResponse(w, err)
+		return
 	}
-	t.buildSuccResponse(w, false)
+	rs.buildSuccTaskResponse(w, *outTask)
 }
 
 // GetTask is a restful API handler to get task
-func (t taskCtrl) GetTask(w http.ResponseWriter, r *http.Request) {
+func (rs RESTServer) GetTask(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	task := database.TaskRepo.GetTask(id)
-	if task == nil {
-		t.buildSuccResponse(w, false)
+	task, err := rs.TaskRepo.GetTaskByUUID(id)
+	if err != nil {
+		rs.buildErrorResponse(w, err)
 		return
 	}
-	t.buildSuccTaskResponse(w, *task)
+	rs.buildSuccTaskResponse(w, *task)
 }
 
 // UpdateTask is a restful API handler to update task
-func (t taskCtrl) UpdateTask(w http.ResponseWriter, r *http.Request) {
+func (rs RESTServer) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	task := database.TaskRepo.GetTask(id)
-	if task == nil {
-		t.buildSuccResponse(w, false)
-		return
-	}
-
 	reqBody, _ := ioutil.ReadAll(r.Body)
-	var updatedTask dao.Task
+	var updatedTask interfaces.Task
 	json.Unmarshal(reqBody, &updatedTask)
 
-	updatedTask.UUID = id
-	updatedTask.UpdatedAt = time.Now().Unix()
-	updatedTask.CreatedAt = task.CreatedAt
-	ret := database.TaskRepo.UpdateTask(updatedTask)
-
-	if ret {
-		task := database.TaskRepo.GetTask(id)
-		if task != nil {
-			t.buildSuccTaskResponse(w, *task)
-			return
-		}
+	task, err := rs.TaskRepo.UpdateTask(id, updatedTask)
+	if err != nil {
+		rs.buildErrorResponse(w, err)
+		return
 	}
-	t.buildSuccResponse(w, false)
+	rs.buildSuccTaskResponse(w, *task)
 }
 
 // DeleteTask is a restful API handler to delete task
-func (t taskCtrl) DeleteTask(w http.ResponseWriter, r *http.Request) {
+func (rs RESTServer) DeleteTask(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	ret := database.TaskRepo.DeleteTask(id)
-	if ret {
-		task := database.TaskRepo.GetTask(id)
-		if task != nil {
-			t.buildSuccTaskResponse(w, *task)
-			return
-		}
+	task, err := rs.TaskRepo.DeleteTask(id)
+	if err != nil {
+		rs.buildErrorResponse(w, err)
+		return
 	}
-	t.buildSuccResponse(w, ret)
+	rs.buildSuccTaskResponse(w, *task)
 }
