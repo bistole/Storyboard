@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"path"
 	"time"
@@ -28,16 +29,16 @@ func NewDatabaseService(config interfaces.ConfigService) *Database {
 }
 
 // ProcessError process if error raised
-func processError(err error) {
+func processError(prefix string, err error) {
 	if err != nil {
-		panic(err)
+		log.Fatalf("%s: %v", prefix, err)
 	}
 }
 
 // GetConnection get connection to db
 func (d Database) GetConnection() *sql.DB {
 	if d.connDB == nil {
-		processError(errors.New("Call Init() before GetConnection()"))
+		processError("GetConnection", errors.New("Call Init() before GetConnection()"))
 	}
 	return d.connDB
 }
@@ -48,7 +49,7 @@ func (d Database) GetTS() int64 {
 }
 
 // GetDataFolder get data folder
-func (d Database) getDataFolder() string {
+func (d Database) GetDataFolder() string {
 	return path.Join(xdg.DataHome, d.config.GetVendorName(), d.config.GetAppName())
 }
 
@@ -75,22 +76,22 @@ func (d Database) initDBInstance() {
 		"`createdAt` INTEGER NOT NULL," +
 		"`_ts` INTEGER NOT NULL" +
 		")")
-	processError(err)
+	processError("initDBInstance", err)
 
 	// create ts index
 	_, err = d.connDB.Exec("CREATE INDEX IF NOT EXISTS `index_tasks_ts` " +
 		" ON `tasks` ( `_ts` )")
-	processError(err)
+	processError("initDBInstance", err)
 }
 
 // Init to init database
 func (d *Database) Init() {
 	// create folder if required
-	dirPath := d.getDataFolder()
+	dirPath := d.GetDataFolder()
 	fullPath, existed := d.createDBInstance(dirPath, d.config.GetDatabaseName())
 
 	db, err := sql.Open("sqlite3", fullPath)
-	processError(err)
+	processError("Init", err)
 
 	d.connDB = db
 

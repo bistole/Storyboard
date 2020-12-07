@@ -19,12 +19,6 @@ type RESTServer struct {
 	TaskRepo interfaces.TaskRepo
 }
 
-func processError(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
 // NewRESTServer create REST server
 func NewRESTServer(taskRepo interfaces.TaskRepo) *RESTServer {
 	var wg = &sync.WaitGroup{}
@@ -49,12 +43,12 @@ func (rs RESTServer) route() *mux.Router {
 
 // Start to build RESTful API Server
 func (rs *RESTServer) Start() {
-	go func() {
-		rs.Server = &http.Server{
-			Addr:    ":3000",
-			Handler: rs.route(),
-		}
+	rs.Server = &http.Server{
+		Addr:    ":3000",
+		Handler: rs.route(),
+	}
 
+	go func() {
 		defer func() {
 			rs.Server = nil
 			rs.Wg.Done()
@@ -75,7 +69,9 @@ func (rs *RESTServer) Stop() {
 	defer cancelFunc()
 
 	err := rs.Server.Shutdown(ctx)
-	processError(err)
+	if err != nil {
+		log.Fatalf("Shutdown(): %v", err)
+	}
 
 	rs.Wg.Wait()
 	rs.Wg = nil

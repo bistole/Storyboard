@@ -9,7 +9,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type taskCtrl struct{}
+// Task is defined in interfaces
+type Task = interfaces.Task
 
 func (rs RESTServer) buildErrorResponse(w http.ResponseWriter, err error) {
 	type Succ struct {
@@ -23,10 +24,10 @@ func (rs RESTServer) buildErrorResponse(w http.ResponseWriter, err error) {
 	json.NewEncoder(w).Encode(response)
 }
 
-func (rs RESTServer) buildSuccTaskResponse(w http.ResponseWriter, task interfaces.Task) {
+func (rs RESTServer) buildSuccTaskResponse(w http.ResponseWriter, task Task) {
 	type SuccTask struct {
-		Succ bool            `json:"succ"`
-		Task interfaces.Task `json:"task"`
+		Succ bool `json:"succ"`
+		Task Task `json:"task"`
 	}
 	var response SuccTask
 	response.Succ = true
@@ -35,10 +36,10 @@ func (rs RESTServer) buildSuccTaskResponse(w http.ResponseWriter, task interface
 	json.NewEncoder(w).Encode(response)
 }
 
-func (rs RESTServer) buildSuccTasksResponse(w http.ResponseWriter, tasks []interfaces.Task) {
+func (rs RESTServer) buildSuccTasksResponse(w http.ResponseWriter, tasks []Task) {
 	type SuccTasks struct {
-		Succ  bool              `json:"succ"`
-		Tasks []interfaces.Task `json:"tasks"`
+		Succ  bool   `json:"succ"`
+		Tasks []Task `json:"tasks"`
 	}
 	var response SuccTasks
 	response.Succ = true
@@ -46,9 +47,6 @@ func (rs RESTServer) buildSuccTasksResponse(w http.ResponseWriter, tasks []inter
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
-
-// TaskCtrl is task controller
-var TaskCtrl taskCtrl = taskCtrl{}
 
 // GetTasks is a restful API handler to get tasks
 func (rs RESTServer) GetTasks(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +65,7 @@ func (rs RESTServer) CreateTask(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := ioutil.ReadAll(r.Body)
 
 	// decode json
-	var inTask interfaces.Task
+	var inTask Task
 	json.Unmarshal(reqBody, &inTask)
 
 	outTask, err := rs.TaskRepo.CreateTask(inTask)
@@ -97,7 +95,7 @@ func (rs RESTServer) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	id := vars["id"]
 
 	reqBody, _ := ioutil.ReadAll(r.Body)
-	var updatedTask interfaces.Task
+	var updatedTask Task
 	json.Unmarshal(reqBody, &updatedTask)
 
 	task, err := rs.TaskRepo.UpdateTask(id, updatedTask)

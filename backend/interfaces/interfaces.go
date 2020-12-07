@@ -22,6 +22,7 @@ type ConfigService interface {
 // DatabaseService is interface of database package
 type DatabaseService interface {
 	Init()
+	GetDataFolder() string
 	GetConnection() *sql.DB
 	GetTS() int64
 	Close()
