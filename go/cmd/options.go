@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Storyboard/backend/config"
+	"storyboard/backend/config"
 
 	"github.com/go-flutter-desktop/go-flutter"
 	"github.com/go-flutter-desktop/plugins/path_provider"

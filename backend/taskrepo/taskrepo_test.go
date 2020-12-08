@@ -1,9 +1,9 @@
 package taskrepo
 
 import (
-	"Storyboard/backend/database"
-	"Storyboard/backend/interfaces"
-	"Storyboard/backend/mocks"
+	"storyboard/backend/database"
+	"storyboard/backend/interfaces"
+	"storyboard/backend/mocks"
 	"time"
 
 	"os"

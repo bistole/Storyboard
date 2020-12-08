@@ -1,4 +1,4 @@
-import 'package:Storyboard/actions/actions.dart';
+import 'package:storyboard/actions/actions.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

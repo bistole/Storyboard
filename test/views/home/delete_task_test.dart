@@ -1,11 +1,11 @@
 import 'dart:convert';
 
-import 'package:Storyboard/models/app.dart';
-import 'package:Storyboard/models/status.dart';
-import 'package:Storyboard/models/task.dart';
-import 'package:Storyboard/net/config.dart';
-import 'package:Storyboard/reducers/app_reducer.dart';
-import 'package:Storyboard/views/home/page.dart';
+import 'package:storyboard/models/app.dart';
+import 'package:storyboard/models/status.dart';
+import 'package:storyboard/models/task.dart';
+import 'package:storyboard/net/config.dart';
+import 'package:storyboard/reducers/app_reducer.dart';
+import 'package:storyboard/views/home/page.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';

@@ -1,4 +1,4 @@
-application-name: "Storyboard"
+application-name: "storyboard"
 executable-name: "storyboard" # Only lowercase a-z, numbers, underscores and no spaces
 package-name: "storyboard" # Only lowercase a-z, numbers and no underscores or spaces
 

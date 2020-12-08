@@ -1,7 +1,7 @@
 package server
 
 import (
-	"Storyboard/backend/mocks"
+	"storyboard/backend/mocks"
 	"testing"
 )
 

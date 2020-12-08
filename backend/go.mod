@@ -1,4 +1,4 @@
-module Storyboard/backend
+module storyboard/backend
 
 go 1.15
 

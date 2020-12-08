@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Storyboard/backend"
+	"storyboard/backend"
 	"fmt"
 	"image"
 	_ "image/png"

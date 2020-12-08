@@ -1,5 +1,5 @@
-import 'package:Storyboard/models/status.dart';
-import 'package:Storyboard/models/task.dart';
+import 'package:storyboard/models/status.dart';
+import 'package:storyboard/models/task.dart';
 
 class FetchTasksAction {
   final List<Task> taskList;

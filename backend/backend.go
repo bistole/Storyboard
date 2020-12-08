@@ -1,12 +1,12 @@
 package backend
 
 import (
-	"Storyboard/backend/config"
-	"Storyboard/backend/database"
-	"Storyboard/backend/interfaces"
-	"Storyboard/backend/server"
-	"Storyboard/backend/taskrepo"
 	"fmt"
+	"storyboard/backend/config"
+	"storyboard/backend/database"
+	"storyboard/backend/interfaces"
+	"storyboard/backend/server"
+	"storyboard/backend/taskrepo"
 )
 
 // Backend implements

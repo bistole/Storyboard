@@ -1,7 +1,7 @@
 package database
 
 import (
-	"Storyboard/backend/mocks"
+	"storyboard/backend/mocks"
 
 	"os"
 	"path"

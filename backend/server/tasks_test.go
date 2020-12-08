@@ -1,10 +1,10 @@
 package server
 
 import (
-	"Storyboard/backend/mocks"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"storyboard/backend/mocks"
 	"strings"
 	"testing"
 )

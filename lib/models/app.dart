@@ -1,4 +1,4 @@
-import 'package:Storyboard/models/status.dart';
+import 'package:storyboard/models/status.dart';
 import 'package:flutter/material.dart';
 import 'task.dart';
 

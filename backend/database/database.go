@@ -1,13 +1,13 @@
 package database
 
 import (
-	"Storyboard/backend/interfaces"
 	"database/sql"
 	"errors"
 	"fmt"
 	"log"
 	"os"
 	"path"
+	"storyboard/backend/interfaces"
 	"time"
 
 	"github.com/adrg/xdg"

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:Storyboard/actions/actions.dart';
-import 'package:Storyboard/models/app.dart';
+import 'package:storyboard/actions/actions.dart';
+import 'package:storyboard/models/app.dart';
 import 'package:redux/redux.dart';
 
 import '../net/config.dart';

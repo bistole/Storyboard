@@ -1,10 +1,10 @@
 package server
 
 import (
-	"Storyboard/backend/interfaces"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"storyboard/backend/interfaces"
 
 	"github.com/gorilla/mux"
 )
