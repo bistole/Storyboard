@@ -1,4 +1,6 @@
-package backend
+package main
+
+import "C"
 
 import (
 	"fmt"
@@ -9,56 +11,55 @@ import (
 	"storyboard/backend/taskrepo"
 )
 
-// Backend implements
-type Backend struct {
-	init     bool
-	c        interfaces.ConfigService
-	db       interfaces.DatabaseService
-	taskrepo interfaces.TaskRepo
-	ss       interfaces.RESTService
-}
+var inited bool = false
+var c interfaces.ConfigService
+var db interfaces.DatabaseService
+var taskRepo interfaces.TaskRepo
+var ss interfaces.RESTService
 
-// NewBackend create backend instance
-func NewBackend() *Backend {
-	return &Backend{init: false}
-}
-
-// Start to start backend server
-func (b *Backend) Start() {
-	if b.init {
+//export Backend_Start
+func Backend_Start() {
+	if inited {
 		fmt.Printf("Already Started")
 		return
 	}
+	inited = true
 	fmt.Println("Hello, Backend Server")
 
 	// config service
-	b.c = config.NewConfigService()
+	c = config.NewConfigService()
 
 	// database service
-	b.db = database.NewDatabaseService(b.c)
-	b.db.Init()
+	db = database.NewDatabaseService(c)
+	db.Init()
 
 	// task repo
-	b.taskrepo = taskrepo.NewTaskRepo(b.db)
+	taskRepo = taskrepo.NewTaskRepo(db)
 
 	// server
-	b.ss = server.NewRESTServer(b.taskrepo)
-	go b.ss.Start()
+	ss = server.NewRESTServer(taskRepo)
+	go ss.Start()
 }
 
-// Stop standalone RESTful API server
-func (b Backend) Stop() {
+//export Backend_Stop
+func Backend_Stop() {
 	fmt.Println("Goodbye, Backend Server")
 
 	// server
-	b.ss.Stop()
+	ss.Stop()
 
 	// database
-	b.db.Close()
+	db.Close()
 
-	b.ss = nil
-	b.taskrepo = nil
-	b.db = nil
-	b.c = nil
-	b.init = false
+	ss = nil
+	taskRepo = nil
+	db = nil
+	c = nil
+	inited = false
+}
+
+func main() {
+	Backend_Start()
+	for true {
+	}
 }
