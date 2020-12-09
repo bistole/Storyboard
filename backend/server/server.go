@@ -2,77 +2,79 @@ package server
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
+	"storyboard/backend/interfaces"
 	"sync"
 	"time"
 
 	"github.com/gorilla/mux"
-
-	"Storyboard/backend/database"
 )
 
-// RestfulServer is wrapper for http server and wait group
-type RestfulServer struct {
-	Server *http.Server
-	Wg     *sync.WaitGroup
-	DB     *sql.DB
+// RESTServer is wrapper for http server and wait group
+type RESTServer struct {
+	Server   *http.Server
+	Wg       *sync.WaitGroup
+	TaskRepo interfaces.TaskRepo
 }
 
-var restful *RestfulServer
+// NewRESTServer create REST server
+func NewRESTServer(taskRepo interfaces.TaskRepo) *RESTServer {
+	var wg = &sync.WaitGroup{}
+	wg.Add(1)
 
-func route() *mux.Router {
+	return &RESTServer{
+		Server:   nil,
+		Wg:       wg,
+		TaskRepo: taskRepo,
+	}
+}
+
+func (rs RESTServer) route() *mux.Router {
 	r := mux.NewRouter()
-	r.HandleFunc("/tasks", GetTasks).Methods("GET")
-	r.HandleFunc("/tasks", CreateTask).Methods("POST")
-	r.HandleFunc("/tasks/{id}", GetTask).Methods("GET")
-	r.HandleFunc("/tasks/{id}", UpdateTask).Methods("POST")
-	r.HandleFunc("/tasks/{id}", DeleteTask).Methods("DELETE")
+	r.HandleFunc("/tasks", rs.GetTasks).Methods("GET")
+	r.HandleFunc("/tasks", rs.CreateTask).Methods("POST")
+	r.HandleFunc("/tasks/{id}", rs.GetTask).Methods("GET")
+	r.HandleFunc("/tasks/{id}", rs.UpdateTask).Methods("POST")
+	r.HandleFunc("/tasks/{id}", rs.DeleteTask).Methods("DELETE")
 	return r
 }
 
 // Start to build RESTful API Server
-func Start() bool {
-	if restful != nil {
-		return false
+func (rs *RESTServer) Start() {
+	rs.Server = &http.Server{
+		Addr:    ":3000",
+		Handler: rs.route(),
 	}
 
-	restful = &RestfulServer{}
-	restful.Wg = &sync.WaitGroup{}
-	restful.Wg.Add(1)
-
-	restful.Server = &http.Server{Addr: ":3000", Handler: route()}
-
 	go func() {
-		database.InitDatabase()
-		defer database.Close()
+		defer func() {
+			rs.Server = nil
+			rs.Wg.Done()
+		}()
 
-		defer restful.Wg.Done()
-		if err := restful.Server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := rs.Server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("ListenAndServe(): %v", err)
 		}
 	}()
-
-	return true
 }
 
 // Stop the RESTful server
-func Stop() bool {
-	if restful == nil {
-		return false
-	}
-
-	database.Close()
-
-	ctx, cancelFunc := context.WithTimeout(context.Background(), 5*time.Second)
+func (rs *RESTServer) Stop() {
+	ctx, cancelFunc := context.WithTimeout(
+		context.Background(),
+		5*time.Second,
+	)
 	defer cancelFunc()
-	if err := restful.Server.Shutdown(ctx); err != nil {
-		panic(err)
+
+	err := rs.Server.Shutdown(ctx)
+	if err != nil {
+		log.Fatalf("Shutdown(): %v", err)
 	}
-	restful.Wg.Wait()
-	restful = nil
+
+	rs.Wg.Wait()
+	rs.Wg = nil
+
 	fmt.Println("Stopped")
-	return true
 }

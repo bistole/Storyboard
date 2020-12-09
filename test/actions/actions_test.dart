@@ -1,6 +1,6 @@
-import 'package:Storyboard/actions/actions.dart';
-import 'package:Storyboard/models/status.dart';
-import 'package:Storyboard/models/task.dart';
+import 'package:storyboard/actions/actions.dart';
+import 'package:storyboard/models/status.dart';
+import 'package:storyboard/models/task.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
