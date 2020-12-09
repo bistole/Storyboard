@@ -1,11 +1,11 @@
 NOW
 ===
 
-- Sort Tasks in front-end by updatedAt [DONE]
-
-Test-cases
-- Frontend [DONE]
-- Backend
+Menu
+- Notify Flutter when change happens in backend or macos
+- Notify MacOS when flutter need to
+- Import Photo
+- Quit
 
 TODO
 ====
@@ -59,4 +59,10 @@ Split func to small widget [DONE]
 - Add _ts to trace the updates on backend [DONE]
   - backend [DONE]
   - frontend [DONE]
+
+- Sort Tasks in front-end by updatedAt [DONE]
+
+Test-cases [DONE]
+- Frontend [DONE]
+- Backend [DONE]
 
