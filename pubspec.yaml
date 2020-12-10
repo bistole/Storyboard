@@ -1,4 +1,4 @@
-name: Storyboard
+name: storyboard
 description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
@@ -23,6 +23,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  redux: ^3.0.0
+  flutter_redux: ^0.5.2
+  redux_persist: ^0.8.4
+  path_provider: ^1.6.24
   http: ^0.12.2
   intl: ^0.16.1
 
@@ -33,6 +37,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  mockito:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

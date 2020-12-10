@@ -1,6 +1,7 @@
-import 'main.dart' as original_main;
+import 'package:storyboard/app.dart';
+import 'package:flutter/material.dart';
 
-// This file is the default main entry-point for go-flutter application.
-void main() {
-  original_main.main();
+void main() async {
+  final app = new StoryBoardApp();
+  runApp(app);
 }

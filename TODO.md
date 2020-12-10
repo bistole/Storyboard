@@ -1,18 +1,19 @@
 NOW
 ===
 
-Create redux-like data storage in front-end
-Split func to small widget
+Menu
+- Notify Flutter when change happens in backend or macos
+- Notify MacOS when flutter need to
+- Import Photo
+- Quit
 
 TODO
 ====
 
-Test-cases
-- Frontend
-- Backend
-
 Server Send Event
-- Keepalive 
+- Keepalive
+- Only sync updated events
+- Trigger fetchTasks from last time by sync updated events
 
 Authenticate
 
@@ -50,3 +51,18 @@ Front-end API
 UI
 - Update Text [DONE]
 - Delete Text [DONE]
+
+Create redux-like data storage in front-end [DONE]
+Make persist on redux [DONE]
+Split func to small widget [DONE]
+
+- Add _ts to trace the updates on backend [DONE]
+  - backend [DONE]
+  - frontend [DONE]
+
+- Sort Tasks in front-end by updatedAt [DONE]
+
+Test-cases [DONE]
+- Frontend [DONE]
+- Backend [DONE]
+
