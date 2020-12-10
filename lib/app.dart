@@ -5,6 +5,7 @@ import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:storyboard/net/menu_events.dart';
 
 import 'models/app.dart';
 import 'net/tasks.dart';
@@ -27,6 +28,8 @@ Future<Store<AppState>> initStore() async {
     initialState: initialState,
     middleware: [persistor.createMiddleware()],
   );
+
+  bindMenuEvents();
 
   // Use timer to trigger fetchTasks after launch
   Future.delayed(Duration(seconds: 30), () {
