@@ -2,7 +2,8 @@ NOW
 ===
 
 Menu
-- Notify Flutter when change happens in backend or macos
+- Notify Flutter when change happens in macos [DONE]
+- Notify Flutter when change happens in backend
 - Notify MacOS when flutter need to
 - Import Photo
 - Quit

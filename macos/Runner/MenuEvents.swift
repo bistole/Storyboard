@@ -9,14 +9,15 @@
 import Foundation
 import FlutterMacOS
 
-class MenuEvents : NSObject, FlutterStreamHandler {
-    
+class MenuEvents : NSObject {
+
   let MENU_EVENTS = "/MENU_EVENTS";
   
   let MENU_IMPORT_PHOTO = "MENU_EVENTS:IMPORT_PHOTO"
+  let MENU_TIMER = "TIMER"
 
   weak var binaryMessager : FlutterBinaryMessenger?
-  var eventsSink : FlutterEventSink? = nil
+  var methodChannel : FlutterMethodChannel?
     
   func register(withBinaryMessager bm: FlutterBinaryMessenger) {
     // save binary messager
@@ -24,36 +25,23 @@ class MenuEvents : NSObject, FlutterStreamHandler {
 
     // create a event channel
     let channelName = (Bundle.main.infoDictionary?["CFBundleIdentifier"] as! String) + MENU_EVENTS
-    let eventChannel = FlutterEventChannel.init(name: channelName, binaryMessenger: binaryMessager!)
-    eventChannel.setStreamHandler(self)
-
+    methodChannel = FlutterMethodChannel.init(name: channelName, binaryMessenger: binaryMessager!)
+    
     // create schedule
-    Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(MenuEvents.timer), userInfo: nil, repeats: true);
+    Timer.scheduledTimer(
+      timeInterval: 5,
+      target: self,
+      selector: #selector(MenuEvents.timer),
+      userInfo: nil,
+      repeats: true);
   }
   
   @objc func timer() {
-    if eventsSink != nil {
-      eventsSink!("Hello: " + Date().description);
-    }
-  }
-    
-  // flutter start to listen this event
-  func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-    // callback func to send out event
-    eventsSink = events
-    return nil
-  }
-  
-  // flutter cancelled this event
-  func onCancel(withArguments arguments: Any?) -> FlutterError? {
-    eventsSink = nil;
-    return nil
+    methodChannel?.invokeMethod(MENU_TIMER, arguments: Date().description);
   }
     
   // deliever menu event to flutter
   @IBAction func importPhoto(sender: AnyObject) {
-    if eventsSink != nil {
-      eventsSink!(MENU_IMPORT_PHOTO);
-    }
+    methodChannel?.invokeMethod(MENU_IMPORT_PHOTO, arguments: nil)
   }
 }
