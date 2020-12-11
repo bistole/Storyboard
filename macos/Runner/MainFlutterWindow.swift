@@ -2,14 +2,20 @@ import Cocoa
 import FlutterMacOS
 
 class MainFlutterWindow: NSWindow {
-  override func awakeFromNib() {
-    let flutterViewController = FlutterViewController.init()
-    let windowFrame = self.frame
-    self.contentViewController = flutterViewController
-    self.setFrame(windowFrame, display: true)
+    @IBOutlet weak var menuEvent: MenuEvents!
+    @IBOutlet weak var commands: Commands!
 
-    RegisterGeneratedPlugins(registry: flutterViewController)
+    override func awakeFromNib() {
+        let flutterViewController = FlutterViewController.init()
+        let windowFrame = self.frame
+        self.contentViewController = flutterViewController
+        self.setFrame(windowFrame, display: true)
 
-    super.awakeFromNib()
-  }
+        RegisterGeneratedPlugins(registry: flutterViewController)
+
+        menuEvent.register(withBinaryMessager: flutterViewController.engine.binaryMessenger);
+        commands.register(withBinaryMessager: flutterViewController.engine.binaryMessenger);
+
+        super.awakeFromNib();
+    }
 }
