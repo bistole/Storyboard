@@ -1,6 +1,7 @@
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:storyboard/net/command.dart';
 
 import '../../actions/actions.dart';
 import '../../models/app.dart';
@@ -16,14 +17,28 @@ class ReduxActions {
 }
 
 class CreateTaskWidget extends StatelessWidget {
-  ListTile buildAddButton(ReduxActions redux) {
-    return ListTile(
-      title: TextButton(
-        onPressed: () {
-          redux.start();
-        },
-        child: Text('ADD'),
-      ),
+  Widget buildAddButton(ReduxActions redux) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Expanded(
+          child: TextButton(
+            onPressed: () {
+              redux.start();
+            },
+            child: Text('ADD TASK'),
+          ),
+        ),
+        Expanded(
+          child: TextButton(
+            onPressed: () {
+              importPhoto();
+            },
+            child: Text('ADD PHOTO'),
+          ),
+        ),
+      ],
     );
   }
 

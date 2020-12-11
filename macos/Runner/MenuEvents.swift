@@ -23,7 +23,7 @@ class MenuEvents : NSObject {
     // save binary messager
     binaryMessager = bm;
 
-    // create a event channel
+    // create a method channel
     let channelName = (Bundle.main.infoDictionary?["CFBundleIdentifier"] as! String) + MENU_EVENTS
     methodChannel = FlutterMethodChannel.init(name: channelName, binaryMessenger: binaryMessager!)
     

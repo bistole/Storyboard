@@ -19,9 +19,3 @@ http.Client getHTTPClient() {
 void setHTTPClient(http.Client client) {
   _internal = client;
 }
-
-void triggerMethod(String methodName) {
-  MethodChannel channel;
-  channel = MethodChannel(methodName);
-  channel.invokeMapMethod("INVOKE:OPENFILE");
-}

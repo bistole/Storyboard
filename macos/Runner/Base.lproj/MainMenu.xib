@@ -21,6 +21,7 @@
         </customObject>
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
         <customObject id="lzM-LC-Jpj" customClass="MenuEvents" customModule="storyboard" customModuleProvider="target"/>
+        <customObject id="ykl-D1-Ael" customClass="Commands" customModule="storyboard" customModuleProvider="target"/>
         <menu title="Main Menu" systemMenu="main" id="AYu-sK-qS6">
             <items>
                 <menuItem title="APP_NAME" id="1Xt-HY-uBw">
@@ -348,6 +349,7 @@
                 <autoresizingMask key="autoresizingMask"/>
             </view>
             <connections>
+                <outlet property="commands" destination="ykl-D1-Ael" id="yuP-40-Yuz"/>
                 <outlet property="menuEvent" destination="lzM-LC-Jpj" id="naz-Nj-LDV"/>
             </connections>
             <point key="canvasLocation" x="13" y="155"/>
