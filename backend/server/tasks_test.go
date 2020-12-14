@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"storyboard/backend/mocks"
@@ -9,7 +10,7 @@ import (
 	"testing"
 )
 
-func MockAllError() *mocks.TaskRepoMock {
+func MockAllTaskError() *mocks.TaskRepoMock {
 	var taskRepoMock = &mocks.TaskRepoMock{
 		CreateTaskFn: func(Task) (*Task, error) {
 			return nil, fmt.Errorf("Error to create task")
@@ -30,9 +31,31 @@ func MockAllError() *mocks.TaskRepoMock {
 	return taskRepoMock
 }
 
+func MockAllPhotoError() *mocks.PhotoRepoMock {
+	var photoRepoMock = &mocks.PhotoRepoMock{
+		AddPhotoFn: func(filename, mime, size string, i io.Reader) (*mocks.Photo, error) {
+			return nil, fmt.Errorf("Error to add photo")
+		},
+		DeletePhotoFn: func(s string) (*mocks.Photo, error) {
+			return nil, fmt.Errorf("Error to delete photo")
+		},
+		GetPhotoFn: func(s string) (io.ReadCloser, error) {
+			return nil, fmt.Errorf("Error to get photo")
+		},
+		GetPhotoMetaFn: func(s string) (*mocks.Photo, error) {
+			return nil, fmt.Errorf("Error to get photo meta data")
+		},
+		GetPhotoMetaByTSFn: func(ts int64, limit, offset int) ([]mocks.Photo, error) {
+			return nil, fmt.Errorf("Error to get list")
+		},
+	}
+	return photoRepoMock
+}
+
 func TestGetTasksRequests(t *testing.T) {
-	taskRepoMock := MockAllError()
-	ss := NewRESTServer(taskRepoMock)
+	taskRepoMock := MockAllTaskError()
+	photoRepoMock := MockAllPhotoError()
+	ss := NewRESTServer(taskRepoMock, photoRepoMock)
 
 	// create http request
 	req, err := http.NewRequest("GET", "http://localhost:3000/tasks", nil)
@@ -57,8 +80,9 @@ func TestGetTasksRequests(t *testing.T) {
 }
 
 func TestCreateTasksRequests(t *testing.T) {
-	taskRepoMock := MockAllError()
-	ss := NewRESTServer(taskRepoMock)
+	taskRepoMock := MockAllTaskError()
+	photoRepoMock := MockAllPhotoError()
+	ss := NewRESTServer(taskRepoMock, photoRepoMock)
 
 	// create http request
 	body := strings.NewReader(`{"title": "second options"}`)

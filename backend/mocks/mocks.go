@@ -2,11 +2,13 @@ package mocks
 
 import (
 	"database/sql"
+	"io"
 	"storyboard/backend/interfaces"
 )
 
 // Task is defined in interfaces
 type Task = interfaces.Task
+type Photo = interfaces.Photo
 
 // ConfigMock to mock config
 type ConfigMock struct {
@@ -90,6 +92,40 @@ func (t *TaskRepoMock) GetTaskByUUID(UUID string) (*Task, error) {
 // GetTasksByTS mock task repo
 func (t *TaskRepoMock) GetTasksByTS(ts int64, limit int, offset int) ([]Task, error) {
 	return t.GetTasksByTSFn(ts, limit, offset)
+}
+
+// PhotoRepoMock to mock photo repo
+type PhotoRepoMock struct {
+	AddPhotoFn         func(string, string, string, io.Reader) (*Photo, error)
+	DeletePhotoFn      func(string) (*Photo, error)
+	GetPhotoFn         func(string) (io.ReadCloser, error)
+	GetPhotoMetaFn     func(string) (*Photo, error)
+	GetPhotoMetaByTSFn func(ts int64, limit int, offset int) ([]Photo, error)
+}
+
+// AddPhoto mock photo repo
+func (p *PhotoRepoMock) AddPhoto(filename string, mime string, size string, src io.Reader) (*Photo, error) {
+	return p.AddPhotoFn(filename, mime, size, src)
+}
+
+// DeletePhoto mock photo repo
+func (p *PhotoRepoMock) DeletePhoto(UUID string) (*Photo, error) {
+	return p.DeletePhotoFn(UUID)
+}
+
+// GetPhoto mock photo repo
+func (p *PhotoRepoMock) GetPhoto(UUID string) (io.ReadCloser, error) {
+	return p.GetPhotoFn(UUID)
+}
+
+// GetPhotoMeta mock photo repo
+func (p *PhotoRepoMock) GetPhotoMeta(UUID string) (*Photo, error) {
+	return p.GetPhotoMetaFn(UUID)
+}
+
+// GetPhotoMetaByTS mock photo repo
+func (p *PhotoRepoMock) GetPhotoMetaByTS(ts int64, limit int, offset int) ([]Photo, error) {
+	return p.GetPhotoMetaByTSFn(ts, limit, offset)
 }
 
 // RESTMock to mock REST service

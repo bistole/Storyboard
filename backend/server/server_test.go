@@ -7,7 +7,8 @@ import (
 
 func TestServerStartup(t *testing.T) {
 	var taskRepoMock = &mocks.TaskRepoMock{}
-	ss := NewRESTServer(taskRepoMock)
+	var photoRepoMock = &mocks.PhotoRepoMock{}
+	ss := NewRESTServer(taskRepoMock, photoRepoMock)
 	ss.Start()
 	ss.Stop()
 }

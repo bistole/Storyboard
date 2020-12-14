@@ -1,11 +1,27 @@
 package interfaces
 
-import "database/sql"
+import (
+	"database/sql"
+	"io"
+)
 
 // Task is data object of Task
 type Task struct {
+	UUID    string `json:"uuid"`
+	Title   string `json:"title"`
+	Deleted int8   `json:"deleted"`
+
+	CreatedAt int64 `json:"createdAt"`
+	UpdatedAt int64 `json:"updatedAt"`
+	TS        int64 `json:"_ts"`
+}
+
+// Photo is data object of Photo
+type Photo struct {
 	UUID      string `json:"uuid"`
-	Title     string `json:"title"`
+	Filename  string `json:"filename"`
+	Size      string `json:"size"`
+	Mime      string `json:"mime"`
 	Deleted   int8   `json:"deleted"`
 	CreatedAt int64  `json:"createdAt"`
 	UpdatedAt int64  `json:"updatedAt"`
@@ -35,6 +51,15 @@ type TaskRepo interface {
 	DeleteTask(string) (*Task, error)
 	GetTaskByUUID(string) (*Task, error)
 	GetTasksByTS(ts int64, limit int, offset int) ([]Task, error)
+}
+
+// PhotoRepo is interface of photo package
+type PhotoRepo interface {
+	AddPhoto(filename string, mimeType string, size string, src io.Reader) (outPhoto *Photo, err error)
+	DeletePhoto(UUID string) (outPhoto *Photo, err error)
+	GetPhoto(UUID string) (src io.ReadCloser, err error)
+	GetPhotoMeta(UUID string) (outPhoto *Photo, err error)
+	GetPhotoMetaByTS(ts int64, limit int, offset int) ([]Photo, error)
 }
 
 // RESTService is interface of RESTful service package

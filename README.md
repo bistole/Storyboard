@@ -23,7 +23,7 @@ Run backend service
 
 ```
 cd $PROJECT_HOME/backend
-go run
+go run .
 ```
 
 You can also compile and run as executable file.

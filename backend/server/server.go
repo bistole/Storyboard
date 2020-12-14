@@ -14,20 +14,22 @@ import (
 
 // RESTServer is wrapper for http server and wait group
 type RESTServer struct {
-	Server   *http.Server
-	Wg       *sync.WaitGroup
-	TaskRepo interfaces.TaskRepo
+	Server    *http.Server
+	Wg        *sync.WaitGroup
+	TaskRepo  interfaces.TaskRepo
+	PhotoRepo interfaces.PhotoRepo
 }
 
 // NewRESTServer create REST server
-func NewRESTServer(taskRepo interfaces.TaskRepo) *RESTServer {
+func NewRESTServer(taskRepo interfaces.TaskRepo, photoRepo interfaces.PhotoRepo) *RESTServer {
 	var wg = &sync.WaitGroup{}
 	wg.Add(1)
 
 	return &RESTServer{
-		Server:   nil,
-		Wg:       wg,
-		TaskRepo: taskRepo,
+		Server:    nil,
+		Wg:        wg,
+		TaskRepo:  taskRepo,
+		PhotoRepo: photoRepo,
 	}
 }
 
@@ -38,6 +40,11 @@ func (rs RESTServer) route() *mux.Router {
 	r.HandleFunc("/tasks/{id}", rs.GetTask).Methods("GET")
 	r.HandleFunc("/tasks/{id}", rs.UpdateTask).Methods("POST")
 	r.HandleFunc("/tasks/{id}", rs.DeleteTask).Methods("DELETE")
+	r.HandleFunc("/photos", rs.GetPhotos).Methods("GET")
+	r.HandleFunc("/photos", rs.UploadPhoto).Methods("POST")
+	r.HandleFunc("/photos/{id}", rs.DownloadPhoto).Methods("GET")
+	r.HandleFunc("/photos/{id}", rs.DeletePhoto).Methods("DELETE")
+	r.HandleFunc("/photos/{id}/meta", rs.GetPhoto).Methods("GET")
 	return r
 }
 
