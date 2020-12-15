@@ -44,6 +44,7 @@ func (rs RESTServer) route() *mux.Router {
 	r.HandleFunc("/photos", rs.UploadPhoto).Methods("POST")
 	r.HandleFunc("/photos/{id}", rs.DownloadPhoto).Methods("GET")
 	r.HandleFunc("/photos/{id}", rs.DeletePhoto).Methods("DELETE")
+	r.HandleFunc("/photos/{id}/thumbnail", rs.ThumbnailPhoto).Methods("GET")
 	r.HandleFunc("/photos/{id}/meta", rs.GetPhoto).Methods("GET")
 	return r
 }

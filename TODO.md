@@ -4,9 +4,27 @@ NOW
 Menu
 - Notify Flutter when change happens in macos [DONE]
 - Notify Flutter when change happens in backend
-- Notify MacOS when flutter need to
-- Import Photo
-- Quit
+- Notify MacOS when flutter need to [DONES]
+
+Import Photo
+- Backend [DONE]
+  - Add Photo [DONE]
+  - Delete Photo [DONE]
+  - Download Photo [DONE]
+  - Thumbnail Photo [DONE]
+  - Get Photo Meta Data [DONE]
+- Frontend
+  - API
+    - Get Photo List
+    - Add Photo
+    - Delete Photo
+    - Download Photo
+    - Thumbnail Photo
+  - UI
+    - Add Photo
+    - Delete Photo
+    - Show Photo
+
 
 TODO
 ====

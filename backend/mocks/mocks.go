@@ -96,11 +96,12 @@ func (t *TaskRepoMock) GetTasksByTS(ts int64, limit int, offset int) ([]Task, er
 
 // PhotoRepoMock to mock photo repo
 type PhotoRepoMock struct {
-	AddPhotoFn         func(string, string, string, io.Reader) (*Photo, error)
-	DeletePhotoFn      func(string) (*Photo, error)
-	GetPhotoFn         func(string) (io.ReadCloser, error)
-	GetPhotoMetaFn     func(string) (*Photo, error)
-	GetPhotoMetaByTSFn func(ts int64, limit int, offset int) ([]Photo, error)
+	AddPhotoFn          func(string, string, string, io.Reader) (*Photo, error)
+	DeletePhotoFn       func(string) (*Photo, error)
+	GetPhotoFn          func(string) (io.ReadCloser, error)
+	GetPhotoThumbnailFn func(string) (io.ReadCloser, error)
+	GetPhotoMetaFn      func(string) (*Photo, error)
+	GetPhotoMetaByTSFn  func(ts int64, limit int, offset int) ([]Photo, error)
 }
 
 // AddPhoto mock photo repo
@@ -116,6 +117,11 @@ func (p *PhotoRepoMock) DeletePhoto(UUID string) (*Photo, error) {
 // GetPhoto mock photo repo
 func (p *PhotoRepoMock) GetPhoto(UUID string) (io.ReadCloser, error) {
 	return p.GetPhotoFn(UUID)
+}
+
+// GetPhotoThumbnail mock photo repo
+func (p *PhotoRepoMock) GetPhotoThumbnail(UUID string) (io.ReadCloser, error) {
+	return p.GetPhotoThumbnailFn(UUID)
 }
 
 // GetPhotoMeta mock photo repo

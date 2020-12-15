@@ -58,6 +58,7 @@ type PhotoRepo interface {
 	AddPhoto(filename string, mimeType string, size string, src io.Reader) (outPhoto *Photo, err error)
 	DeletePhoto(UUID string) (outPhoto *Photo, err error)
 	GetPhoto(UUID string) (src io.ReadCloser, err error)
+	GetPhotoThumbnail(UUID string) (src io.ReadCloser, err error)
 	GetPhotoMeta(UUID string) (outPhoto *Photo, err error)
 	GetPhotoMetaByTS(ts int64, limit int, offset int) ([]Photo, error)
 }

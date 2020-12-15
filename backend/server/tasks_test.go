@@ -42,6 +42,9 @@ func MockAllPhotoError() *mocks.PhotoRepoMock {
 		GetPhotoFn: func(s string) (io.ReadCloser, error) {
 			return nil, fmt.Errorf("Error to get photo")
 		},
+		GetPhotoThumbnailFn: func(s string) (io.ReadCloser, error) {
+			return nil, fmt.Errorf("Error to get photo thumbnail")
+		},
 		GetPhotoMetaFn: func(s string) (*mocks.Photo, error) {
 			return nil, fmt.Errorf("Error to get photo meta data")
 		},

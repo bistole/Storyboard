@@ -1,15 +1,23 @@
 package photorepo
 
 import (
+	"log"
+	"storyboard/backend/interfaces"
+
 	"database/sql"
 	"fmt"
+	"image"
+	"image/draw"
+	_ "image/gif"
+	"image/jpeg"
+	"image/png"
 	"io"
 	"os"
 	"path"
-	"storyboard/backend/interfaces"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/nfnt/resize"
 )
 
 // Photo is defined in interfaces
@@ -36,13 +44,35 @@ func (p PhotoRepo) createPhotoFolder() (string, bool) {
 	return folderPath, true
 }
 
+var validMimeType = []string{"image/jpeg", "image/png", "image/gif"}
+
+func isMimeTypeValid(mimeType string) bool {
+	for _, v := range validMimeType {
+		if v == mimeType {
+			return true
+		}
+	}
+	return false
+}
+
 // AddPhoto add photo
 func (p PhotoRepo) AddPhoto(filename string, mimeType string, size string, src io.Reader) (outPhoto *Photo, err error) {
-	UUID, _ := uuid.NewRandom()
+	if !isMimeTypeValid(mimeType) {
+		return nil, fmt.Errorf("Invalid MIME type")
+	}
 
-	err = p._writeToDisk(UUID.String(), src)
+	UUID, _ := uuid.NewRandom()
+	dst, err := p._getFileHandler(UUID.String(), false)
 	if err != nil {
-		return nil, err
+		log.Println(err)
+		return nil, fmt.Errorf("Failed to save photo")
+	}
+	defer dst.Close()
+
+	err = p._writeToDisk(src, dst)
+	if err != nil {
+		log.Println(err)
+		return nil, fmt.Errorf("Failed to save photo")
 	}
 
 	inPhoto := Photo{
@@ -54,18 +84,31 @@ func (p PhotoRepo) AddPhoto(filename string, mimeType string, size string, src i
 		CreatedAt: time.Now().Unix(),
 	}
 	if err = p._createPhoto(inPhoto); err != nil {
-		return nil, err
+		log.Println(err)
+		return nil, fmt.Errorf("Failed to save to DB")
 	}
 	outPhoto, err = p._getPhoto(inPhoto.UUID)
 	if err != nil {
-		return nil, err
+		log.Println(err)
+		return nil, fmt.Errorf("Failed to load from DB")
 	}
+
+	go p._createThumbnail(UUID.String(), mimeType)
 	return outPhoto, nil
 }
 
 // GetPhoto get photo
 func (p PhotoRepo) GetPhoto(UUID string) (src io.ReadCloser, err error) {
-	src, err = p._readFromDisk(UUID)
+	src, err = p._readFromDisk(UUID, false)
+	if err != nil {
+		return nil, err
+	}
+	return src, nil
+}
+
+// GetPhotoThumbnail get thumbnail
+func (p PhotoRepo) GetPhotoThumbnail(UUID string) (src io.ReadCloser, err error) {
+	src, err = p._readFromDisk(UUID, true)
 	if err != nil {
 		return nil, err
 	}
@@ -188,26 +231,98 @@ func (p PhotoRepo) _getPhoto(UUID string) (*Photo, error) {
 	return &photo, nil
 }
 
-// Write photo to disk
-func (p PhotoRepo) _writeToDisk(UUID string, src io.Reader) (err error) {
-	p.createPhotoFolder()
-	localPath := path.Join(p.db.GetDataFolder(), "photos", UUID)
+const (
+	thumbWidth  = 320
+	thumbHeight = 320
+)
 
-	f, err := os.Create(localPath)
-	defer f.Close()
+// create thumbnail
+func (p PhotoRepo) _createThumbnail(UUID string, mimeType string) {
+	reader, err := p._readFromDisk(UUID, false)
 	if err != nil {
-		return err
+		log.Fatalln(err)
 	}
 
-	_, err = io.Copy(f, src)
+	srcImage, _, err := image.Decode(reader)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	originW := srcImage.Bounds().Max.X
+	originH := srcImage.Bounds().Max.Y
+
+	var ratioW float64 = 1.0
+	var ratioH float64 = 1.0
+	if originW > thumbWidth {
+		ratioW = float64(originW) / thumbWidth
+	}
+	if originH > thumbHeight {
+		ratioH = float64(originH) / thumbHeight
+	}
+
+	var ratio float64 = 1
+	if ratioH > ratioW {
+		ratio = ratioW
+	} else {
+		ratio = ratioH
+	}
+
+	var finalW int
+	var finalH int
+	if ratio > 1 {
+		// need to resize
+		finalW = int(float64(originW) / ratio)
+		finalH = int(float64(originH) / ratio)
+		srcImage = resize.Resize(uint(finalW), uint(finalH), srcImage, resize.Bilinear)
+	} else {
+		finalW = originW
+		finalH = originH
+	}
+
+	dstImage := image.NewRGBA(image.Rect(0, 0, finalW, finalH))
+	draw.Draw(dstImage, image.Rect(0, 0, finalW, finalH), srcImage, image.ZP, draw.Src)
+
+	dst, err := p._getFileHandler(UUID, true)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	if mimeType == "image/png" {
+		png.Encode(dst, dstImage)
+	} else {
+		jpeg.Encode(dst, dstImage, &jpeg.Options{Quality: jpeg.DefaultQuality})
+	}
+}
+
+func (p PhotoRepo) _getFileHandler(UUID string, thumbnail bool) (writer io.WriteCloser, err error) {
+	p.createPhotoFolder()
+	localPath := path.Join(p.db.GetDataFolder(), "photos", UUID)
+	if thumbnail {
+		localPath += "_thumbnail"
+	}
+
+	f, err := os.Create(localPath)
+	if err != nil {
+		return nil, err
+	}
+	return f, nil
+}
+
+// Write to disk
+func (p PhotoRepo) _writeToDisk(src io.Reader, dst io.Writer) (err error) {
+	_, err = io.Copy(dst, src)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (p PhotoRepo) _readFromDisk(UUID string) (reader io.ReadCloser, err error) {
+func (p PhotoRepo) _readFromDisk(UUID string, thumbnail bool) (reader io.ReadCloser, err error) {
+
 	localPath := path.Join(p.db.GetDataFolder(), "photos", UUID)
+	if thumbnail {
+		localPath += "_thumbnail"
+	}
 
 	_, err = os.Stat(localPath)
 	if err != nil {
@@ -223,12 +338,11 @@ func (p PhotoRepo) _readFromDisk(UUID string) (reader io.ReadCloser, err error) 
 
 // Remove photo from disk
 func (p PhotoRepo) _removeFromDisk(UUID string) (err error) {
-	localPath := path.Join(p.db.GetDataFolder(), "photos", UUID)
+	originPath := path.Join(p.db.GetDataFolder(), "photos", UUID)
+	os.Remove(originPath)
 
-	err = os.Remove(localPath)
-	if err != nil {
-		return err
-	}
+	thumbnailPath := path.Join(p.db.GetDataFolder(), "photos", UUID+"_thumbnail")
+	os.Remove(thumbnailPath)
 	return nil
 }
 

@@ -98,6 +98,24 @@ func (rs RESTServer) DownloadPhoto(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// ThumbnailPhoto is a restful API handler to download photo
+func (rs RESTServer) ThumbnailPhoto(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	src, err := rs.PhotoRepo.GetPhotoThumbnail(id)
+	if err != nil {
+		rs.buildErrorResponse(w, err)
+		return
+	}
+
+	_, err = io.Copy(w, src)
+	if err != nil {
+		rs.buildErrorResponse(w, err)
+		return
+	}
+}
+
 // DeletePhoto is a restful API handler to delete photo
 func (rs RESTServer) DeletePhoto(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
