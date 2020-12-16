@@ -107,16 +107,14 @@ func (d Database) initDBInstance() {
 func (d *Database) Init() {
 	// create folder if required
 	dirPath := d.GetDataFolder()
-	fullPath, existed := d.createDBInstance(dirPath, d.config.GetDatabaseName())
+	fullPath, _ := d.createDBInstance(dirPath, d.config.GetDatabaseName())
 
 	db, err := sql.Open("sqlite3", fullPath)
 	processError("Init", err)
 
 	d.connDB = db
 
-	if !existed {
-		d.initDBInstance()
-	}
+	d.initDBInstance()
 }
 
 // Close database connection
