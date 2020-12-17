@@ -26,26 +26,32 @@ class ReduxActions {
   });
 }
 
-class CreateTaskWidget extends StatelessWidget {
+class CreateBarWidget extends StatelessWidget {
   Widget buildAddButton(ReduxActions redux) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisSize: MainAxisSize.max,
       children: [
         Expanded(
-          child: TextButton(
-            onPressed: () {
-              redux.startTask();
-            },
-            child: Text('ADD TASK'),
+          child: Container(
+            child: TextButton(
+              onPressed: () {
+                redux.startTask();
+              },
+              child: Text('ADD TASK'),
+            ),
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           ),
         ),
         Expanded(
-          child: TextButton(
-            onPressed: () {
-              importPhoto();
-            },
-            child: Text('ADD PHOTO'),
+          child: Container(
+            child: TextButton(
+              onPressed: () {
+                importPhoto();
+              },
+              child: Text('ADD PHOTO'),
+            ),
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           ),
         ),
       ],

@@ -7,7 +7,7 @@ import '../../models/app.dart';
 import '../../models/task.dart';
 import '../../models/status.dart';
 
-import 'create_task_widget.dart';
+import 'create_bar_widget.dart';
 import 'update_task_widget.dart';
 import 'task_widget.dart';
 
@@ -25,7 +25,7 @@ class HomePage extends StatelessWidget {
 
   List<Widget> buildList(ReduxActions redux) {
     var children = List<Widget>();
-    children.add(CreateTaskWidget());
+    children.add(CreateBarWidget());
 
     var updatedTaskList = List<Task>.from(redux.taskList);
     updatedTaskList.sort((Task a, Task b) {
