@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"storyboard/backend/interfaces"
+	"strings"
 
 	"github.com/gorilla/mux"
 )
@@ -64,15 +65,16 @@ func (rs RESTServer) GetPhotos(w http.ResponseWriter, r *http.Request) {
 
 // UploadPhoto is a restful API handler to upload photo
 func (rs RESTServer) UploadPhoto(w http.ResponseWriter, r *http.Request) {
-	mimeType := r.Header.Get("Content-Type")
+	mimeHeader := r.Header.Get("Content-Type")
 	size := r.Header.Get("Content-Length")
 	filename := r.Header.Get("Content-Name")
 
 	fmt.Printf("File Name: %+v\n", filename)
 	fmt.Printf("File Size: %+v\n", size)
-	fmt.Printf("MIME Header: %+v\n", mimeType)
+	fmt.Printf("MIME Header: %+v\n", mimeHeader)
+	mimeTypeArr := strings.Split(mimeHeader, ";")
 
-	photo, err := rs.PhotoRepo.AddPhoto(filename, mimeType, size, r.Body)
+	photo, err := rs.PhotoRepo.AddPhoto(filename, mimeTypeArr[0], size, r.Body)
 	if err != nil {
 		rs.buildErrorResponse(w, err)
 		return

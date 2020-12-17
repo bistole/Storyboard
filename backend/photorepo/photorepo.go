@@ -75,6 +75,8 @@ func (p PhotoRepo) AddPhoto(filename string, mimeType string, size string, src i
 		return nil, fmt.Errorf("Failed to save photo")
 	}
 
+	p._createThumbnail(UUID.String(), mimeType)
+
 	inPhoto := Photo{
 		UUID:      UUID.String(),
 		Filename:  filename,
@@ -93,7 +95,6 @@ func (p PhotoRepo) AddPhoto(filename string, mimeType string, size string, src i
 		return nil, fmt.Errorf("Failed to load from DB")
 	}
 
-	go p._createThumbnail(UUID.String(), mimeType)
 	return outPhoto, nil
 }
 

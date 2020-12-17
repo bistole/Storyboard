@@ -1,5 +1,7 @@
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter/material.dart';
+import 'package:storyboard/models/photo.dart';
+import 'package:storyboard/views/home/photo_widget.dart';
 
 import '../../models/app.dart';
 import '../../models/task.dart';
@@ -11,8 +13,9 @@ import 'task_widget.dart';
 
 class ReduxActions {
   final List<Task> taskList;
+  final List<Photo> photoList;
   final Status status;
-  ReduxActions({this.status, this.taskList});
+  ReduxActions({this.status, this.taskList, this.photoList});
 }
 
 class HomePage extends StatelessWidget {
@@ -38,6 +41,17 @@ class HomePage extends StatelessWidget {
       children.insert(1, w);
     });
 
+    var updatedPhotoList = List<Photo>.from(redux.photoList);
+    updatedPhotoList.sort((Photo a, Photo b) {
+      return a.updatedAt == b.updatedAt
+          ? 0
+          : (a.updatedAt > b.updatedAt ? 1 : -1);
+    });
+    updatedPhotoList.forEach((photo) {
+      Widget w = PhotoWidget(photo: photo);
+      children.insert(1, w);
+    });
+
     return children;
   }
 
@@ -55,9 +69,18 @@ class HomePage extends StatelessWidget {
               taskList.add(task);
             }
           });
+
+          List<Photo> photoList = List();
+          store.state.photos.forEach((uuid, photo) {
+            if (photo.deleted == 0) {
+              photoList.add(photo);
+            }
+          });
+
           return ReduxActions(
             status: store.state.status,
             taskList: taskList,
+            photoList: photoList,
           );
         },
         builder: (context, ReduxActions redux) {

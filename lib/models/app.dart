@@ -1,3 +1,4 @@
+import 'package:storyboard/models/photo.dart';
 import 'package:storyboard/models/status.dart';
 import 'package:flutter/material.dart';
 import 'task.dart';
@@ -6,33 +7,40 @@ import 'task.dart';
 class AppState {
   final Status status;
   final Map<String, Task> tasks;
+  final Map<String, Photo> photos;
 
   AppState({
     this.status,
     this.tasks = const <String, Task>{},
+    this.photos = const <String, Photo>{},
   });
 
   AppState copyWith({
     Status status,
     Map<String, Task> tasks,
+    Map<String, Photo> photos,
   }) {
     return AppState(
       status: status ?? this.status,
       tasks: tasks ?? this.tasks,
+      photos: photos ?? this.photos,
     );
   }
 
   @override
-  int get hashCode => status.hashCode ^ tasks.hashCode;
+  int get hashCode => status.hashCode ^ tasks.hashCode ^ photos.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is AppState && status == other.status && tasks == other.tasks);
+      (other is AppState &&
+          status == other.status &&
+          tasks == other.tasks &&
+          photos == other.photos);
 
   @override
   String toString() {
-    return 'AppState{status: $status, tasks: $tasks}';
+    return 'AppState{status: $status, tasks: $tasks, photos: $photos}';
   }
 
   static AppState fromJson(dynamic json) {
@@ -43,14 +51,22 @@ class AppState {
         tasks[task.uuid] = task;
       });
     }
-    return AppState(status: Status.noParam(StatusKey.ListTask), tasks: tasks);
+    var photos = <String, Photo>{};
+    if (json is Map && json['photos'] is Map) {
+      json['photos'].forEach((uuid, jsonPhoto) {
+        var photo = Photo.fromJson(jsonPhoto);
+        photos[photo.uuid] = photo;
+      });
+    }
+
+    return AppState(
+      status: Status.noParam(StatusKey.ListTask),
+      tasks: tasks,
+      photos: photos,
+    );
   }
 
   dynamic toJson() {
-    Map<String, dynamic> ret = <String, dynamic>{};
-    tasks.forEach((uuid, task) {
-      ret[uuid] = task.toJson();
-    });
-    return {"tasks": tasks};
+    return {"tasks": tasks, "photos": photos};
   }
 }

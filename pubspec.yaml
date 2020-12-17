@@ -28,6 +28,7 @@ dependencies:
   redux_persist: ^0.8.4
   path_provider: ^1.6.24
   package_info: ^0.4.3+2
+  mime: ^0.9.7
   http: ^0.12.2
   intl: ^0.16.1
 

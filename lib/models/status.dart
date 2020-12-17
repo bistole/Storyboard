@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 
-enum StatusKey { AddingTask, EditingTask, ListTask }
+enum StatusKey {
+  AddingPhoto,
+  AddingTask,
+  EditingTask,
+  ListTask,
+}
 
 @immutable
 class Status {

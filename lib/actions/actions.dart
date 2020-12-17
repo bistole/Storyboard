@@ -1,3 +1,4 @@
+import 'package:storyboard/models/photo.dart';
 import 'package:storyboard/models/status.dart';
 import 'package:storyboard/models/task.dart';
 
@@ -45,6 +46,61 @@ class DeleteTaskAction {
   }
 }
 
+class FetchPhotosAction {
+  final List<Photo> photoList;
+
+  FetchPhotosAction({this.photoList});
+
+  @override
+  String toString() {
+    return 'FetchPhotosAction{photoList: $photoList}';
+  }
+}
+
+class CreatePhotoAction {
+  final Photo photo;
+
+  CreatePhotoAction({this.photo});
+
+  @override
+  String toString() {
+    return 'CreatePhotoAction{photo: $photo}';
+  }
+}
+
+class DownloadPhotoAction {
+  final String uuid;
+
+  DownloadPhotoAction({this.uuid});
+
+  @override
+  String toString() {
+    return 'DownloadPhotoAction{uuid: $uuid}';
+  }
+}
+
+class ThumbnailPhotoAction {
+  final String uuid;
+
+  ThumbnailPhotoAction({this.uuid});
+
+  @override
+  String toString() {
+    return 'ThumbnailPhotoAction{uuid: $uuid}';
+  }
+}
+
+class DeletePhotoAction {
+  final Photo photo;
+
+  DeletePhotoAction({this.photo});
+
+  @override
+  String toString() {
+    return 'DeletePhotoAction{photo: $photo}';
+  }
+}
+
 class ChangeStatusAction {
   final StatusKey status;
 
@@ -65,5 +121,17 @@ class ChangeStatusWithUUIDAction {
   @override
   String toString() {
     return 'ChangeStatusWithUUIDAction{status: $status, uuid: $uuid}';
+  }
+}
+
+class ChangeStatusWithPathAction {
+  final StatusKey status;
+  final String path;
+
+  ChangeStatusWithPathAction({this.status, this.path});
+
+  @override
+  String toString() {
+    return 'ChangeStatusWithPathAction{status: $status, path: $path}';
   }
 }

@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:storyboard/net/command.dart';
+import 'package:storyboard/net/photos.dart';
 
 import '../../actions/actions.dart';
 import '../../models/app.dart';
@@ -9,11 +12,18 @@ import '../../models/status.dart';
 import '../../net/tasks.dart';
 
 class ReduxActions {
-  final void Function() start;
-  final void Function(String) create;
+  final void Function() startTask;
+  final void Function(String) createTask;
+  final void Function(String) createPhoto;
   final void Function() cancel;
   final Status status;
-  ReduxActions({this.start, this.create, this.cancel, this.status});
+  ReduxActions({
+    this.startTask,
+    this.createTask,
+    this.createPhoto,
+    this.cancel,
+    this.status,
+  });
 }
 
 class CreateTaskWidget extends StatelessWidget {
@@ -25,7 +35,7 @@ class CreateTaskWidget extends StatelessWidget {
         Expanded(
           child: TextButton(
             onPressed: () {
-              redux.start();
+              redux.startTask();
             },
             child: Text('ADD TASK'),
           ),
@@ -42,11 +52,11 @@ class CreateTaskWidget extends StatelessWidget {
     );
   }
 
-  Widget buildWhenAdding(ReduxActions redux) {
-    return new ListTile(
+  Widget buildWhenAddingTask(ReduxActions redux) {
+    return ListTile(
       title: RawKeyboardListener(
         child: TextField(
-          onSubmitted: redux.create,
+          onSubmitted: redux.createTask,
           autofocus: true,
           decoration: InputDecoration(hintText: 'Put task name here'),
         ),
@@ -60,28 +70,55 @@ class CreateTaskWidget extends StatelessWidget {
     );
   }
 
+  Widget buildWhenAddingPhoto(ReduxActions redux) {
+    return Column(
+      children: [
+        Image.file(File(redux.status.param1)),
+        Row(children: [
+          TextButton(
+            onPressed: () {
+              redux.createPhoto(redux.status.param1);
+            },
+            child: Text("ADD"),
+          ),
+          TextButton(
+            onPressed: () {
+              redux.cancel();
+            },
+            child: Text("CANCEL"),
+          )
+        ]),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return StoreConnector<AppState, ReduxActions>(
       converter: (store) {
-        return new ReduxActions(
-          start: () {
-            store
-                .dispatch(new ChangeStatusAction(status: StatusKey.AddingTask));
+        return ReduxActions(
+          startTask: () {
+            store.dispatch(ChangeStatusAction(status: StatusKey.AddingTask));
           },
-          create: (String title) {
-            store.dispatch(new ChangeStatusAction(status: StatusKey.ListTask));
+          createTask: (String title) {
+            store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
             createTask(store, title);
           },
+          createPhoto: (String path) {
+            store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
+            uploadPhoto(store, path);
+          },
           cancel: () {
-            store.dispatch(new ChangeStatusAction(status: StatusKey.ListTask));
+            store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
           },
           status: store.state.status,
         );
       },
       builder: (context, ReduxActions redux) {
         if (redux.status.status == StatusKey.AddingTask) {
-          return buildWhenAdding(redux);
+          return buildWhenAddingTask(redux);
+        } else if (redux.status.status == StatusKey.AddingPhoto) {
+          return buildWhenAddingPhoto(redux);
         }
         return buildAddButton(redux);
       },

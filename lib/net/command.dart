@@ -1,5 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
+import 'package:storyboard/actions/actions.dart';
+import 'package:storyboard/models/status.dart';
+import 'package:storyboard/store.dart';
 
 const COMMANDS = '/COMMANDS';
 
@@ -27,8 +30,11 @@ Future<List<String>> _openFileDialog(String title, String types) async {
 Future<void> importPhoto() async {
   List<String> paths =
       await _openFileDialog("Import Photo", "jpeg;jpg;gif;png");
-  // TODO: upload images
-  paths.forEach((path) {
-    print(path);
-  });
+
+  if (paths.length > 0) {
+    getStore().dispatch(ChangeStatusWithPathAction(
+      status: StatusKey.AddingPhoto,
+      path: paths[0],
+    ));
+  }
 }
