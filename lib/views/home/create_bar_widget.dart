@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:storyboard/net/command.dart';
 import 'package:storyboard/net/photos.dart';
+import 'package:storyboard/widgets/toolbar.dart';
+import 'package:storyboard/widgets/toolbar_button.dart';
 
 import '../../actions/actions.dart';
 import '../../models/app.dart';
@@ -24,39 +26,10 @@ class ReduxActions {
 
 class CreateBarWidget extends StatelessWidget {
   Widget buildAddButton(ReduxActions redux) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisSize: MainAxisSize.max,
-      children: [
-        Container(
-          constraints: BoxConstraints(maxWidth: 120),
-          child: TextButton(
-            onPressed: () {
-              redux.startTask();
-            },
-            child: Container(
-              child: Text('ADD TASK'),
-              margin: EdgeInsets.symmetric(horizontal: 8),
-            ),
-          ),
-          margin: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-        ),
-        Container(
-          constraints: BoxConstraints(maxWidth: 120),
-          child: TextButton(
-            onPressed: () {
-              importPhoto();
-            },
-            child: Container(
-              child: Text('ADD PHOTO'),
-              margin: EdgeInsets.symmetric(horizontal: 8),
-            ),
-          ),
-          margin: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-        ),
-      ],
-    );
+    return SBToolbar([
+      SBToolbarButton("ADD TASK", redux.startTask),
+      SBToolbarButton("ADD PHOTO", importPhoto),
+    ]);
   }
 
   Widget buildWhenAddingTask(ReduxActions redux) {

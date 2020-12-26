@@ -3,6 +3,8 @@ import 'package:photo_view/photo_view.dart';
 import 'package:storyboard/models/photo.dart';
 import 'package:storyboard/models/status.dart';
 import 'package:storyboard/views/photo/view_photo_widget.dart';
+import 'package:storyboard/widgets/toolbar.dart';
+import 'package:storyboard/widgets/toolbar_button.dart';
 
 class ReduxActions {
   final Status status;
@@ -47,13 +49,9 @@ class PhotoPage extends StatelessWidget {
               right: 0,
               bottom: 0,
               height: 44,
-              child: Container(
-                child: TextButton(
-                  onPressed: () => {},
-                  child: Text("RESET"),
-                ),
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              ),
+              child: SBToolbar([
+                SBToolbarButton("RESET", () => {}),
+              ]),
             ),
           ],
         ),

@@ -6,6 +6,8 @@ import 'package:storyboard/actions/actions.dart';
 import 'package:storyboard/models/app.dart';
 import 'package:storyboard/models/status.dart';
 import 'package:storyboard/net/photos.dart';
+import 'package:storyboard/widgets/toolbar.dart';
+import 'package:storyboard/widgets/toolbar_button.dart';
 
 class ReduxActions {
   final void Function(String) createPhoto;
@@ -20,37 +22,10 @@ class ReduxActions {
 
 class CreatePhotoWidget extends StatelessWidget {
   Widget buildAddingPhotoToolbar(ReduxActions redux) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Container(
-                child: TextButton(
-                  onPressed: () {
-                    redux.createPhoto(redux.status.param1);
-                  },
-                  child: Text("ADD"),
-                ),
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              ),
-            ),
-            Expanded(
-              child: Container(
-                child: TextButton(
-                  onPressed: () {
-                    redux.cancel();
-                  },
-                  child: Text("CANCEL"),
-                ),
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
+    return SBToolbar([
+      SBToolbarButton("ADD", () => redux.createPhoto(redux.status.param1)),
+      SBToolbarButton("CANCEL", redux.cancel),
+    ]);
   }
 
   Widget buildWhenAddingPhoto(context, ReduxActions redux) {

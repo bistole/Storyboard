@@ -5,9 +5,9 @@ NOW
   - Zoom view overlap the RESET button
 - Change Welcome Page [DONE]
 - Change Layout of 'add photo' [DONE]
-- Wrapper same layout attribute into widget
-  - Function bar
-  - Function button in bar
+- Wrapper same layout attribute into widget [DONE]
+  - Function bar [DONE]
+  - Function button in bar [DONE]
 
 Server Send Event
 - Generate UUID on client side
