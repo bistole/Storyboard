@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,13 +12,11 @@ import '../../net/tasks.dart';
 class ReduxActions {
   final void Function() startTask;
   final void Function(String) createTask;
-  final void Function(String) createPhoto;
   final void Function() cancel;
   final Status status;
   ReduxActions({
     this.startTask,
     this.createTask,
-    this.createPhoto,
     this.cancel,
     this.status,
   });
@@ -29,30 +25,35 @@ class ReduxActions {
 class CreateBarWidget extends StatelessWidget {
   Widget buildAddButton(ReduxActions redux) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisSize: MainAxisSize.max,
       children: [
-        Expanded(
-          child: Container(
-            child: TextButton(
-              onPressed: () {
-                redux.startTask();
-              },
+        Container(
+          constraints: BoxConstraints(maxWidth: 120),
+          child: TextButton(
+            onPressed: () {
+              redux.startTask();
+            },
+            child: Container(
               child: Text('ADD TASK'),
+              margin: EdgeInsets.symmetric(horizontal: 8),
             ),
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           ),
+          margin: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         ),
-        Expanded(
-          child: Container(
-            child: TextButton(
-              onPressed: () {
-                importPhoto();
-              },
+        Container(
+          constraints: BoxConstraints(maxWidth: 120),
+          child: TextButton(
+            onPressed: () {
+              importPhoto();
+            },
+            child: Container(
               child: Text('ADD PHOTO'),
+              margin: EdgeInsets.symmetric(horizontal: 8),
             ),
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           ),
+          margin: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         ),
       ],
     );
@@ -76,28 +77,6 @@ class CreateBarWidget extends StatelessWidget {
     );
   }
 
-  Widget buildWhenAddingPhoto(ReduxActions redux) {
-    return Column(
-      children: [
-        Image.file(File(redux.status.param1)),
-        Row(children: [
-          TextButton(
-            onPressed: () {
-              redux.createPhoto(redux.status.param1);
-            },
-            child: Text("ADD"),
-          ),
-          TextButton(
-            onPressed: () {
-              redux.cancel();
-            },
-            child: Text("CANCEL"),
-          )
-        ]),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return StoreConnector<AppState, ReduxActions>(
@@ -110,10 +89,6 @@ class CreateBarWidget extends StatelessWidget {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
             createTask(store, title);
           },
-          createPhoto: (String path) {
-            store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
-            uploadPhoto(store, path);
-          },
           cancel: () {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
           },
@@ -123,8 +98,6 @@ class CreateBarWidget extends StatelessWidget {
       builder: (context, ReduxActions redux) {
         if (redux.status.status == StatusKey.AddingTask) {
           return buildWhenAddingTask(redux);
-        } else if (redux.status.status == StatusKey.AddingPhoto) {
-          return buildWhenAddingPhoto(redux);
         }
         return buildAddButton(redux);
       },

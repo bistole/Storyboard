@@ -1,6 +1,7 @@
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter/material.dart';
 import 'package:storyboard/models/photo.dart';
+import 'package:storyboard/views/home/create_photo_widget.dart';
 import 'package:storyboard/views/home/photo_widget.dart';
 
 import '../../models/app.dart';
@@ -84,6 +85,10 @@ class HomePage extends StatelessWidget {
           );
         },
         builder: (context, ReduxActions redux) {
+          if (redux.status.status == StatusKey.AddingPhoto) {
+            return CreatePhotoWidget();
+          }
+
           return ListView(
             children: buildList(redux),
           );

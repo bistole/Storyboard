@@ -2,13 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
-import './store.dart';
-import 'models/app.dart';
-import 'views/home/page.dart';
+import 'package:storyboard/views/home/page.dart';
+import 'package:storyboard/models/app.dart';
+import 'package:storyboard/store.dart';
 
 class StoryBoardApp extends StatelessWidget {
   // This widget is the root of your application.
   StoryBoardApp();
+
+  Widget buildNotAvailableWidget() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Container(
+              child: Text(
+                "Hello, Storyboard",
+                textDirection: TextDirection.ltr,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+              ),
+              margin: EdgeInsets.symmetric(vertical: 16.0),
+            ),
+            CircularProgressIndicator(),
+          ],
+        )
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +44,7 @@ class StoryBoardApp extends StatelessWidget {
       future: initStore(),
       builder: (context, AsyncSnapshot<Store<AppState>> snapshot) {
         if (!snapshot.hasData) {
-          return CircularProgressIndicator();
+          return buildNotAvailableWidget();
         }
 
         return new StoreProvider(

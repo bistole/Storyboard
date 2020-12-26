@@ -1,43 +1,34 @@
 NOW
 ===
 
-Menu
-- Notify Flutter when change happens in macos [DONE]
-- Notify Flutter when change happens in backend
-- Notify MacOS when flutter need to [DONES]
+- Show Big Photo, zoom and scale [IN_PROGRESS]
+  - Zoom view overlap the RESET button
+- Change Welcome Page [DONE]
+- Change Layout of 'add photo' [DONE]
+- Wrapper same layout attribute into widget
+  - Function bar
+  - Function button in bar
 
-Import Photo
-- Backend [DONE]
-  - Add Photo [DONE]
-  - Delete Photo [DONE]
-  - Download Photo [DONE]
-  - Thumbnail Photo [DONE]
-  - Get Photo Meta Data [DONE]
-- Frontend
-  - API
-    - Get Photo List
-    - Add Photo
-    - Delete Photo
-    - Download Photo
-    - Thumbnail Photo
-  - UI
-    - Add Photo
-    - Delete Photo
-    - Show Photo
+Server Send Event
+- Generate UUID on client side
+- Only sync updated events
+- Trigger fetchTasks from last time by sync updated events
+- Pipeline requests
+- Keepalive
 
 
 TODO
 ====
 
-Server Send Event
-- Keepalive
-- Only sync updated events
-- Trigger fetchTasks from last time by sync updated events
+
+Communication
+- Notify Flutter when change happens in backend
 
 Authenticate
 
 Deployment
 - Build to App
+
 
 DONE
 ====
@@ -85,3 +76,25 @@ Test-cases [DONE]
 - Frontend [DONE]
 - Backend [DONE]
 
+Menu
+- Notify Flutter when change happens in macos [DONE]
+- Notify MacOS when flutter need to [DONES]
+
+Import Photo
+- Backend [DONE]
+  - Add Photo [DONE]
+  - Delete Photo [DONE]
+  - Download Photo [DONE]
+  - Thumbnail Photo [DONE]
+  - Get Photo Meta Data [DONE]
+- Frontend [DONE]
+  - API [DONE]
+    - Get Photo List [DONE]
+    - Add Photo [DONE]
+    - Delete Photo [DONE]
+    - Download Photo [DONE]
+    - Thumbnail Photo [DONE]
+  - UI
+    - Add Photo [DONE]
+    - Delete Photo [DONE]
+    - Show Photo [DONE]

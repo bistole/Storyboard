@@ -1,5 +1,3 @@
-import 'dart:js';
-
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -61,7 +59,7 @@ class TaskWidget extends StatelessWidget {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(task.title,
-                  style: Theme.of(context).textTheme.headline2),
+                  style: Theme.of(context).textTheme.headline3),
             ),
             Align(
               alignment: Alignment.centerLeft,

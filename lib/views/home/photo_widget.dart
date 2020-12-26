@@ -9,6 +9,7 @@ import 'package:storyboard/models/photo.dart';
 import 'package:storyboard/models/status.dart';
 import 'package:storyboard/net/photos.dart';
 import 'package:storyboard/storage/photo.dart';
+import 'package:storyboard/views/photo/page.dart';
 
 class ReduxActions {
   final void Function() delete;
@@ -21,24 +22,35 @@ class PhotoWidget extends StatelessWidget {
 
   PhotoWidget({this.photo});
 
-  Widget buildPopupMenu(ReduxActions redux) {
+  Widget buildPopupMenu(BuildContext context, ReduxActions redux) {
     return PopupMenuButton(
       onSelected: (value) {
         if (value == 'delete') {
           redux.delete();
+        } else if (value == 'show') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PhotoPage(photo: photo),
+            ),
+          );
         }
       },
       icon: Icon(Icons.more_horiz),
       itemBuilder: (_) => <PopupMenuItem<String>>[
-        new PopupMenuItem<String>(
+        PopupMenuItem<String>(
           child: Text('Delete'),
           value: 'delete',
+        ),
+        PopupMenuItem<String>(
+          child: Text('Show'),
+          value: 'show',
         ),
       ],
     );
   }
 
-  List<Widget> buildLoadingIndicator(ReduxActions redux) {
+  List<Widget> buildLoadingIndicator(BuildContext context, ReduxActions redux) {
     return [
       Container(
         decoration: BoxDecoration(
@@ -54,11 +66,11 @@ class PhotoWidget extends StatelessWidget {
         ),
       ),
       Spacer(),
-      this.buildPopupMenu(redux),
+      this.buildPopupMenu(context, redux),
     ];
   }
 
-  List<Widget> buildThumb(ReduxActions redux) {
+  List<Widget> buildThumb(BuildContext context, ReduxActions redux) {
     var photoPath = getThumbnailPathByUUID(this.photo.uuid);
     return [
       Expanded(
@@ -79,7 +91,7 @@ class PhotoWidget extends StatelessWidget {
           ),
         ),
       ),
-      this.buildPopupMenu(redux),
+      this.buildPopupMenu(context, redux),
     ];
   }
 
@@ -107,8 +119,8 @@ class PhotoWidget extends StatelessWidget {
           children:
               // ...this.buildLoadingIndicator(),
               this.photo.hasThumb
-                  ? this.buildThumb(redux)
-                  : this.buildLoadingIndicator(redux),
+                  ? this.buildThumb(context, redux)
+                  : this.buildLoadingIndicator(context, redux),
         );
       },
     );
