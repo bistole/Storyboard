@@ -66,7 +66,6 @@ class ViewPhotoWidgetState extends State<ViewPhotoWidget> {
               maxScale: 2.0,
               minScale: 0.5,
               initialScale: 1.0,
-              tightMode: true,
               backgroundDecoration: BoxDecoration(
                 color: Colors.white,
                 border: Border.all(

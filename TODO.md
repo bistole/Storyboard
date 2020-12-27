@@ -1,21 +1,12 @@
 NOW
 ===
 
-- Show Big Photo, zoom and scale [IN_PROGRESS]
-  - Zoom view overlap the RESET button
-- Change Welcome Page [DONE]
-- Change Layout of 'add photo' [DONE]
-- Wrapper same layout attribute into widget [DONE]
-  - Function bar [DONE]
-  - Function button in bar [DONE]
-
 Server Send Event
 - Generate UUID on client side
 - Only sync updated events
 - Trigger fetchTasks from last time by sync updated events
 - Pipeline requests
 - Keepalive
-
 
 TODO
 ====
@@ -28,7 +19,6 @@ Authenticate
 
 Deployment
 - Build to App
-
 
 DONE
 ====
@@ -98,3 +88,11 @@ Import Photo
     - Add Photo [DONE]
     - Delete Photo [DONE]
     - Show Photo [DONE]
+
+- Show Big Photo, zoom and scale [DONE]
+  - Zoom view overlap the RESET button [DONE]
+- Change Welcome Page [DONE]
+- Change Layout of 'add photo' [DONE]
+- Wrapper same layout attribute into widget [DONE]
+  - Function bar [DONE]
+  - Function button in bar [DONE]
