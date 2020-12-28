@@ -16,7 +16,6 @@ import (
 	"path"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/nfnt/resize"
 )
 
@@ -56,13 +55,13 @@ func isMimeTypeValid(mimeType string) bool {
 }
 
 // AddPhoto add photo
-func (p PhotoRepo) AddPhoto(filename string, mimeType string, size string, src io.Reader) (outPhoto *Photo, err error) {
+func (p PhotoRepo) AddPhoto(uuid string, filename string, mimeType string, size string,
+	src io.Reader, createdAt int64) (outPhoto *Photo, err error) {
 	if !isMimeTypeValid(mimeType) {
 		return nil, fmt.Errorf("Invalid MIME type")
 	}
 
-	UUID, _ := uuid.NewRandom()
-	dst, err := p._getFileHandler(UUID.String(), false)
+	dst, err := p._getFileHandler(uuid, false)
 	if err != nil {
 		log.Println(err)
 		return nil, fmt.Errorf("Failed to save photo")
@@ -75,15 +74,15 @@ func (p PhotoRepo) AddPhoto(filename string, mimeType string, size string, src i
 		return nil, fmt.Errorf("Failed to save photo")
 	}
 
-	p._createThumbnail(UUID.String(), mimeType)
+	p._createThumbnail(uuid, mimeType)
 
 	inPhoto := Photo{
-		UUID:      UUID.String(),
+		UUID:      uuid,
 		Filename:  filename,
 		Size:      size,
 		Mime:      mimeType,
-		UpdatedAt: time.Now().Unix(),
-		CreatedAt: time.Now().Unix(),
+		UpdatedAt: createdAt,
+		CreatedAt: createdAt,
 	}
 	if err = p._createPhoto(inPhoto); err != nil {
 		log.Println(err)

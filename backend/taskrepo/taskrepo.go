@@ -6,8 +6,6 @@ import (
 	"database/sql"
 	"fmt"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 // Task is defined in interfaces
@@ -25,12 +23,6 @@ func NewTaskRepo(db interfaces.DatabaseService) TaskRepo {
 
 // CreateTask in DB
 func (t TaskRepo) CreateTask(inTask Task) (outTask *Task, err error) {
-	// create uuid
-	UUID, _ := uuid.NewRandom()
-	inTask.UUID = UUID.String()
-	inTask.CreatedAt = time.Now().Unix()
-	inTask.UpdatedAt = time.Now().Unix()
-
 	// create task
 	if err := t._createTask(inTask); err != nil {
 		return nil, err
@@ -50,7 +42,6 @@ func (t TaskRepo) UpdateTask(UUID string, inTask Task) (outTask *Task, err error
 	}
 
 	inTask.UUID = UUID
-	inTask.UpdatedAt = time.Now().Unix()
 	inTask.CreatedAt = task.CreatedAt
 
 	if err := t._updateTask(inTask); err != nil {

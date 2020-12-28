@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"storyboard/backend/interfaces"
+	"strconv"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -63,18 +64,62 @@ func (rs RESTServer) GetPhotos(w http.ResponseWriter, r *http.Request) {
 	rs.buildSuccPhotosResponse(w, photos)
 }
 
+func (rs RESTServer) getUUIDFromParameters(r *http.Request) (string, error) {
+	if r.Form["uuid"] == nil {
+		return "", fmt.Errorf("uuid is missing")
+	}
+	uuid := r.Form["uuid"][0]
+	if err := IsStringUUID(uuid, "uuid is invalid"); err != nil {
+		return "", err
+	}
+	return uuid, nil
+}
+
+func (rs RESTServer) getCreatedAtFromParameter(r *http.Request) (int64, error) {
+	if r.Form["createdAt"] == nil {
+		return 0, fmt.Errorf("createdAt is missing")
+	}
+	createdAt, err := strconv.ParseInt(r.Form["createdAt"][0], 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("createdAt is invalid")
+	}
+	if err := IsIntValidDate(createdAt, "createdAt is missing"); err != nil {
+		return 0, err
+	}
+
+	return createdAt, nil
+}
+
 // UploadPhoto is a restful API handler to upload photo
 func (rs RESTServer) UploadPhoto(w http.ResponseWriter, r *http.Request) {
-	mimeHeader := r.Header.Get("Content-Type")
-	size := r.Header.Get("Content-Length")
-	filename := r.Header.Get("Content-Name")
+	r.ParseMultipartForm(10 << 20)
+
+	file, handler, err := r.FormFile("photo")
+	if err != nil {
+		rs.buildErrorResponse(w, err)
+		return
+	}
+
+	uuid, err := rs.getUUIDFromParameters(r)
+	if err != nil {
+		rs.buildErrorResponse(w, err)
+		return
+	}
+	filename := handler.Filename
+	mimeType := handler.Header.Get("Content-Type")
+	size := handler.Header.Get("Content-Length")
+	createdAt, err := rs.getCreatedAtFromParameter(r)
+	if err != nil {
+		rs.buildErrorResponse(w, err)
+		return
+	}
 
 	fmt.Printf("File Name: %+v\n", filename)
 	fmt.Printf("File Size: %+v\n", size)
-	fmt.Printf("MIME Header: %+v\n", mimeHeader)
-	mimeTypeArr := strings.Split(mimeHeader, ";")
+	fmt.Printf("MIME Header: %+v\n", mimeType)
+	mimeTypeArr := strings.Split(mimeType, ";")
 
-	photo, err := rs.PhotoRepo.AddPhoto(filename, mimeTypeArr[0], size, r.Body)
+	photo, err := rs.PhotoRepo.AddPhoto(uuid, filename, mimeTypeArr[0], size, file, createdAt)
 	if err != nil {
 		rs.buildErrorResponse(w, err)
 		return

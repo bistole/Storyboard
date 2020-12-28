@@ -6,8 +6,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"storyboard/backend/mocks"
+	"strconv"
 	"strings"
 	"testing"
+	"time"
+
+	uuid "github.com/google/uuid"
 )
 
 func MockAllTaskError() *mocks.TaskRepoMock {
@@ -33,7 +37,7 @@ func MockAllTaskError() *mocks.TaskRepoMock {
 
 func MockAllPhotoError() *mocks.PhotoRepoMock {
 	var photoRepoMock = &mocks.PhotoRepoMock{
-		AddPhotoFn: func(filename, mime, size string, i io.Reader) (*mocks.Photo, error) {
+		AddPhotoFn: func(uuid, filename, mime, size string, i io.Reader, ud int64) (*mocks.Photo, error) {
 			return nil, fmt.Errorf("Error to add photo")
 		},
 		DeletePhotoFn: func(s string) (*mocks.Photo, error) {
@@ -88,7 +92,9 @@ func TestCreateTasksRequests(t *testing.T) {
 	ss := NewRESTServer(taskRepoMock, photoRepoMock)
 
 	// create http request
-	body := strings.NewReader(`{"title": "second options"}`)
+	UUID := uuid.New().String()
+	time := strconv.FormatInt(time.Now().Unix(), 10)
+	body := strings.NewReader(`{"UUID": "` + UUID + `", "title": "second options", "createdAt": ` + time + `}`)
 	req, err := http.NewRequest("POST", "http://localhost:3000/tasks", body)
 	if err != nil {
 		t.Fatal("Can not make a create request")

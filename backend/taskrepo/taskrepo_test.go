@@ -10,6 +10,7 @@ import (
 	"path"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -47,32 +48,38 @@ func TestCreateTask(t *testing.T) {
 
 	taskRepo := NewTaskRepo(db)
 
+	createdAt := time.Now().Unix() - 1000
+	updatedAt := time.Now().Unix()
+
 	// create
-	inTask := Task{Title: "new title"}
+	inTask := Task{
+		UUID:      uuid.New().String(),
+		Title:     "new title",
+		CreatedAt: createdAt,
+		UpdatedAt: updatedAt,
+	}
 	createdTask, err := taskRepo.CreateTask(inTask)
 	if err != nil {
 		t.Errorf("Failed to create task: %v", err)
 	}
 
-	now := time.Now().Unix()
 	nownano := time.Now().UnixNano()
 
+	assert.Equal(t, inTask.UUID, createdTask.UUID)
 	assert.Equal(t, "new title", createdTask.Title)
-	assert.NotEmpty(t, createdTask.UUID)
 	assert.Equal(t, createdTask.Deleted, int8(0))
+	assert.Equal(t, createdTask.CreatedAt, createdAt)
+	assert.Equal(t, createdTask.UpdatedAt, updatedAt)
 	assert.Less(t, nownano-2000000000, createdTask.TS)
 	assert.Greater(t, nownano+2000000000, createdTask.TS)
-	assert.Less(t, now-2, createdTask.UpdatedAt)
-	assert.Greater(t, now+2, createdTask.UpdatedAt)
-	assert.Less(t, now-2, createdTask.CreatedAt)
-	assert.Greater(t, now+2, createdTask.CreatedAt)
 
 	// sleep
 	time.Sleep(time.Second * 1)
 
 	// update
 	UUID := createdTask.UUID
-	inTask = Task{Title: "update title"}
+	updatedAt = time.Now().Unix()
+	inTask = Task{Title: "update title", UpdatedAt: updatedAt}
 	updatedTask, err := taskRepo.UpdateTask(UUID, inTask)
 	if err != nil {
 		t.Errorf("Failed to update task: %v", err)
@@ -81,9 +88,9 @@ func TestCreateTask(t *testing.T) {
 	assert.Equal(t, "update title", updatedTask.Title)
 	assert.Equal(t, updatedTask.UUID, UUID)
 	assert.Equal(t, updatedTask.Deleted, int8(0))
+	assert.Equal(t, updatedTask.UpdatedAt, updatedAt)
 	assert.Equal(t, createdTask.CreatedAt, updatedTask.CreatedAt)
 	assert.Greater(t, updatedTask.TS, createdTask.TS)
-	assert.Greater(t, updatedTask.UpdatedAt, createdTask.UpdatedAt)
 
 	// sleep
 	time.Sleep(time.Second * 1)

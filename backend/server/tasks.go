@@ -68,6 +68,21 @@ func (rs RESTServer) CreateTask(w http.ResponseWriter, r *http.Request) {
 	var inTask Task
 	json.Unmarshal(reqBody, &inTask)
 
+	// validate json
+	if err := IsStringUUID(inTask.UUID, "UUID is invalid"); err != nil {
+		rs.buildErrorResponse(w, err)
+		return
+	}
+	if err := IsStringNotEmpty(inTask.Title, "Title is missing"); err != nil {
+		rs.buildErrorResponse(w, err)
+		return
+	}
+	if err := IsIntValidDate(inTask.CreatedAt, "CreatedAt is missing"); err != nil {
+		rs.buildErrorResponse(w, err)
+		return
+	}
+	inTask.UpdatedAt = inTask.CreatedAt
+
 	outTask, err := rs.TaskRepo.CreateTask(inTask)
 	if err != nil {
 		rs.buildErrorResponse(w, err)
@@ -97,6 +112,15 @@ func (rs RESTServer) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	var updatedTask Task
 	json.Unmarshal(reqBody, &updatedTask)
+
+	if err := IsStringNotEmpty(updatedTask.Title, "Title is missing"); err != nil {
+		rs.buildErrorResponse(w, err)
+		return
+	}
+	if err := IsIntValidDate(updatedTask.UpdatedAt, "UpdatedAt is missing"); err != nil {
+		rs.buildErrorResponse(w, err)
+		return
+	}
 
 	task, err := rs.TaskRepo.UpdateTask(id, updatedTask)
 	if err != nil {

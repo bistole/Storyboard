@@ -3,6 +3,10 @@ NOW
 
 Server Send Event
 - Generate UUID on client side
+  - Backend [IN_PROGRESS]
+    - Func [DONE]
+    - Test-case
+  - Frontend
 - Only sync updated events
 - Trigger fetchTasks from last time by sync updated events
 - Pipeline requests
