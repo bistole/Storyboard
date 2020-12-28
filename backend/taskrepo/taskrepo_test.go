@@ -96,7 +96,8 @@ func TestCreateTask(t *testing.T) {
 	time.Sleep(time.Second * 1)
 
 	// delete
-	deletedTask, err := taskRepo.DeleteTask(UUID)
+	updatedAt = time.Now().Unix()
+	deletedTask, err := taskRepo.DeleteTask(UUID, updatedAt)
 	if err != nil {
 		t.Errorf("Failed to delete task: %v", err)
 	}
@@ -107,6 +108,29 @@ func TestCreateTask(t *testing.T) {
 	assert.Equal(t, deletedTask.CreatedAt, updatedTask.CreatedAt)
 	assert.Greater(t, deletedTask.TS, updatedTask.TS)
 	assert.Greater(t, deletedTask.UpdatedAt, updatedTask.UpdatedAt)
+
+	// get task by uuid
+	getTask, err := taskRepo.GetTaskByUUID(UUID)
+	if err != nil {
+		t.Errorf("Failed to get task: %v", err)
+	}
+
+	assert.Equal(t, getTask.UUID, UUID)
+	assert.Equal(t, getTask.CreatedAt, deletedTask.CreatedAt)
+	assert.Equal(t, getTask.UpdatedAt, deletedTask.UpdatedAt)
+	assert.Equal(t, getTask.TS, deletedTask.TS)
+
+	// get tasks
+	tasks, err := taskRepo.GetTasksByTS(0, 10, 0)
+	if err != nil {
+		t.Errorf("Failed to get tasks: %v", err)
+	}
+
+	assert.Equal(t, len(tasks), 1)
+	assert.Equal(t, tasks[0].UUID, UUID)
+	assert.Equal(t, tasks[0].CreatedAt, deletedTask.CreatedAt)
+	assert.Equal(t, tasks[0].UpdatedAt, deletedTask.UpdatedAt)
+	assert.Equal(t, tasks[0].TS, deletedTask.TS)
 
 	destoyDB("test", db)
 }

@@ -134,7 +134,17 @@ func (rs RESTServer) UpdateTask(w http.ResponseWriter, r *http.Request) {
 func (rs RESTServer) DeleteTask(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	task, err := rs.TaskRepo.DeleteTask(id)
+
+	reqBody, _ := ioutil.ReadAll(r.Body)
+	var deletedTask Task
+	json.Unmarshal(reqBody, &deletedTask)
+
+	if err := IsIntValidDate(deletedTask.UpdatedAt, "UpdatedAt is missing"); err != nil {
+		rs.buildErrorResponse(w, err)
+		return
+	}
+
+	task, err := rs.TaskRepo.DeleteTask(id, deletedTask.UpdatedAt)
 	if err != nil {
 		rs.buildErrorResponse(w, err)
 		return

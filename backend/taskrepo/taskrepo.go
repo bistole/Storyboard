@@ -5,7 +5,6 @@ import (
 
 	"database/sql"
 	"fmt"
-	"time"
 )
 
 // Task is defined in interfaces
@@ -55,9 +54,7 @@ func (t TaskRepo) UpdateTask(UUID string, inTask Task) (outTask *Task, err error
 }
 
 // DeleteTask in DB
-func (t TaskRepo) DeleteTask(UUID string) (outTask *Task, err error) {
-
-	updatedAt := time.Now().Unix()
+func (t TaskRepo) DeleteTask(UUID string, updatedAt int64) (outTask *Task, err error) {
 	if err := t._deleteTask(UUID, updatedAt); err != nil {
 		return nil, err
 	}

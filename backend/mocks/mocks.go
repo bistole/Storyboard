@@ -64,7 +64,7 @@ func (d *DatabaseMock) Close() {
 type TaskRepoMock struct {
 	CreateTaskFn    func(Task) (*Task, error)
 	UpdateTaskFn    func(string, Task) (*Task, error)
-	DeleteTaskFn    func(string) (*Task, error)
+	DeleteTaskFn    func(string, int64) (*Task, error)
 	GetTaskByUUIDFn func(string) (*Task, error)
 	GetTasksByTSFn  func(ts int64, limit int, offset int) ([]Task, error)
 }
@@ -80,8 +80,8 @@ func (t *TaskRepoMock) UpdateTask(UUID string, task Task) (*Task, error) {
 }
 
 // DeleteTask mock task repo
-func (t *TaskRepoMock) DeleteTask(UUID string) (*Task, error) {
-	return t.DeleteTaskFn(UUID)
+func (t *TaskRepoMock) DeleteTask(UUID string, updatedAt int64) (*Task, error) {
+	return t.DeleteTaskFn(UUID, updatedAt)
 }
 
 // GetTaskByUUID mock task repo

@@ -48,7 +48,7 @@ type DatabaseService interface {
 type TaskRepo interface {
 	CreateTask(Task) (*Task, error)
 	UpdateTask(string, Task) (*Task, error)
-	DeleteTask(string) (*Task, error)
+	DeleteTask(string, int64) (*Task, error)
 	GetTaskByUUID(string) (*Task, error)
 	GetTasksByTS(ts int64, limit int, offset int) ([]Task, error)
 }
