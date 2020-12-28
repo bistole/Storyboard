@@ -57,7 +57,7 @@ type TaskRepo interface {
 type PhotoRepo interface {
 	AddPhoto(uuid string, filename string, mimeType string, size string, src io.Reader,
 		createdAt int64) (outPhoto *Photo, err error)
-	DeletePhoto(UUID string) (outPhoto *Photo, err error)
+	DeletePhoto(UUID string, updatedAt int64) (outPhoto *Photo, err error)
 	GetPhoto(UUID string) (src io.ReadCloser, err error)
 	GetPhotoThumbnail(UUID string) (src io.ReadCloser, err error)
 	GetPhotoMeta(UUID string) (outPhoto *Photo, err error)

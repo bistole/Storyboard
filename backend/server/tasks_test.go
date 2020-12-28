@@ -62,7 +62,7 @@ func MockAllPhotoError() *mocks.PhotoRepoMock {
 		AddPhotoFn: func(uuid, filename, mime, size string, i io.Reader, ud int64) (*mocks.Photo, error) {
 			return nil, fmt.Errorf("Error to add photo")
 		},
-		DeletePhotoFn: func(s string) (*mocks.Photo, error) {
+		DeletePhotoFn: func(s string, ud int64) (*mocks.Photo, error) {
 			return nil, fmt.Errorf("Error to delete photo")
 		},
 		GetPhotoFn: func(s string) (io.ReadCloser, error) {

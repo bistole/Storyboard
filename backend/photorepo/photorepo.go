@@ -14,7 +14,6 @@ import (
 	"io"
 	"os"
 	"path"
-	"time"
 
 	"github.com/nfnt/resize"
 )
@@ -125,10 +124,7 @@ func (p PhotoRepo) GetPhotoMeta(UUID string) (outPhoto *Photo, err error) {
 }
 
 // DeletePhoto delete photo
-func (p PhotoRepo) DeletePhoto(UUID string) (outPhoto *Photo, err error) {
-	updatedAt := time.Now().Unix()
-
-	// ignore error
+func (p PhotoRepo) DeletePhoto(UUID string, updatedAt int64) (outPhoto *Photo, err error) {
 	p._removeFromDisk(UUID)
 
 	if err := p._deletePhoto(UUID, updatedAt); err != nil {

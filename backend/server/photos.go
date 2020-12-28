@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"storyboard/backend/interfaces"
 	"strconv"
@@ -167,7 +168,17 @@ func (rs RESTServer) ThumbnailPhoto(w http.ResponseWriter, r *http.Request) {
 func (rs RESTServer) DeletePhoto(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	photo, err := rs.PhotoRepo.DeletePhoto(id)
+
+	reqBody, _ := ioutil.ReadAll(r.Body)
+	var deletedPhoto Photo
+	json.Unmarshal(reqBody, &deletedPhoto)
+
+	if err := IsIntValidDate(deletedPhoto.UpdatedAt, "UpdatedAt is missing"); err != nil {
+		rs.buildErrorResponse(w, err)
+		return
+	}
+
+	photo, err := rs.PhotoRepo.DeletePhoto(id, deletedPhoto.UpdatedAt)
 	if err != nil {
 		rs.buildErrorResponse(w, err)
 		return

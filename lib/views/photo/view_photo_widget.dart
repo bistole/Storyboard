@@ -48,7 +48,6 @@ class ViewPhotoWidgetState extends State<ViewPhotoWidget> {
         );
       },
       builder: (context, ReduxActions redux) {
-        var s = MediaQuery.of(context).size;
         var photoPath = getPhotoPathByUUID(widget.photo.uuid);
         return Listener(
           onPointerSignal: (event) {

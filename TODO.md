@@ -6,7 +6,7 @@ Server Send Event
   - Backend [IN_PROGRESS]
     - Func [DONE]
     - Test-case
-  - Frontend
+  - Frontend [DONE]
 - Only sync updated events
 - Trigger fetchTasks from last time by sync updated events
 - Pipeline requests

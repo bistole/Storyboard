@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:mime/mime.dart';
+import 'package:uuid/uuid.dart';
 import 'package:redux/redux.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+
 import 'package:storyboard/actions/actions.dart';
 import 'package:storyboard/models/app.dart';
 import 'package:storyboard/models/photo.dart';
@@ -34,16 +37,21 @@ Future<void> uploadPhoto(Store<AppState> store, String path) async {
   var pathComp = path.split("/");
   var filename = pathComp[pathComp.length - 1];
 
-  final response = await getHTTPClient().post(URLPrefix + "/photos",
-      headers: {
-        'Content-Type': mimeType,
-        'Content-Name': filename,
-      },
-      body: File(path).readAsBytesSync(),
-      encoding: Encoding.getByName("utf-8"));
+  final uuid = Uuid().v4();
+  final ts = new DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+  final response = await getHTTPClient().send(
+    http.MultipartRequest("POST", Uri.parse(URLPrefix + "/photos"))
+      ..fields['uuid'] = uuid
+      ..fields['createdAt'] = ts.toString()
+      ..files.add(await http.MultipartFile.fromPath('photo', path,
+          filename: filename, contentType: MediaType.parse(mimeType))),
+  );
+
+  final body = await response.stream.bytesToString();
 
   if (response.statusCode == 200) {
-    Map<String, dynamic> object = jsonDecode(response.body);
+    Map<String, dynamic> object = jsonDecode(body);
     if (object['succ'] == true && object['photo'] != null) {
       var photo = Photo.fromJson(object['photo']);
 
@@ -87,11 +95,16 @@ Future<void> downloadThumbnail(Store<AppState> store, String uuid) async {
 }
 
 Future<void> deletePhoto(Store<AppState> store, Photo photo) async {
-  final response =
-      await getHTTPClient().delete(URLPrefix + "/photos/" + photo.uuid);
+  final ts = new DateTime.now().millisecondsSinceEpoch ~/ 1000;
+  final responseStream = await getHTTPClient().send(
+    http.Request("DELETE", Uri.parse(URLPrefix + "/photos/" + photo.uuid))
+      ..body = jsonEncode({"updatedAt": ts}),
+  );
 
-  if (response.statusCode == 200) {
-    Map<String, dynamic> object = jsonDecode(response.body);
+  final body = await responseStream.stream.bytesToString();
+
+  if (responseStream.statusCode == 200) {
+    Map<String, dynamic> object = jsonDecode(body);
     if (object['succ'] == true && object['photo'] != null) {
       var photo = Photo.fromJson(object['photo']);
       // delete from local
