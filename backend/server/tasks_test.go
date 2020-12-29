@@ -3,15 +3,18 @@ package server
 import (
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"net/textproto"
+	"os"
 	"storyboard/backend/mocks"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
 
-	uuid "github.com/google/uuid"
+	"github.com/google/uuid"
 )
 
 type httpFunc func(http.ResponseWriter, *http.Request)
@@ -19,6 +22,7 @@ type httpFunc func(http.ResponseWriter, *http.Request)
 func GetRESTResponse(t *testing.T, ss *RESTServer, f httpFunc,
 	method string, url string, body io.Reader) *httptest.ResponseRecorder {
 	req, err := http.NewRequest(method, url, body)
+
 	if err != nil {
 		t.Fatal("Can not make a request")
 	}
@@ -31,6 +35,94 @@ func GetRESTResponse(t *testing.T, ss *RESTServer, f httpFunc,
 	// get result
 	if status := rr.Result().StatusCode; status != http.StatusOK {
 		t.Errorf("Wrong response status code: got %v want %v", status, http.StatusOK)
+	}
+	return rr
+}
+
+type RESTMultipartsDef struct {
+	isFile bool
+	val    string
+	path   string
+	mime   string
+}
+
+var quoteEscaper = strings.NewReplacer("\\", "\\\\", `"`, "\\\"")
+
+func escapeQuotes(s string) string {
+	return quoteEscaper.Replace(s)
+}
+
+func GetRESTMultipartResponse(t *testing.T, ss *RESTServer, f httpFunc,
+	method string, url string, parts map[string]RESTMultipartsDef) *httptest.ResponseRecorder {
+
+	body, writer := io.Pipe()
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		t.Fatalf("Can not make a request\n")
+	}
+	multiWriter := multipart.NewWriter(writer)
+	req.Header.Add("Content-Type", multiWriter.FormDataContentType())
+
+	errchan := make(chan error)
+	go func() {
+		defer close(errchan)
+		defer writer.Close()
+		defer multiWriter.Close()
+
+		for key, val := range parts {
+			var w io.Writer
+			var r io.Reader
+			if val.isFile {
+				fi, err := os.Stat(val.path)
+				if err != nil {
+					errchan <- err
+					return
+				}
+				len := int(fi.Size())
+
+				r, err = os.Open(val.path)
+				if err != nil {
+					errchan <- err
+					return
+				}
+
+				h := make(textproto.MIMEHeader)
+				h.Set("Content-Disposition",
+					fmt.Sprintf(`form-data; name="%s"; filename="%s"`,
+						escapeQuotes(key), escapeQuotes(val.path)))
+				h.Set("Content-Type", val.mime)
+				h.Set("Content-Length", strconv.Itoa(len))
+				w, err = multiWriter.CreatePart(h)
+			} else {
+				r = strings.NewReader(val.val)
+				w, err = multiWriter.CreateFormField(key)
+			}
+			if err != nil {
+				errchan <- err
+				return
+			}
+
+			if _, err = io.Copy(w, r); err != nil {
+				errchan <- err
+				return
+			}
+		}
+	}()
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(ss.UploadPhoto)
+
+	// send request
+	handler.ServeHTTP(rr, req)
+
+	// get result
+	if status := rr.Result().StatusCode; status != http.StatusOK {
+		t.Errorf("Wrong response status code: got %v want %v", status, http.StatusOK)
+	}
+
+	multiErr := <-errchan
+	if multiErr != nil {
+		t.Errorf("Wrong multipart error: %v", multiErr)
 	}
 
 	return rr
@@ -81,7 +173,7 @@ func MockAllPhotoError() *mocks.PhotoRepoMock {
 	return photoRepoMock
 }
 
-func TestGetTasksSuccRequests(t *testing.T) {
+func TestGetTasksSuccRequest(t *testing.T) {
 	item := Task{UUID: "uuid", Title: "title", UpdatedAt: 1000, CreatedAt: 2000, Deleted: 0}
 
 	taskRepoMock := MockAllTaskError()
@@ -100,7 +192,7 @@ func TestGetTasksSuccRequests(t *testing.T) {
 	}
 }
 
-func TestGetTasksFailureRequests(t *testing.T) {
+func TestGetTasksFailureRequest(t *testing.T) {
 	taskRepoMock := MockAllTaskError()
 	photoRepoMock := MockAllPhotoError()
 	ss := NewRESTServer(taskRepoMock, photoRepoMock)
@@ -147,7 +239,7 @@ func TestGetTaskFailureRequest(t *testing.T) {
 	}
 }
 
-func TestCreateTaskRequests(t *testing.T) {
+func TestCreateTaskRequest(t *testing.T) {
 	taskRepoMock := MockAllTaskError()
 	photoRepoMock := MockAllPhotoError()
 	ss := NewRESTServer(taskRepoMock, photoRepoMock)
@@ -166,7 +258,7 @@ func TestCreateTaskRequests(t *testing.T) {
 	}
 }
 
-func TestUpdateTasksRequests(t *testing.T) {
+func TestUpdateTaskRequest(t *testing.T) {
 	taskRepoMock := MockAllTaskError()
 	photoRepoMock := MockAllPhotoError()
 	ss := NewRESTServer(taskRepoMock, photoRepoMock)
@@ -184,7 +276,7 @@ func TestUpdateTasksRequests(t *testing.T) {
 	}
 }
 
-func TestDeleteTasksRequests(t *testing.T) {
+func TestDeleteTaskRequest(t *testing.T) {
 	taskRepoMock := MockAllTaskError()
 	photoRepoMock := MockAllPhotoError()
 	ss := NewRESTServer(taskRepoMock, photoRepoMock)
