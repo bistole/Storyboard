@@ -5,9 +5,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:storyboard/models/app.dart';
-import 'package:storyboard/models/photo.dart';
-import 'package:storyboard/models/status.dart';
+import 'package:storyboard/redux/models/app.dart';
+import 'package:storyboard/redux/models/photo.dart';
+import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/storage/photo.dart';
 
 class ReduxActions {

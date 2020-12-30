@@ -1,8 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
-import 'package:storyboard/actions/actions.dart';
-import 'package:storyboard/models/status.dart';
-import 'package:storyboard/store.dart';
+import 'package:storyboard/redux/actions/actions.dart';
+import 'package:storyboard/redux/models/status.dart';
+import 'package:storyboard/redux/store.dart';
 
 const COMMANDS = '/COMMANDS';
 

@@ -7,11 +7,11 @@
 
 import 'dart:convert';
 
-import 'package:storyboard/models/app.dart';
-import 'package:storyboard/models/status.dart';
-import 'package:storyboard/models/task.dart';
+import 'package:storyboard/redux/models/app.dart';
+import 'package:storyboard/redux/models/status.dart';
+import 'package:storyboard/redux/models/task.dart';
+import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/net/config.dart';
-import 'package:storyboard/reducers/app_reducer.dart';
 import 'package:storyboard/views/home/page.dart';
 
 import 'package:http/http.dart' as http;

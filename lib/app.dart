@@ -3,8 +3,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 import 'package:storyboard/views/home/page.dart';
-import 'package:storyboard/models/app.dart';
-import 'package:storyboard/store.dart';
+import 'package:storyboard/redux/models/app.dart';
+import 'package:storyboard/redux/store.dart';
 
 class StoryBoardApp extends StatelessWidget {
   // This widget is the root of your application.

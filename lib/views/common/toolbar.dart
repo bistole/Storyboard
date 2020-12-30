@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:storyboard/widgets/toolbar_button.dart';
+import 'package:storyboard/views/common/toolbar_button.dart';
 
 class SBToolbar extends StatelessWidget {
   final List<SBToolbarButton> children;

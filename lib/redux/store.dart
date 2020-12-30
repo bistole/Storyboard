@@ -3,13 +3,13 @@ import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
-import 'package:storyboard/models/app.dart';
+import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/menu_events.dart';
 import 'package:storyboard/net/photos.dart';
 import 'package:storyboard/net/tasks.dart';
 import 'package:storyboard/storage/photo.dart';
-import 'package:storyboard/reducers/app_reducer.dart';
+import 'package:storyboard/redux/reducers/app_reducer.dart';
 
 Store<AppState> _store;
 

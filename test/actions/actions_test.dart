@@ -1,7 +1,8 @@
-import 'package:storyboard/actions/actions.dart';
-import 'package:storyboard/models/status.dart';
-import 'package:storyboard/models/task.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'package:storyboard/redux/actions/actions.dart';
+import 'package:storyboard/redux/models/status.dart';
+import 'package:storyboard/redux/models/task.dart';
 
 void main() {
   final task = Task.fromJson({

@@ -1,6 +1,6 @@
-import 'package:storyboard/reducers/photo_reducer.dart';
+import 'package:storyboard/redux/models/app.dart';
+import 'package:storyboard/redux/reducers/photo_reducer.dart';
 
-import '../models/app.dart';
 import 'task_reducer.dart';
 import 'status_reducer.dart';
 

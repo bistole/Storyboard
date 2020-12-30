@@ -1,6 +1,8 @@
-import 'package:storyboard/models/photo.dart';
-import 'package:storyboard/models/status.dart';
 import 'package:flutter/material.dart';
+
+import 'package:storyboard/redux/models/photo.dart';
+import 'package:storyboard/redux/models/status.dart';
+
 import 'task.dart';
 
 @immutable

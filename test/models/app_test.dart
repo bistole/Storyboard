@@ -1,5 +1,5 @@
-import 'package:storyboard/models/app.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:storyboard/redux/models/app.dart';
 
 void main() {
   test("appState", () {

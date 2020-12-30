@@ -1,6 +1,6 @@
-import 'package:storyboard/models/photo.dart';
-import 'package:storyboard/models/status.dart';
-import 'package:storyboard/models/task.dart';
+import 'package:storyboard/redux/models/photo.dart';
+import 'package:storyboard/redux/models/status.dart';
+import 'package:storyboard/redux/models/task.dart';
 
 class FetchTasksAction {
   final List<Task> taskList;

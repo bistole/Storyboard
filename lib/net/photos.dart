@@ -6,9 +6,9 @@ import 'package:redux/redux.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
-import 'package:storyboard/actions/actions.dart';
-import 'package:storyboard/models/app.dart';
-import 'package:storyboard/models/photo.dart';
+import 'package:storyboard/redux/actions/actions.dart';
+import 'package:storyboard/redux/models/app.dart';
+import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/storage/photo.dart';
 

@@ -1,12 +1,11 @@
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-import '../../actions/actions.dart';
-import '../../net/tasks.dart';
-import '../../models/app.dart';
-import '../../models/task.dart';
-import '../../models/status.dart';
+import 'package:storyboard/net/tasks.dart';
+import 'package:storyboard/redux/actions/actions.dart';
+import 'package:storyboard/redux/models/app.dart';
+import 'package:storyboard/redux/models/status.dart';
+import 'package:storyboard/redux/models/task.dart';
 
 class ReduxActions {
   final void Function() delete;

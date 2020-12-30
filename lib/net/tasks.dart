@@ -4,10 +4,10 @@ import 'package:http/http.dart' as http;
 import 'package:redux/redux.dart';
 import 'package:uuid/uuid.dart';
 
-import 'package:storyboard/actions/actions.dart';
+import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/net/config.dart';
-import 'package:storyboard/models/app.dart';
-import 'package:storyboard/models/task.dart';
+import 'package:storyboard/redux/models/app.dart';
+import 'package:storyboard/redux/models/task.dart';
 
 Future<void> fetchTasks(Store<AppState> store) async {
   final response = await getHTTPClient().get(URLPrefix + "/tasks");

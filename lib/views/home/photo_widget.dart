@@ -3,10 +3,10 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:storyboard/actions/actions.dart';
-import 'package:storyboard/models/app.dart';
-import 'package:storyboard/models/photo.dart';
-import 'package:storyboard/models/status.dart';
+import 'package:storyboard/redux/actions/actions.dart';
+import 'package:storyboard/redux/models/app.dart';
+import 'package:storyboard/redux/models/photo.dart';
+import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/net/photos.dart';
 import 'package:storyboard/storage/photo.dart';
 import 'package:storyboard/views/photo/page.dart';
