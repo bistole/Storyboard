@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
-import 'package:storyboard/net/command.dart';
+import 'package:storyboard/channel/command.dart';
 
 const MENU_EVENTS = "/MENU_EVENTS";
 

@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:path/path.dart' as path;
-import 'package:storyboard/net/config.dart';
+import 'package:storyboard/channel/config.dart';
 
 Future<void> initPhotoStorage() async {
   final homePage = getDataHome();

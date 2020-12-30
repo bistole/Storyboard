@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 
 import 'package:storyboard/views/common/toolbar.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
-import 'package:storyboard/net/command.dart';
+import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/net/tasks.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
