@@ -11,25 +11,50 @@ final taskReducer = combineReducers<Map<String, Task>>([
 ]);
 
 Map<String, Task> _fetchTasks(
-    Map<String, Task> tasks, FetchTasksAction action) {
-  var newTasks = Map<String, Task>.fromIterable(action.taskList,
-      key: (v) => v.uuid, value: (v) => v);
-  return Map.from(tasks)..addAll(newTasks);
+  Map<String, Task> tasks,
+  FetchTasksAction action,
+) {
+  Set<String> removeUuids = Set();
+  Map<String, Task> updatedTasks = Map();
+  action.taskMap.forEach((uuid, task) {
+    if (task.deleted == 1) {
+      removeUuids.add(uuid);
+    } else {
+      updatedTasks[uuid] = task;
+    }
+  });
+
+  return Map.unmodifiable(
+    Map.from(tasks)
+      ..addAll(updatedTasks)
+      ..removeWhere((uuid, task) => removeUuids.contains(uuid)),
+  );
 }
 
 Map<String, Task> _createTask(
-    Map<String, Task> tasks, CreateTaskAction action) {
-  return Map.from(tasks)..addAll({action.task.uuid: action.task});
+  Map<String, Task> tasks,
+  CreateTaskAction action,
+) {
+  return Map.unmodifiable(
+    Map.from(tasks)..addAll({action.task.uuid: action.task}),
+  );
 }
 
 Map<String, Task> _updateTask(
-    Map<String, Task> tasks, UpdateTaskAction action) {
-  return tasks.map((uuid, task) =>
-      MapEntry(uuid, uuid == action.task.uuid ? action.task : task));
+  Map<String, Task> tasks,
+  UpdateTaskAction action,
+) {
+  return Map.unmodifiable(
+    tasks.map((uuid, task) =>
+        MapEntry(uuid, uuid == action.task.uuid ? action.task : task)),
+  );
 }
 
 Map<String, Task> _deleteTask(
-    Map<String, Task> tasks, DeleteTaskAction action) {
-  return tasks.map((uuid, task) =>
-      MapEntry(uuid, uuid == action.task.uuid ? action.task : task));
+  Map<String, Task> tasks,
+  DeleteTaskAction action,
+) {
+  return Map.unmodifiable(
+    Map.from(tasks)..remove(action.uuid),
+  );
 }

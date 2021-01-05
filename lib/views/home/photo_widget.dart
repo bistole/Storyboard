@@ -3,11 +3,11 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/net/photos.dart';
 import 'package:storyboard/storage/photo.dart';
 import 'package:storyboard/views/photo/page.dart';
 
@@ -102,10 +102,10 @@ class PhotoWidget extends StatelessWidget {
         return ReduxActions(
           delete: () {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
-            deletePhoto(store, photo);
+            actDeletePhoto(store, photo.uuid);
           },
           getThumb: () {
-            downloadThumbnail(store, photo.uuid);
+            actDownloadThumbnail(store, photo.uuid);
           },
         );
       },

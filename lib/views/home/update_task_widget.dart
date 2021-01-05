@@ -1,7 +1,7 @@
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:storyboard/net/tasks.dart';
+import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
@@ -25,11 +25,7 @@ class UpdateTaskWidget extends StatelessWidget {
       converter: (store) {
         return ReduxActions(
           update: (String value) {
-            var updatedTask = task.copyWith(
-              title: value,
-              updatedAt: DateTime.now().millisecondsSinceEpoch ~/ 1000,
-            );
-            updateTask(store, updatedTask);
+            actUpdateTask(store, task.uuid, value);
             store.dispatch(new ChangeStatusAction(status: StatusKey.ListTask));
           },
           cancel: () {

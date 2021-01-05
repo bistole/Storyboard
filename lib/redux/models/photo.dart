@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+
+@immutable
 class Photo {
   final String uuid;
   final String filename;
@@ -62,8 +65,8 @@ class Photo {
       filename: json['filename'],
       mime: json['mime'],
       size: json['size'],
-      hasOrigin: false,
-      hasThumb: false,
+      hasOrigin: json['hasOrigin'] ?? false,
+      hasThumb: json['hasThumb'] ?? false,
       deleted: json['deleted'],
       updatedAt: json['updatedAt'],
       createdAt: json['createdAt'],
@@ -87,21 +90,23 @@ class Photo {
   }
 }
 
-List<Photo> buildPhotoList(List<dynamic> json) {
-  var list = new List<Photo>();
+Map<String, Photo> buildPhotoMap(List<dynamic> json) {
+  var map = Map<String, Photo>();
   json.forEach((element) {
-    list.add(Photo(
-      uuid: element['uuid'],
-      filename: element['filename'],
-      mime: element['mime'],
-      size: element['size'],
-      hasOrigin: element['hasOrigin'] ?? false,
-      hasThumb: element['hasThumb'] ?? false,
-      deleted: element['deleted'],
-      updatedAt: element['updatedAt'],
-      createdAt: element['createdAt'],
-      ts: element['_ts'],
-    ));
+    if (element['uuid'] != null) {
+      map[element['uuid']] = Photo(
+        uuid: element['uuid'],
+        filename: element['filename'],
+        mime: element['mime'],
+        size: element['size'],
+        hasOrigin: element['hasOrigin'] ?? false,
+        hasThumb: element['hasThumb'] ?? false,
+        deleted: element['deleted'],
+        updatedAt: element['updatedAt'],
+        createdAt: element['createdAt'],
+        ts: element['_ts'],
+      );
+    }
   });
-  return list;
+  return map;
 }

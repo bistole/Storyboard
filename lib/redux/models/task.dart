@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+
+@immutable
 class Task {
   final String uuid;
   final String title;
@@ -61,17 +64,19 @@ class Task {
   }
 }
 
-List<Task> buildTaskList(List<dynamic> json) {
-  var list = new List<Task>();
+Map<String, Task> buildTaskMap(List<dynamic> json) {
+  var map = Map<String, Task>();
   json.forEach((element) {
-    list.add(Task(
-      uuid: element['uuid'],
-      title: element['title'],
-      deleted: element['deleted'],
-      updatedAt: element['updatedAt'],
-      createdAt: element['createdAt'],
-      ts: element['_ts'],
-    ));
+    if (element['uuid'] != null) {
+      map[element['uuid']] = Task(
+        uuid: element['uuid'],
+        title: element['title'],
+        deleted: element['deleted'],
+        updatedAt: element['updatedAt'],
+        createdAt: element['createdAt'],
+        ts: element['_ts'],
+      );
+    }
   });
-  return list;
+  return map;
 }

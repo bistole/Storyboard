@@ -1,7 +1,7 @@
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:storyboard/net/tasks.dart';
+import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
@@ -62,7 +62,7 @@ class TaskWidget extends StatelessWidget {
             ),
             Align(
               alignment: Alignment.centerLeft,
-              child: Text(fmt.format(date),
+              child: Text(fmt.format(date) + " (${task.ts})",
                   style: Theme.of(context).textTheme.headline3),
             ),
           ],
@@ -78,7 +78,7 @@ class TaskWidget extends StatelessWidget {
         return ReduxActions(
           delete: () {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
-            deleteTask(store, task);
+            actDeleteTask(store, task.uuid);
           },
           update: () {
             // start to update

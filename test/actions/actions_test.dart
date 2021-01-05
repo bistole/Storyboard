@@ -14,7 +14,7 @@ void main() {
     '_ts': 1000000,
   });
   test("FetchTasksAction", () {
-    final act = FetchTasksAction(taskList: [task]);
+    final act = FetchTasksAction(taskMap: {"uuid": task});
     expect(act.toString(),
         "FetchTasksAction{taskList: [Task{uuid: uuid, title: title, deleted: 0, updatedAt: 1000, createdAt: 1000}]}");
   });
@@ -32,7 +32,7 @@ void main() {
   });
 
   test("DeleteTaskAction", () {
-    final act = DeleteTaskAction(task: task);
+    final act = DeleteTaskAction(uuid: "uuid");
     expect(act.toString(),
         "DeleteTaskAction{task: Task{uuid: uuid, title: title, deleted: 0, updatedAt: 1000, createdAt: 1000}}");
   });

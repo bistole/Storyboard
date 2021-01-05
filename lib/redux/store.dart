@@ -3,11 +3,10 @@ import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
+import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/channel/config.dart';
 import 'package:storyboard/channel/menu_events.dart';
-import 'package:storyboard/net/photos.dart';
-import 'package:storyboard/net/tasks.dart';
 import 'package:storyboard/storage/photo.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
 
@@ -23,6 +22,7 @@ Future<Store<AppState>> initStore() async {
 
   final homePath = getDataHome();
   final statePath = path.join(homePath, 'state.json');
+  print("state path: $statePath");
 
   final persistor = Persistor<AppState>(
     storage: FileStorage(File(statePath)),
@@ -37,14 +37,10 @@ Future<Store<AppState>> initStore() async {
     middleware: [persistor.createMiddleware()],
   );
 
+  _store = store;
+
+  initQueue();
   bindMenuEvents();
 
-  // Use timer to trigger fetchTasks/fetchPhotos after launch
-  Future.delayed(Duration(seconds: 30), () async {
-    await fetchTasks(store);
-    await fetchPhotos(store);
-  });
-
-  _store = store;
   return store;
 }

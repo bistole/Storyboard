@@ -1,15 +1,16 @@
 import 'package:storyboard/redux/models/photo.dart';
+import 'package:storyboard/redux/models/queue_item.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
 
 class FetchTasksAction {
-  final List<Task> taskList;
+  final Map<String, Task> taskMap;
 
-  FetchTasksAction({this.taskList});
+  FetchTasksAction({this.taskMap});
 
   @override
   String toString() {
-    return 'FetchTasksAction{taskList: $taskList}';
+    return 'FetchTasksAction{taskMap: $taskMap}';
   }
 }
 
@@ -36,24 +37,24 @@ class UpdateTaskAction {
 }
 
 class DeleteTaskAction {
-  final Task task;
+  final String uuid;
 
-  DeleteTaskAction({this.task});
+  DeleteTaskAction({this.uuid});
 
   @override
   String toString() {
-    return 'DeleteTaskAction{task: $task}';
+    return 'DeleteTaskAction{uuid: $uuid}';
   }
 }
 
 class FetchPhotosAction {
-  final List<Photo> photoList;
+  final Map<String, Photo> photoMap;
 
-  FetchPhotosAction({this.photoList});
+  FetchPhotosAction({this.photoMap});
 
   @override
   String toString() {
-    return 'FetchPhotosAction{photoList: $photoList}';
+    return 'FetchPhotosAction{photoMap: $photoMap}';
   }
 }
 
@@ -90,14 +91,25 @@ class ThumbnailPhotoAction {
   }
 }
 
-class DeletePhotoAction {
+class UpdatePhotoAction {
   final Photo photo;
 
-  DeletePhotoAction({this.photo});
+  UpdatePhotoAction({this.photo});
 
   @override
   String toString() {
-    return 'DeletePhotoAction{photo: $photo}';
+    return 'UpdatePhotoAction{photo: $photo}';
+  }
+}
+
+class DeletePhotoAction {
+  final String uuid;
+
+  DeletePhotoAction({this.uuid});
+
+  @override
+  String toString() {
+    return 'DeletePhotoAction{uuid: $uuid}';
   }
 }
 
@@ -133,5 +145,49 @@ class ChangeStatusWithPathAction {
   @override
   String toString() {
     return 'ChangeStatusWithPathAction{status: $status, path: $path}';
+  }
+}
+
+class PushQueueItemAction {
+  final QueueItemType type;
+  final QueueItemAction action;
+  final String uuid;
+
+  PushQueueItemAction({this.type, this.action, this.uuid});
+
+  @override
+  String toString() {
+    return 'PushQueueItemAction{type: $type, action: $action, uuid: $uuid}';
+  }
+}
+
+class UnshiftQueueItemAction {
+  final QueueItemType type;
+  final QueueItemAction action;
+  final String uuid;
+
+  UnshiftQueueItemAction({this.type, this.action, this.uuid});
+
+  @override
+  String toString() {
+    return 'UnshiftQueueItemAction{type: $type, action: $action, uuid: $uuid}';
+  }
+}
+
+class ProcessQueueItemAction {
+  ProcessQueueItemAction();
+
+  @override
+  String toString() {
+    return 'ProcessQueueItemAction{}';
+  }
+}
+
+class DoneQueueItemAction {
+  DoneQueueItemAction();
+
+  @override
+  String toString() {
+    return 'DoneQueueItemAction{}';
   }
 }

@@ -1,7 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
-import 'package:mime/mime.dart';
-import 'package:uuid/uuid.dart';
 import 'package:redux/redux.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -14,104 +11,128 @@ import 'package:storyboard/storage/photo.dart';
 
 var validMimeTypes = ["image/jpeg", "image/png", "image/gif"];
 
-Future<void> fetchPhotos(Store<AppState> store) async {
-  final response = await getHTTPClient().get(URLPrefix + "/photos");
-
-  if (response.statusCode == 200) {
-    Map<String, dynamic> object = jsonDecode(response.body);
-    if (object['succ'] == true && object['photos'] != null) {
-      var photoList = buildPhotoList(object['photos']);
-      store.dispatch(new FetchPhotosAction(photoList: photoList));
+Future<bool> netFetchPhotos(Store<AppState> store) async {
+  try {
+    final response = await getHTTPClient().get(URLPrefix + "/photos");
+    if (response.statusCode == 200) {
+      Map<String, dynamic> object = jsonDecode(response.body);
+      if (object['succ'] == true && object['photos'] != null) {
+        var photoMap = buildPhotoMap(object['photos']);
+        for (var photo in photoMap.values) {
+          if (photo.deleted == 1) {
+            await deletePhotoAndThumbByUUID(photo.uuid);
+          }
+        }
+        store.dispatch(FetchPhotosAction(photoMap: photoMap));
+      }
+      return true;
     }
+  } catch (e) {
+    print("netFetchPhotos failed: $e");
   }
+  return false;
 }
 
-Future<void> uploadPhoto(Store<AppState> store, String path) async {
-  // TODO: convert to valid format in backend
-  var mimeType = lookupMimeType(path);
-  if (!validMimeTypes.contains(mimeType)) {
-    // TODO: show error in UI
-    return;
-  }
+Future<bool> netUploadPhoto(Store<AppState> store, String uuid) async {
+  try {
+    Photo photo = store.state.photos[uuid];
+    if (photo == null) return true;
 
-  var pathComp = path.split("/");
-  var filename = pathComp[pathComp.length - 1];
+    final response = await getHTTPClient().send(
+      http.MultipartRequest("POST", Uri.parse(URLPrefix + "/photos"))
+        ..fields['uuid'] = photo.uuid
+        ..fields['createdAt'] = photo.createdAt.toString()
+        ..files.add(
+          await http.MultipartFile.fromPath(
+            'photo',
+            getPhotoPathByUUID(uuid),
+            filename: photo.filename,
+            contentType: MediaType.parse(photo.mime),
+          ),
+        ),
+    );
 
-  final uuid = Uuid().v4();
-  final ts = new DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    final body = await response.stream.bytesToString();
 
-  final response = await getHTTPClient().send(
-    http.MultipartRequest("POST", Uri.parse(URLPrefix + "/photos"))
-      ..fields['uuid'] = uuid
-      ..fields['createdAt'] = ts.toString()
-      ..files.add(await http.MultipartFile.fromPath('photo', path,
-          filename: filename, contentType: MediaType.parse(mimeType))),
-  );
-
-  final body = await response.stream.bytesToString();
-
-  if (response.statusCode == 200) {
-    Map<String, dynamic> object = jsonDecode(body);
-    if (object['succ'] == true && object['photo'] != null) {
-      var photo = Photo.fromJson(object['photo']);
-
-      // copy to local
-      await copyPhotoByUUID(photo.uuid, File(path));
-
-      // update store
-      store.dispatch(new CreatePhotoAction(photo: photo));
+    if (response.statusCode == 200) {
+      Map<String, dynamic> object = jsonDecode(body);
+      if (object['succ'] == true && object['photo'] != null) {
+        var photo = Photo.fromJson(object['photo']);
+        store.dispatch(UpdatePhotoAction(photo: photo));
+      }
+      return true;
     }
+  } catch (e) {
+    print("netUploadPhoto failed: $e");
   }
+  return false;
 }
 
-// TODO: put into pipeline
-Future<void> downloadPhoto(Store<AppState> store, String uuid) async {
-  final response = await getHTTPClient().get(
-    URLPrefix + "/photos/" + uuid,
-  );
+Future<bool> netDownloadPhoto(Store<AppState> store, String uuid) async {
+  try {
+    Photo photo = store.state.photos[uuid];
+    if (photo == null) return true;
+    if (photo.hasOrigin) return true;
 
-  if (response.statusCode == 200) {
-    // save to local
-    await savePhotoByUUID(uuid, response.bodyBytes);
+    final response = await getHTTPClient().get(
+      URLPrefix + "/photos/" + uuid,
+    );
 
-    // update store
-    store.dispatch(new DownloadPhotoAction(uuid: uuid));
-  }
-}
-
-// TODO: put into pipeline
-Future<void> downloadThumbnail(Store<AppState> store, String uuid) async {
-  final response = await getHTTPClient().get(
-    URLPrefix + "/photos/" + uuid + '/thumbnail',
-  );
-
-  if (response.statusCode == 200) {
-    // save to local
-    await saveThumbailByUUID(uuid, response.bodyBytes);
-
-    // update store
-    store.dispatch(new ThumbnailPhotoAction(uuid: uuid));
-  }
-}
-
-Future<void> deletePhoto(Store<AppState> store, Photo photo) async {
-  final ts = new DateTime.now().millisecondsSinceEpoch ~/ 1000;
-  final responseStream = await getHTTPClient().send(
-    http.Request("DELETE", Uri.parse(URLPrefix + "/photos/" + photo.uuid))
-      ..body = jsonEncode({"updatedAt": ts}),
-  );
-
-  final body = await responseStream.stream.bytesToString();
-
-  if (responseStream.statusCode == 200) {
-    Map<String, dynamic> object = jsonDecode(body);
-    if (object['succ'] == true && object['photo'] != null) {
-      var photo = Photo.fromJson(object['photo']);
-      // delete from local
-      await deletePhotoAndThumbByUUID(photo.uuid);
-
-      // update store
-      store.dispatch(new DeletePhotoAction(photo: photo));
+    if (response.statusCode == 200) {
+      await savePhotoByUUID(uuid, response.bodyBytes);
+      store.dispatch(DownloadPhotoAction(uuid: uuid));
+      return true;
     }
+  } catch (e) {
+    print("netDownloadPhoto failed: $e");
   }
+  return false;
+}
+
+Future<bool> netDownloadThumbnail(Store<AppState> store, String uuid) async {
+  try {
+    Photo photo = store.state.photos[uuid];
+    if (photo == null) return true;
+    if (photo.hasThumb) return true;
+
+    final response = await getHTTPClient().get(
+      URLPrefix + "/photos/" + uuid + '/thumbnail',
+    );
+
+    if (response.statusCode == 200) {
+      await saveThumbailByUUID(uuid, response.bodyBytes);
+      store.dispatch(ThumbnailPhotoAction(uuid: uuid));
+      return true;
+    }
+  } catch (e) {
+    print("netDownloadThumbnail failed: $e");
+  }
+  return false;
+}
+
+Future<bool> netDeletePhoto(Store<AppState> store, String uuid) async {
+  try {
+    Photo photo = store.state.photos[uuid];
+    if (photo == null) return true;
+
+    final responseStream = await getHTTPClient().send(
+      http.Request("DELETE", Uri.parse(URLPrefix + "/photos/" + photo.uuid))
+        ..body = jsonEncode({"updatedAt": photo.updatedAt}),
+    );
+
+    final body = await responseStream.stream.bytesToString();
+
+    if (responseStream.statusCode == 200) {
+      Map<String, dynamic> object = jsonDecode(body);
+      if (object['succ'] == true && object['photo'] != null) {
+        var photo = Photo.fromJson(object['photo']);
+        await deletePhotoAndThumbByUUID(photo.uuid);
+        store.dispatch(DeletePhotoAction(uuid: photo.uuid));
+      }
+      return true;
+    }
+  } catch (e) {
+    print("netDeletePhoto failed: $e");
+  }
+  return false;
 }

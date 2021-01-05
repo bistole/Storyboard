@@ -9,8 +9,8 @@ Server Send Event
   - Frontend [DONE]
 - Only sync updated events
 - Trigger fetchTasks from last time by sync updated events
-- Pipeline requests
-- Keepalive
+- Pipeline requests [DONE]
+- Keepalive [DONE]
 
 TODO
 ====

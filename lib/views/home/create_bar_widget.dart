@@ -2,10 +2,10 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/views/common/toolbar.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
 import 'package:storyboard/channel/command.dart';
-import 'package:storyboard/net/tasks.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
@@ -59,7 +59,7 @@ class CreateBarWidget extends StatelessWidget {
           },
           createTask: (String title) {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
-            createTask(store, title);
+            actCreateTask(store, title);
           },
           cancel: () {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
