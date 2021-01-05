@@ -78,7 +78,7 @@ class TaskWidget extends StatelessWidget {
         return ReduxActions(
           delete: () {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
-            actDeleteTask(store, task.uuid);
+            getActTasks().actDeleteTask(store, task.uuid);
           },
           update: () {
             // start to update

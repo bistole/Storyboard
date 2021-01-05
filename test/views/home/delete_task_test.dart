@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
@@ -20,6 +21,8 @@ class MockClient extends Mock implements http.Client {
     return "I am the mock";
   }
 }
+
+class MockNetQueue extends Mock implements NetQueue {}
 
 Type typeof<T>() => T;
 
@@ -54,6 +57,10 @@ void main() {
   group(
     "delete item",
     () {
+      setUp(() {
+        setNetQueue(MockNetQueue());
+      });
+
       testWidgets("delete item succ", (WidgetTester tester) async {
         // Setup HTTP Response
         final client = MockClient();
@@ -103,13 +110,6 @@ void main() {
         );
         await tester.tap(itmFinder.first);
         await tester.pumpAndSettle();
-
-        // Verify http request is correct
-        var captured = verify(client.delete(
-          captureAny,
-        )).captured;
-
-        expect(captured[0], "http://localhost:3000/tasks/" + uuid);
 
         // Verify the redux state is correct
         expect(store.state.status.status, StatusKey.ListTask);

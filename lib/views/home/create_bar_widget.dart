@@ -59,7 +59,7 @@ class CreateBarWidget extends StatelessWidget {
           },
           createTask: (String title) {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
-            actCreateTask(store, title);
+            getActTasks().actCreateTask(store, title);
           },
           cancel: () {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));

@@ -16,7 +16,7 @@ void main() {
   test("FetchTasksAction", () {
     final act = FetchTasksAction(taskMap: {"uuid": task});
     expect(act.toString(),
-        "FetchTasksAction{taskList: [Task{uuid: uuid, title: title, deleted: 0, updatedAt: 1000, createdAt: 1000}]}");
+        "FetchTasksAction{taskMap: {uuid: Task{uuid: uuid, title: title, deleted: 0, updatedAt: 1000, createdAt: 1000}}}");
   });
 
   test("CreateTaskAction", () {
@@ -33,8 +33,7 @@ void main() {
 
   test("DeleteTaskAction", () {
     final act = DeleteTaskAction(uuid: "uuid");
-    expect(act.toString(),
-        "DeleteTaskAction{task: Task{uuid: uuid, title: title, deleted: 0, updatedAt: 1000, createdAt: 1000}}");
+    expect(act.toString(), "DeleteTaskAction{uuid: uuid}");
   });
 
   test("ChangeStatusAction", () {

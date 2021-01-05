@@ -102,10 +102,10 @@ class PhotoWidget extends StatelessWidget {
         return ReduxActions(
           delete: () {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
-            actDeletePhoto(store, photo.uuid);
+            getActPhotos().actDeletePhoto(store, photo.uuid);
           },
           getThumb: () {
-            actDownloadThumbnail(store, photo.uuid);
+            getActPhotos().actDownloadThumbnail(store, photo.uuid);
           },
         );
       },

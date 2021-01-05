@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
@@ -20,6 +21,8 @@ class MockClient extends Mock implements http.Client {
     return "I am the mock";
   }
 }
+
+class MockNetQueue extends Mock implements NetQueue {}
 
 Type typeof<T>() => T;
 
@@ -54,6 +57,10 @@ void main() {
   group(
     "update item",
     () {
+      setUp(() {
+        setNetQueue(MockNetQueue());
+      });
+
       testWidgets("update item succ", (WidgetTester tester) async {
         // Setup HTTP Response
         final client = MockClient();
@@ -115,31 +122,14 @@ void main() {
         await tester.testTextInput.receiveAction(TextInputAction.done);
         await tester.pump();
 
-        // Verify http request is correct
-        var captured = verify(client.post(
-          captureAny,
-          headers: anyNamed("headers"),
-          body: captureAnyNamed("body"),
-          encoding: anyNamed("encoding"),
-        )).captured;
-
-        expect(captured[0], "http://localhost:3000/tasks/" + uuid);
-
-        var bodyJson = jsonDecode(captured[1]);
-        expect(bodyJson['uuid'], uuid);
-        expect(bodyJson['title'], "Add updated list");
-        var ts = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-        expect(bodyJson['updatedAt'], greaterThan(ts - 5));
-        expect(bodyJson['updatedAt'], lessThan(ts + 5));
-
         // Verify the redux state is correct
         expect(store.state.status.status, StatusKey.ListTask);
         expect(store.state.tasks.length, 1);
-        expect(store.state.tasks[uuid].title, "updated Title");
+        expect(store.state.tasks[uuid].title, "Add updated list");
 
         // verify the UI is correct
         expect(find.byType(TextField), findsNothing);
-        expect(find.text('updated Title'), findsOneWidget);
+        expect(find.text('Add updated list'), findsOneWidget);
       });
     },
   );

@@ -62,7 +62,7 @@ class CreatePhotoWidget extends StatelessWidget {
         return ReduxActions(
           createPhoto: (String path) {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
-            actUploadPhoto(store, path);
+            getActPhotos().actUploadPhoto(store, path);
           },
           cancel: () {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));

@@ -7,6 +7,7 @@
 
 import 'dart:convert';
 
+import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
@@ -27,6 +28,8 @@ class MockClient extends Mock implements http.Client {
     return "I am the mock";
   }
 }
+
+class MockNetQueue extends Mock implements NetQueue {}
 
 void main() {
   Store<AppState> store;
@@ -50,6 +53,10 @@ void main() {
   group(
     "add item",
     () {
+      setUp(() {
+        setNetQueue(MockNetQueue());
+      });
+
       testWidgets('add item succ', (WidgetTester tester) async {
         // Setup HTTP Response
         final client = MockClient();
@@ -81,11 +88,11 @@ void main() {
         await tester.pumpWidget(widget);
 
         // Add Button here
-        expect(find.byType(TextButton), findsOneWidget);
-        expect(find.text('ADD'), findsOneWidget);
+        expect(find.byType(TextButton), findsNWidgets(2));
+        expect(find.text('ADD TASK'), findsOneWidget);
 
         // Tap 'ADD' button
-        await tester.tap(find.text('ADD'));
+        await tester.tap(find.text('ADD TASK'));
         await tester.pump();
 
         // Find TextField
@@ -96,26 +103,25 @@ void main() {
         await tester.testTextInput.receiveAction(TextInputAction.done);
         await tester.pump();
 
-        // Verify http request is correct
-        var captured = verify(client.post(
-          captureAny,
-          headers: anyNamed("headers"),
-          body: captureAnyNamed("body"),
-          encoding: anyNamed("encoding"),
-        )).captured;
-
-        expect(captured[0], "http://localhost:3000/tasks");
-        expect(captured[1], '{"title":"Add new list"}');
+        expect(store.state.tasks.length, 1);
+        int ts = DateTime.now().millisecondsSinceEpoch ~/ 1000 + 1;
+        int tsBefore = ts - 6;
+        Task task = store.state.tasks.values.first;
+        expect(store.state.tasks[task.uuid], isNotNull);
+        expect(task.title, 'Add new list');
+        expect(task.deleted, 0);
+        expect(task.updatedAt, lessThan(ts));
+        expect(task.updatedAt, greaterThan(tsBefore));
+        expect(task.createdAt, task.updatedAt);
+        expect(task.ts, 0);
 
         // Verify the redux state is correct
         expect(store.state.status.status, StatusKey.ListTask);
-        expect(store.state.tasks.length, 1);
-        expect(store.state.tasks[uuid], isNotNull);
 
         // verify the UI is correct
         expect(find.byType(TextField), findsNothing);
-        expect(find.text('ADD'), findsOneWidget);
-        expect(find.text('new Title'), findsOneWidget);
+        expect(find.text('ADD TASK'), findsOneWidget);
+        expect(find.text('Add new list'), findsOneWidget);
       });
     },
   );
