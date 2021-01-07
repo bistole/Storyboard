@@ -55,18 +55,17 @@ Map<String, Photo> _updatePhoto(
   UpdatePhotoAction action,
 ) {
   String updatedUuid = action.photo.uuid;
-  return Map.from(photos)
-    ..map(
-      (uuid, photo) => MapEntry(
-        uuid,
-        updatedUuid == uuid
-            ? action.photo.copyWith(
-                hasOrigin: photo.hasOrigin,
-                hasThumb: photo.hasThumb,
-              )
-            : photo,
-      ),
-    );
+  return Map.from(photos).map(
+    (uuid, photo) => MapEntry(
+      uuid,
+      updatedUuid == uuid
+          ? action.photo.copyWith(
+              hasOrigin: photo.hasOrigin,
+              hasThumb: photo.hasThumb,
+            )
+          : photo,
+    ),
+  );
 }
 
 Map<String, Photo> _downloadPhoto(
