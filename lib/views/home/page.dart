@@ -48,7 +48,7 @@ class HomePage extends StatelessWidget {
           : (a.updatedAt > b.updatedAt ? 1 : -1);
     });
     updatedPhotoList.forEach((photo) {
-      Widget w = PhotoWidget(photo: photo);
+      Widget w = PhotoWidget(uuid: photo.uuid);
       children.insert(1, w);
     });
 

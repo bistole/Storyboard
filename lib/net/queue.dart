@@ -24,7 +24,6 @@ class NetQueue {
   // init queue to listen redux changed
   NetQueue() {
     getStore().onChange.listen((event) {
-      print("Queue : ${event.queue}");
       if (event.queue.tick != _stamp) {
         _stamp = event.queue.tick;
         if (_status == NetQueueStatus.IDLE) {
@@ -109,7 +108,6 @@ class NetQueue {
 
   // wait a while until run again
   Future<bool> _executeQueueItem(Store<AppState> store, QueueItem item) async {
-    print("_executeQueueItem $item");
     if (_actions[item.type] != null &&
         _actions[item.type][item.action] != null) {
       return await _actions[item.type]
@@ -124,7 +122,6 @@ class NetQueue {
     if (q.now != null) {
       // process current one
       _executeQueueItem(getStore(), q.now).then((bool succ) {
-        print("_executeQueueItem ret: $succ");
         if (succ) {
           // if succ, remove first one and run again
           getStore().dispatch(DoneQueueItemAction());

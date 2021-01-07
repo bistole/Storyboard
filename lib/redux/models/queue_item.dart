@@ -54,6 +54,17 @@ class QueueItem {
   }
 
   @override
+  int get hashCode => type.hashCode ^ action.hashCode ^ uuid.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is QueueItem &&
+          type == other.type &&
+          action == other.action &&
+          uuid == other.uuid);
+
+  @override
   String toString() {
     return "QueueItem{type: $type, action: $action, uuid: $uuid}";
   }

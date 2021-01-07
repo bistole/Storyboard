@@ -5,6 +5,7 @@ import 'package:redux/redux.dart';
 import 'package:storyboard/views/home/page.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/store.dart';
+import 'package:storyboard/views/photo/page.dart';
 
 class StoryBoardApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -51,6 +52,9 @@ class StoryBoardApp extends StatelessWidget {
           store: snapshot.data,
           child: new MaterialApp(
             title: 'Flutter Demo',
+            routes: {
+              PhotoPage.routeName: (_) => PhotoPage(),
+            },
             theme: ThemeData(
               primarySwatch: Colors.green,
               visualDensity: VisualDensity.adaptivePlatformDensity,

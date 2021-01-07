@@ -51,6 +51,17 @@ class Queue {
   }
 
   @override
+  int get hashCode => tick.hashCode ^ now.hashCode ^ list.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Queue &&
+          tick == other.tick &&
+          now == other.now &&
+          list == other.list);
+
+  @override
   String toString() {
     return "Queue{list: $list, tick: $tick, now: $now}";
   }

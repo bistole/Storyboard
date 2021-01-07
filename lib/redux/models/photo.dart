@@ -53,6 +53,36 @@ class Photo {
   }
 
   @override
+  int get hashCode =>
+      uuid.hashCode ^
+      filename.hashCode ^
+      mime.hashCode ^
+      size.hashCode ^
+      hasOrigin.hashCode ^
+      hasThumb.hashCode ^
+      deleted.hashCode ^
+      updatedAt.hashCode ^
+      createdAt.hashCode ^
+      ts.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    var same = identical(this, other) ||
+        (other is Photo &&
+            uuid == other.uuid &&
+            filename == other.filename &&
+            mime == other.mime &&
+            size == other.size &&
+            hasOrigin == other.hasOrigin &&
+            hasThumb == other.hasThumb &&
+            deleted == other.deleted &&
+            updatedAt == other.updatedAt &&
+            createdAt == other.createdAt &&
+            ts == other.ts);
+    return same;
+  }
+
+  @override
   String toString() {
     return "Photo{uuid: $uuid, filename: $filename, mime: $mime, " +
         "size: $size, hasOrigin: $hasOrigin, hasThumb: $hasThumb, " +

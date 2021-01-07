@@ -12,15 +12,25 @@ import 'package:storyboard/storage/photo.dart';
 import 'package:storyboard/views/photo/page.dart';
 
 class ReduxActions {
+  final Photo photo;
   final void Function() delete;
   final void Function() getThumb;
-  ReduxActions({this.delete, this.getThumb});
+  ReduxActions({this.delete, this.getThumb, this.photo});
+
+  @override
+  int get hashCode => photo.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is ReduxActions && photo == other.photo);
+  }
 }
 
 class PhotoWidget extends StatelessWidget {
-  final Photo photo;
+  final String uuid;
 
-  PhotoWidget({this.photo});
+  PhotoWidget({this.uuid});
 
   Widget buildPopupMenu(BuildContext context, ReduxActions redux) {
     return PopupMenuButton(
@@ -28,11 +38,9 @@ class PhotoWidget extends StatelessWidget {
         if (value == 'delete') {
           redux.delete();
         } else if (value == 'show') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PhotoPage(photo: photo),
-            ),
+          Navigator.of(context).pushNamed(
+            PhotoPage.routeName,
+            arguments: PhotoPageArguments(redux.photo.uuid),
           );
         }
       },
@@ -71,7 +79,7 @@ class PhotoWidget extends StatelessWidget {
   }
 
   List<Widget> buildThumb(BuildContext context, ReduxActions redux) {
-    var photoPath = getThumbnailPathByUUID(this.photo.uuid);
+    var photoPath = getThumbnailPathByUUID(this.uuid);
     return [
       Expanded(
         child: Container(
@@ -102,23 +110,23 @@ class PhotoWidget extends StatelessWidget {
         return ReduxActions(
           delete: () {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
-            getActPhotos().actDeletePhoto(store, photo.uuid);
+            getActPhotos().actDeletePhoto(store, this.uuid);
           },
           getThumb: () {
-            getActPhotos().actDownloadThumbnail(store, photo.uuid);
+            getActPhotos().actDownloadThumbnail(store, this.uuid);
           },
+          photo: store.state.photos[this.uuid],
         );
       },
       builder: (context, ReduxActions redux) {
         // download if required
-        if (!this.photo.hasThumb) {
+        if (!redux.photo.hasThumb) {
           redux.getThumb();
         }
-
         return Row(
           children:
               // ...this.buildLoadingIndicator(),
-              this.photo.hasThumb
+              redux.photo.hasThumb
                   ? this.buildThumb(context, redux)
                   : this.buildLoadingIndicator(context, redux),
         );

@@ -1,26 +1,16 @@
-import 'dart:convert';
-
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
-import 'package:storyboard/net/config.dart';
+import 'package:storyboard/redux/store.dart';
 import 'package:storyboard/views/home/page.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
-
-class MockClient extends Mock implements http.Client {
-  @override
-  String toString() {
-    return "I am the mock";
-  }
-}
 
 class MockNetQueue extends Mock implements NetQueue {}
 
@@ -39,13 +29,6 @@ void main() {
     '_ts': 1606406017000,
   };
   Widget buildTestableWidget(Widget widget) {
-    store = Store<AppState>(
-      appReducer,
-      initialState: AppState(
-        status: Status.noParam(StatusKey.ListTask),
-        tasks: <String, Task>{uuid: Task.fromJson(taskJson)},
-      ),
-    );
     return new StoreProvider(
       store: store,
       child: new MaterialApp(
@@ -58,34 +41,19 @@ void main() {
     "update item",
     () {
       setUp(() {
+        store = Store<AppState>(
+          appReducer,
+          initialState: AppState(
+            status: Status.noParam(StatusKey.ListTask),
+            tasks: <String, Task>{uuid: Task.fromJson(taskJson)},
+          ),
+        );
+        setStore(store);
+
         setNetQueue(MockNetQueue());
       });
 
       testWidgets("update item succ", (WidgetTester tester) async {
-        // Setup HTTP Response
-        final client = MockClient();
-        setHTTPClient(client);
-
-        final responseBody = jsonEncode({
-          'succ': true,
-          'task': {
-            'uuid': uuid,
-            'title': 'updated Title',
-            'deleted': 0,
-            'updatedAt': 1606506017,
-            'createdAt': 1606406017,
-            '_ts': 1606506017000,
-          },
-        });
-        when(client.post(
-          startsWith(URLPrefix),
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-          encoding: anyNamed('encoding'),
-        )).thenAnswer((_) async {
-          return http.Response(responseBody, 200);
-        });
-
         // home page
         var widget = buildTestableWidget(HomePage(title: 'title'));
         await tester.pumpWidget(widget);

@@ -27,7 +27,7 @@ class CreateBarWidget extends StatelessWidget {
   Widget buildAddButton(ReduxActions redux) {
     return SBToolbar([
       SBToolbarButton("ADD TASK", redux.startTask),
-      SBToolbarButton("ADD PHOTO", importPhoto),
+      SBToolbarButton("ADD PHOTO", getCommandChannel().importPhoto),
     ]);
   }
 

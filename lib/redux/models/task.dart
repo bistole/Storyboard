@@ -37,6 +37,26 @@ class Task {
   }
 
   @override
+  int get hashCode =>
+      uuid.hashCode ^
+      title.hashCode ^
+      deleted.hashCode ^
+      updatedAt.hashCode ^
+      createdAt.hashCode ^
+      ts.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Task &&
+          uuid == other.uuid &&
+          title == other.title &&
+          deleted == other.deleted &&
+          updatedAt == other.updatedAt &&
+          createdAt == other.createdAt &&
+          ts == other.ts);
+
+  @override
   String toString() {
     return "Task{uuid: $uuid, title: $title, deleted: $deleted, updatedAt: $updatedAt, createdAt: $createdAt}";
   }

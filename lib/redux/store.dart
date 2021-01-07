@@ -10,7 +10,7 @@ import 'package:storyboard/net/tasks.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/channel/config.dart';
-import 'package:storyboard/channel/menu_events.dart';
+import 'package:storyboard/channel/menu.dart';
 import 'package:storyboard/storage/photo.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
 
@@ -18,6 +18,10 @@ Store<AppState> _store;
 
 Store<AppState> getStore() {
   return _store;
+}
+
+setStore(Store<AppState> s) {
+  _store = s;
 }
 
 Future<Store<AppState>> initStore() async {
@@ -49,7 +53,7 @@ Future<Store<AppState>> initStore() async {
   netQueue.registerPeriodicTrigger(getActTasks().actFetchTasks);
   netQueue.registerPeriodicTrigger(getActPhotos().actFetchPhotos);
 
-  bindMenuEvents();
+  getMenuChannel().bindMenuEvents();
 
   return store;
 }

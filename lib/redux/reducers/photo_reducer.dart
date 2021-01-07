@@ -35,12 +35,11 @@ Map<String, Photo> _fetchPhotos(
   });
 
   // merge
-  return Map.unmodifiable(
-    Map.from(photos)
-      ..addAll(newPhotos)
-      ..addAll(existedPhotos)
-      ..removeWhere((uuid, photo) => removeUuids.contains(uuid)),
-  );
+  return Map.from(photos)
+    ..addAll(newPhotos)
+    ..removeWhere((uuid, photo) => removeUuids.contains(uuid))
+    ..map((uuid, photo) => MapEntry(
+        uuid, existedPhotos[uuid] != null ? existedPhotos[uuid] : photo));
 }
 
 Map<String, Photo> _createPhoto(
@@ -55,28 +54,31 @@ Map<String, Photo> _updatePhoto(
   Map<String, Photo> photos,
   UpdatePhotoAction action,
 ) {
-  String uuid = action.photo.uuid;
-  return Map.unmodifiable(
-    Map.from(photos)
-      ..addAll({
-        uuid: action.photo.copyWith(
-          hasOrigin: photos[uuid].hasOrigin,
-          hasThumb: photos[uuid].hasThumb,
-        )
-      }),
-  );
+  String updatedUuid = action.photo.uuid;
+  return Map.from(photos)
+    ..map(
+      (uuid, photo) => MapEntry(
+        uuid,
+        updatedUuid == uuid
+            ? action.photo.copyWith(
+                hasOrigin: photo.hasOrigin,
+                hasThumb: photo.hasThumb,
+              )
+            : photo,
+      ),
+    );
 }
 
 Map<String, Photo> _downloadPhoto(
   Map<String, Photo> photos,
   DownloadPhotoAction action,
 ) {
-  String uuid = action.uuid;
-  return Map.unmodifiable(
-    Map.from(photos)
-      ..addAll({
-        uuid: photos[uuid].copyWith(hasOrigin: true),
-      }),
+  String updatedUuid = action.uuid;
+  return Map.from(photos).map(
+    (uuid, photo) => MapEntry(
+      uuid,
+      updatedUuid == uuid ? photo.copyWith(hasOrigin: true) : photo,
+    ),
   );
 }
 
@@ -84,12 +86,12 @@ Map<String, Photo> _thumbnailPhoto(
   Map<String, Photo> photos,
   ThumbnailPhotoAction action,
 ) {
-  String uuid = action.uuid;
-  return Map.unmodifiable(
-    Map.from(photos)
-      ..addAll({
-        uuid: photos[uuid].copyWith(hasThumb: true),
-      }),
+  String updatedUuid = action.uuid;
+  return Map.from(photos).map(
+    (uuid, photo) => MapEntry(
+      uuid,
+      updatedUuid == uuid ? photo.copyWith(hasThumb: true) : photo,
+    ),
   );
 }
 
@@ -97,7 +99,5 @@ Map<String, Photo> _deletePhoto(
   Map<String, Photo> photos,
   DeletePhotoAction action,
 ) {
-  return Map.unmodifiable(
-    Map.from(photos)..remove(action.uuid),
-  );
+  return Map.from(photos)..remove(action.uuid);
 }

@@ -8,6 +8,10 @@ String getDataHome() {
   return _dataHome;
 }
 
+void setDataHome(String dh) {
+  _dataHome = dh;
+}
+
 Future<void> initDataHome() async {
   Directory dict = await getApplicationSupportDirectory();
   _dataHome = dict.path;
