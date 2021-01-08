@@ -19,7 +19,7 @@ class NetQueue {
   int _stamp;
   Timer _checker;
   Map<QueueItemType, Map<QueueItemAction, NetQueueActionFunc>> _actions = Map();
-  List<NetQueuePeriodicTriggerFunc> _triggers = List();
+  List<NetQueuePeriodicTriggerFunc> _triggers = [];
 
   // init queue to listen redux changed
   NetQueue() {

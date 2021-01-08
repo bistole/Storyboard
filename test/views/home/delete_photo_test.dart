@@ -3,13 +3,13 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
-import 'package:storyboard/channel/config.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/redux/store.dart';
+import 'package:storyboard/storage/storage.dart';
 import 'package:storyboard/views/home/page.dart';
 import 'package:storyboard/views/home/photo_widget.dart';
 
@@ -54,7 +54,7 @@ void main() {
       );
       setStore(store);
       setNetQueue(MockNetQueue());
-      setDataHome("project_home");
+      getStorage().dataHome = "project_home";
     });
 
     testWidgets("delete item succ", (WidgetTester tester) async {

@@ -120,11 +120,11 @@ class Photo {
   }
 }
 
-Map<String, Photo> buildPhotoMap(List<dynamic> json) {
-  var map = Map<String, Photo>();
-  json.forEach((element) {
-    if (element['uuid'] != null) {
-      map[element['uuid']] = Photo(
+Map<String, Photo> buildPhotoMap(Map<String, dynamic> json) {
+  Map<String, Photo> map = json.map(
+    (uuid, element) => MapEntry(
+      uuid,
+      Photo(
         uuid: element['uuid'],
         filename: element['filename'],
         mime: element['mime'],
@@ -135,8 +135,8 @@ Map<String, Photo> buildPhotoMap(List<dynamic> json) {
         updatedAt: element['updatedAt'],
         createdAt: element['createdAt'],
         ts: element['_ts'],
-      );
-    }
-  });
+      ),
+    ),
+  );
   return map;
 }

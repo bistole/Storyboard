@@ -5,7 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:storyboard/redux/models/photo.dart';
-import 'package:storyboard/storage/photo.dart';
+import 'package:storyboard/storage/storage.dart';
 
 class ViewPhotoWidget extends StatefulWidget {
   final Photo photo;
@@ -32,7 +32,7 @@ class ViewPhotoWidgetState extends State<ViewPhotoWidget> {
   }
 
   Widget buildViewer() {
-    var photoPath = getPhotoPathByUUID(widget.photo.uuid);
+    var photoPath = getStorage().getPhotoPathByUUID(widget.photo.uuid);
     return Container(
       child: PhotoView(
         maxScale: 2.0,

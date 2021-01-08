@@ -8,7 +8,7 @@ import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/storage/photo.dart';
+import 'package:storyboard/storage/storage.dart';
 import 'package:storyboard/views/photo/page.dart';
 
 class ReduxActions {
@@ -79,7 +79,7 @@ class PhotoWidget extends StatelessWidget {
   }
 
   List<Widget> buildThumb(BuildContext context, ReduxActions redux) {
-    var photoPath = getThumbnailPathByUUID(this.uuid);
+    var photoPath = getStorage().getThumbnailPathByUUID(this.uuid);
     return [
       Expanded(
         child: Container(

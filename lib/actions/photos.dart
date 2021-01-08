@@ -6,7 +6,7 @@ import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/queue_item.dart';
-import 'package:storyboard/storage/photo.dart';
+import 'package:storyboard/storage/storage.dart';
 import 'package:uuid/uuid.dart';
 
 class ActPhotos {
@@ -60,7 +60,7 @@ class ActPhotos {
       createdAt: ts,
       ts: 0,
     );
-    copyPhotoByUUID(uuid, File(path));
+    getStorage().copyPhotoByUUID(uuid, File(path));
     store.dispatch(CreatePhotoAction(photo: photo));
     getNetQueue().addQueueItem(
       QueueItemType.Photo,

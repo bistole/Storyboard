@@ -88,7 +88,7 @@ class Queue {
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = Map();
 
-    List<dynamic> list = List();
+    List<dynamic> list = [];
     for (var item in this.list) {
       list.add(item.toJson());
     }

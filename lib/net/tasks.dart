@@ -43,7 +43,7 @@ class NetTasks {
         Map<String, dynamic> object = jsonDecode(response.body);
         if (object['succ'] == true && object['tasks'] != null) {
           var taskMap = buildTaskMap(object['tasks']);
-          store.dispatch(new FetchTasksAction(taskMap: taskMap));
+          store.dispatch(FetchTasksAction(taskMap: taskMap));
         }
         return true;
       }
@@ -93,7 +93,7 @@ class NetTasks {
         Map<String, dynamic> object = jsonDecode(response.body);
         if (object['succ'] == true && object['task'] != null) {
           var task = Task.fromJson(object['task']);
-          store.dispatch(new UpdateTaskAction(task: task));
+          store.dispatch(UpdateTaskAction(task: task));
         }
         return true;
       }
@@ -108,10 +108,9 @@ class NetTasks {
       Task task = store.state.tasks[uuid];
       if (task == null) return true;
 
-      final ts = new DateTime.now().millisecondsSinceEpoch ~/ 1000;
       final responseStream = await getHTTPClient().send(
         http.Request("DELETE", Uri.parse(URLPrefix + "/tasks/" + task.uuid))
-          ..body = jsonEncode({"updatedAt": ts}),
+          ..body = jsonEncode({"updatedAt": task.updatedAt}),
       );
 
       final body = await responseStream.stream.bytesToString();

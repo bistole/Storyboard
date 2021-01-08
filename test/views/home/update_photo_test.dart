@@ -5,7 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:redux/redux.dart';
-import 'package:storyboard/channel/config.dart';
 
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/actions/actions.dart';
@@ -14,6 +13,7 @@ import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/redux/store.dart';
+import 'package:storyboard/storage/storage.dart';
 import 'package:storyboard/views/home/page.dart';
 import 'package:storyboard/views/photo/page.dart';
 
@@ -68,7 +68,7 @@ void main() {
       naviObserver = MockNavigatorObserver();
 
       setNetQueue(MockNetQueue());
-      setDataHome("project_home");
+      getStorage().dataHome = "project_home";
     });
 
     testWidgets("update item succ", (WidgetTester tester) async {

@@ -84,19 +84,19 @@ class Task {
   }
 }
 
-Map<String, Task> buildTaskMap(List<dynamic> json) {
-  var map = Map<String, Task>();
-  json.forEach((element) {
-    if (element['uuid'] != null) {
-      map[element['uuid']] = Task(
+Map<String, Task> buildTaskMap(Map<String, dynamic> json) {
+  var map = json.map(
+    (uuid, element) => MapEntry(
+      uuid,
+      Task(
         uuid: element['uuid'],
         title: element['title'],
         deleted: element['deleted'],
         updatedAt: element['updatedAt'],
         createdAt: element['createdAt'],
         ts: element['_ts'],
-      );
-    }
-  });
+      ),
+    ),
+  );
   return map;
 }

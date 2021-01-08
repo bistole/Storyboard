@@ -9,7 +9,7 @@ import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/redux/models/queue_item.dart';
-import 'package:storyboard/storage/photo.dart';
+import 'package:storyboard/storage/storage.dart';
 
 var validMimeTypes = ["image/jpeg", "image/png", "image/gif"];
 
@@ -51,7 +51,7 @@ class NetPhotos {
           var photoMap = buildPhotoMap(object['photos']);
           for (var photo in photoMap.values) {
             if (photo.deleted == 1) {
-              await deletePhotoAndThumbByUUID(photo.uuid);
+              await getStorage().deletePhotoAndThumbByUUID(photo.uuid);
             }
           }
           store.dispatch(FetchPhotosAction(photoMap: photoMap));
@@ -76,7 +76,7 @@ class NetPhotos {
           ..files.add(
             await http.MultipartFile.fromPath(
               'photo',
-              getPhotoPathByUUID(uuid),
+              getStorage().getPhotoPathByUUID(uuid),
               filename: photo.filename,
               contentType: MediaType.parse(photo.mime),
             ),
@@ -110,7 +110,7 @@ class NetPhotos {
       );
 
       if (response.statusCode == 200) {
-        await savePhotoByUUID(uuid, response.bodyBytes);
+        await getStorage().savePhotoByUUID(uuid, response.bodyBytes);
         store.dispatch(DownloadPhotoAction(uuid: uuid));
         return true;
       }
@@ -132,7 +132,7 @@ class NetPhotos {
       );
 
       if (response.statusCode == 200) {
-        await saveThumbailByUUID(uuid, response.bodyBytes);
+        await getStorage().saveThumbailByUUID(uuid, response.bodyBytes);
         store.dispatch(ThumbnailPhotoAction(uuid: uuid));
         return true;
       }
@@ -158,7 +158,7 @@ class NetPhotos {
         Map<String, dynamic> object = jsonDecode(body);
         if (object['succ'] == true && object['photo'] != null) {
           var photo = Photo.fromJson(object['photo']);
-          await deletePhotoAndThumbByUUID(photo.uuid);
+          await getStorage().deletePhotoAndThumbByUUID(photo.uuid);
           store.dispatch(DeletePhotoAction(uuid: photo.uuid));
         }
         return true;

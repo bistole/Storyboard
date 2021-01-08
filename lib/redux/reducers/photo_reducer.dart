@@ -19,27 +19,26 @@ Map<String, Photo> _fetchPhotos(
   Map<String, Photo> existedPhotos = Map();
   Set<String> removeUuids = Set();
 
-  action.photoMap.forEach((uuid, photo) {
+  action.photoMap.forEach((uuid, element) {
     if (photos[uuid] == null) {
-      if (photo.deleted == 0) {
-        newPhotos[uuid] = photo;
+      if (element.deleted == 0) {
+        newPhotos[uuid] = element;
       }
-    } else if (photo.deleted == 0) {
-      existedPhotos[uuid] = photo.copyWith(
+    } else if (element.deleted == 0) {
+      existedPhotos[uuid] = element.copyWith(
         hasOrigin: photos[uuid].hasOrigin,
         hasThumb: photos[uuid].hasThumb,
       );
     } else {
-      removeUuids.add(photo.uuid);
+      removeUuids.add(element.uuid);
     }
   });
 
   // merge
-  return Map.from(photos)
+  return Map.from(photos).map((uuid, photo) =>
+      MapEntry(uuid, existedPhotos[uuid] != null ? existedPhotos[uuid] : photo))
     ..addAll(newPhotos)
-    ..removeWhere((uuid, photo) => removeUuids.contains(uuid))
-    ..map((uuid, photo) => MapEntry(
-        uuid, existedPhotos[uuid] != null ? existedPhotos[uuid] : photo));
+    ..removeWhere((uuid, photo) => removeUuids.contains(uuid));
 }
 
 Map<String, Photo> _createPhoto(

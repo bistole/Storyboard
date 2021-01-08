@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:path/path.dart' as path;
 import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:storyboard/actions/photos.dart';
@@ -9,9 +8,8 @@ import 'package:storyboard/net/photos.dart';
 import 'package:storyboard/net/tasks.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
-import 'package:storyboard/channel/config.dart';
 import 'package:storyboard/channel/menu.dart';
-import 'package:storyboard/storage/photo.dart';
+import 'package:storyboard/storage/storage.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
 
 Store<AppState> _store;
@@ -25,11 +23,11 @@ setStore(Store<AppState> s) {
 }
 
 Future<Store<AppState>> initStore() async {
-  await initDataHome();
-  await initPhotoStorage();
+  Storage s = getStorage();
+  await s.initDataHome();
+  await s.initPhotoStorage();
 
-  final homePath = getDataHome();
-  final statePath = path.join(homePath, 'state.json');
+  final statePath = s.getPersistDataPath();
   print("state path: $statePath");
 
   final persistor = Persistor<AppState>(

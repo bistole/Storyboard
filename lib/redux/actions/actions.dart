@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/queue_item.dart';
 import 'package:storyboard/redux/models/status.dart';
@@ -6,7 +7,7 @@ import 'package:storyboard/redux/models/task.dart';
 class FetchTasksAction {
   final Map<String, Task> taskMap;
 
-  FetchTasksAction({this.taskMap});
+  FetchTasksAction({@required this.taskMap});
 
   @override
   String toString() {
@@ -17,7 +18,7 @@ class FetchTasksAction {
 class CreateTaskAction {
   final Task task;
 
-  CreateTaskAction({this.task});
+  CreateTaskAction({@required this.task});
 
   @override
   String toString() {
@@ -28,7 +29,7 @@ class CreateTaskAction {
 class UpdateTaskAction {
   final Task task;
 
-  UpdateTaskAction({this.task});
+  UpdateTaskAction({@required this.task});
 
   @override
   String toString() {
@@ -39,7 +40,7 @@ class UpdateTaskAction {
 class DeleteTaskAction {
   final String uuid;
 
-  DeleteTaskAction({this.uuid});
+  DeleteTaskAction({@required this.uuid});
 
   @override
   String toString() {
@@ -50,7 +51,7 @@ class DeleteTaskAction {
 class FetchPhotosAction {
   final Map<String, Photo> photoMap;
 
-  FetchPhotosAction({this.photoMap});
+  FetchPhotosAction({@required this.photoMap});
 
   @override
   String toString() {
@@ -61,7 +62,7 @@ class FetchPhotosAction {
 class CreatePhotoAction {
   final Photo photo;
 
-  CreatePhotoAction({this.photo});
+  CreatePhotoAction({@required this.photo});
 
   @override
   String toString() {
@@ -72,7 +73,7 @@ class CreatePhotoAction {
 class DownloadPhotoAction {
   final String uuid;
 
-  DownloadPhotoAction({this.uuid});
+  DownloadPhotoAction({@required this.uuid});
 
   @override
   String toString() {
@@ -83,7 +84,7 @@ class DownloadPhotoAction {
 class ThumbnailPhotoAction {
   final String uuid;
 
-  ThumbnailPhotoAction({this.uuid});
+  ThumbnailPhotoAction({@required this.uuid});
 
   @override
   String toString() {
@@ -94,7 +95,7 @@ class ThumbnailPhotoAction {
 class UpdatePhotoAction {
   final Photo photo;
 
-  UpdatePhotoAction({this.photo});
+  UpdatePhotoAction({@required this.photo});
 
   @override
   String toString() {
@@ -105,7 +106,7 @@ class UpdatePhotoAction {
 class DeletePhotoAction {
   final String uuid;
 
-  DeletePhotoAction({this.uuid});
+  DeletePhotoAction({@required this.uuid});
 
   @override
   String toString() {
@@ -116,7 +117,7 @@ class DeletePhotoAction {
 class ChangeStatusAction {
   final StatusKey status;
 
-  ChangeStatusAction({this.status});
+  ChangeStatusAction({@required this.status});
 
   @override
   String toString() {
@@ -128,7 +129,7 @@ class ChangeStatusWithUUIDAction {
   final StatusKey status;
   final String uuid;
 
-  ChangeStatusWithUUIDAction({this.status, this.uuid});
+  ChangeStatusWithUUIDAction({@required this.status, @required this.uuid});
 
   @override
   String toString() {
@@ -140,7 +141,7 @@ class ChangeStatusWithPathAction {
   final StatusKey status;
   final String path;
 
-  ChangeStatusWithPathAction({this.status, this.path});
+  ChangeStatusWithPathAction({@required this.status, @required this.path});
 
   @override
   String toString() {
@@ -153,7 +154,8 @@ class PushQueueItemAction {
   final QueueItemAction action;
   final String uuid;
 
-  PushQueueItemAction({this.type, this.action, this.uuid});
+  PushQueueItemAction(
+      {@required this.type, @required this.action, @required this.uuid});
 
   @override
   String toString() {
@@ -166,7 +168,8 @@ class UnshiftQueueItemAction {
   final QueueItemAction action;
   final String uuid;
 
-  UnshiftQueueItemAction({this.type, this.action, this.uuid});
+  UnshiftQueueItemAction(
+      {@required this.type, @required this.action, @required this.uuid});
 
   @override
   String toString() {

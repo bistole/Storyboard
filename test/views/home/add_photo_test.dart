@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,7 +5,6 @@ import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
 
 import 'package:storyboard/channel/command.dart';
-import 'package:storyboard/channel/config.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
@@ -17,7 +13,10 @@ import 'package:storyboard/redux/models/queue_item.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/redux/store.dart';
+import 'package:storyboard/storage/storage.dart';
 import 'package:storyboard/views/home/page.dart';
+
+import '../../common.dart';
 
 class MockCommandChannel extends Mock implements CommandChannel {}
 
@@ -51,15 +50,12 @@ void main() {
 
         netQueue = MockNetQueue();
         setNetQueue(netQueue);
-        setDataHome("project_home");
+        getStorage().dataHome = "project_home";
       });
 
       testWidgets('add item succ', (WidgetTester tester) async {
         // mock import photo
-        String resourcePath = "test_resources/photo_test.jpg";
-        while (File(resourcePath).existsSync() != true) {
-          resourcePath = path.join("..", resourcePath);
-        }
+        String resourcePath = getResourcePath("test_resources/photo_test.jpg");
 
         MockCommandChannel mcc = MockCommandChannel();
         when(mcc.importPhoto()).thenAnswer((invoke) async {

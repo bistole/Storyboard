@@ -14,47 +14,47 @@ Map<String, Task> _fetchTasks(
   Map<String, Task> tasks,
   FetchTasksAction action,
 ) {
+  Map<String, Task> newTasks = Map();
+  Map<String, Task> existedTasks = Map();
   Set<String> removeUuids = Set();
-  Map<String, Task> updatedTasks = Map();
-  action.taskMap.forEach((uuid, task) {
-    if (task.deleted == 1) {
-      removeUuids.add(uuid);
+
+  action.taskMap.forEach((uuid, element) {
+    if (tasks[uuid] == null) {
+      if (element.deleted == 0) {
+        newTasks[uuid] = element;
+      }
+    } else if (element.deleted == 0) {
+      existedTasks[uuid] = element;
     } else {
-      updatedTasks[uuid] = task;
+      removeUuids.add(element.uuid);
     }
   });
 
-  return Map.unmodifiable(
-    Map.from(tasks)
-      ..addAll(updatedTasks)
-      ..removeWhere((uuid, task) => removeUuids.contains(uuid)),
-  );
+  // merge
+  return Map.from(tasks).map((uuid, task) =>
+      MapEntry(uuid, existedTasks[uuid] != null ? existedTasks[uuid] : task))
+    ..addAll(newTasks)
+    ..removeWhere((uuid, task) => removeUuids.contains(uuid));
 }
 
 Map<String, Task> _createTask(
   Map<String, Task> tasks,
   CreateTaskAction action,
 ) {
-  return Map.unmodifiable(
-    Map.from(tasks)..addAll({action.task.uuid: action.task}),
-  );
+  return Map.from(tasks)..addAll({action.task.uuid: action.task});
 }
 
 Map<String, Task> _updateTask(
   Map<String, Task> tasks,
   UpdateTaskAction action,
 ) {
-  return Map.unmodifiable(
-    tasks.map((uuid, task) =>
-        MapEntry(uuid, uuid == action.task.uuid ? action.task : task)),
-  );
+  return Map.from(tasks).map((uuid, task) =>
+      MapEntry(uuid, uuid == action.task.uuid ? action.task : task));
 }
 
 Map<String, Task> _deleteTask(
   Map<String, Task> tasks,
   DeleteTaskAction action,
 ) {
-  return Map.unmodifiable(
-    Map.from(tasks)..remove(action.uuid),
-  );
+  return Map.from(tasks)..remove(action.uuid);
 }

@@ -24,7 +24,7 @@ class HomePage extends StatelessWidget {
   final String title;
 
   List<Widget> buildList(ReduxActions redux) {
-    var children = List<Widget>();
+    var children = <Widget>[];
     children.add(CreateBarWidget());
 
     var updatedTaskList = List<Task>.from(redux.taskList);
@@ -63,14 +63,14 @@ class HomePage extends StatelessWidget {
       ),
       body: StoreConnector<AppState, ReduxActions>(
         converter: (store) {
-          List<Task> taskList = List();
+          List<Task> taskList = [];
           store.state.tasks.forEach((uuid, task) {
             if (task.deleted == 0) {
               taskList.add(task);
             }
           });
 
-          List<Photo> photoList = List();
+          List<Photo> photoList = [];
           store.state.photos.forEach((uuid, photo) {
             if (photo.deleted == 0) {
               photoList.add(photo);
