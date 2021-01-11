@@ -11,9 +11,10 @@ import 'package:storyboard/net/photos.dart';
 
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
+import 'package:storyboard/redux/models/photo_repo.dart';
 import 'package:storyboard/redux/models/queue.dart';
 import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task.dart';
+import 'package:storyboard/redux/models/task_repo.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/storage/storage.dart';
 
@@ -34,8 +35,8 @@ void main() {
       appReducer,
       initialState: AppState(
         status: Status.noParam(StatusKey.ListTask),
-        photos: photos,
-        tasks: <String, Task>{},
+        photoRepo: PhotoRepo(photos: photos, lastTS: 0),
+        taskRepo: TaskRepo(tasks: {}, lastTS: 0),
         queue: Queue(),
       ),
     );
@@ -85,7 +86,7 @@ void main() {
 
       final responseBody = jsonEncode({
         'succ': true,
-        'photos': {'uuid': getJsonPhotoObject()},
+        'photos': [getJsonPhotoObject()],
       });
       when(httpClient.get(startsWith(URLPrefix))).thenAnswer((_) async {
         return http.Response(responseBody, 200);
@@ -96,7 +97,7 @@ void main() {
       var captured = verify(httpClient.get(captureAny)).captured.first;
       expect(captured, URLPrefix + '/photos');
 
-      expect(store.state.photos, {'uuid': getPhotoObject()});
+      expect(store.state.photoRepo.photos, {'uuid': getPhotoObject()});
     });
 
     test('fetch existed photo', () async {
@@ -112,7 +113,7 @@ void main() {
 
       final responseBody = jsonEncode({
         'succ': true,
-        'photos': {'uuid': getJsonPhotoObject()},
+        'photos': [getJsonPhotoObject()],
       });
 
       when(httpClient.get(startsWith(URLPrefix))).thenAnswer((_) async {
@@ -124,7 +125,7 @@ void main() {
       var captured = verify(httpClient.get(captureAny)).captured.first;
       expect(captured, URLPrefix + '/photos');
 
-      expect(store.state.photos, {
+      expect(store.state.photoRepo.photos, {
         'uuid': getPhotoObject().copyWith(
           hasThumb: true,
           hasOrigin: true,
@@ -142,9 +143,9 @@ void main() {
 
       final responseBody = jsonEncode({
         'succ': true,
-        'photos': {
-          'uuid': getJsonPhotoObject()..addAll({'deleted': 1})
-        },
+        'photos': [
+          getJsonPhotoObject()..addAll({'deleted': 1})
+        ],
       });
 
       when(httpClient.get(startsWith(URLPrefix))).thenAnswer((_) async {
@@ -160,7 +161,7 @@ void main() {
           verify(storage.deletePhotoAndThumbByUUID(captureAny)).captured.single,
           'uuid');
 
-      expect(store.state.photos, {});
+      expect(store.state.photoRepo.photos, {});
     });
   });
 
@@ -208,9 +209,9 @@ void main() {
       expect(captured.files[0].contentType.mimeType, 'image/jpeg');
       expect(captured.files[0].length, await File(resourcePath).length());
 
-      expect(store.state.photos['uuid'].hasOrigin, true);
-      expect(store.state.photos['uuid'].hasThumb, false);
-      expect(store.state.photos['uuid'].ts, 1606506017000);
+      expect(store.state.photoRepo.photos['uuid'].hasOrigin, true);
+      expect(store.state.photoRepo.photos['uuid'].hasThumb, false);
+      expect(store.state.photoRepo.photos['uuid'].ts, 1606506017000);
     });
   });
 
@@ -241,7 +242,7 @@ void main() {
 
       expect(capStorage[0], 'uuid');
       expect(String.fromCharCodes(capStorage[1]), 'buffer');
-      expect(store.state.photos['uuid'].hasOrigin, true);
+      expect(store.state.photoRepo.photos['uuid'].hasOrigin, true);
     });
   });
 
@@ -272,7 +273,7 @@ void main() {
 
       expect(capStorage[0], 'uuid');
       expect(String.fromCharCodes(capStorage[1]), 'buffer');
-      expect(store.state.photos['uuid'].hasThumb, true);
+      expect(store.state.photoRepo.photos['uuid'].hasThumb, true);
     });
   });
 
@@ -309,7 +310,7 @@ void main() {
 
       expect(capStorage[0], 'uuid');
 
-      expect(store.state.photos['uuid'], isNull);
+      expect(store.state.photoRepo.photos['uuid'], isNull);
     });
   });
 }

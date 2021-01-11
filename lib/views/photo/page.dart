@@ -59,7 +59,7 @@ class PhotoPage extends StatelessWidget {
           getPhoto: () {
             getViewResource().actPhotos.actDownloadPhoto(store, args.uuid);
           },
-          photo: store.state.photos[args.uuid],
+          photo: store.state.photoRepo.photos[args.uuid],
         );
       },
       builder: (BuildContext context, ReduxActions redux) {

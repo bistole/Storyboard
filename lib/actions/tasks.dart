@@ -41,7 +41,7 @@ class ActTasks {
   }
 
   void actUpdateTask(Store<AppState> store, String uuid, String title) {
-    Task task = store.state.tasks[uuid];
+    Task task = store.state.taskRepo.tasks[uuid];
     int ts = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     Task newTask = task.copyWith(
       title: title,
@@ -56,7 +56,7 @@ class ActTasks {
   }
 
   void actDeleteTask(Store<AppState> store, String uuid) {
-    Task task = store.state.tasks[uuid];
+    Task task = store.state.taskRepo.tasks[uuid];
     int ts = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     Task newTask = task.copyWith(
       deleted: 1,

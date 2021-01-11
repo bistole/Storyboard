@@ -40,7 +40,7 @@ class StoryBoardApp extends StatelessWidget {
   }
 
   Future<Store<AppState>> getFutureStore() async {
-    getFactory().initAfterAppCreated();
+    await getFactory().initAfterAppCreated();
     return getFactory().store;
   }
 

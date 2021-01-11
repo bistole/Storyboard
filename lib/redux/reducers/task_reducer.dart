@@ -1,25 +1,28 @@
 import 'package:redux/redux.dart';
+import 'package:storyboard/redux/models/task_repo.dart';
 
 import '../actions/actions.dart';
 import '../models/task.dart';
 
-final taskReducer = combineReducers<Map<String, Task>>([
-  TypedReducer<Map<String, Task>, FetchTasksAction>(_fetchTasks),
-  TypedReducer<Map<String, Task>, CreateTaskAction>(_createTask),
-  TypedReducer<Map<String, Task>, UpdateTaskAction>(_updateTask),
-  TypedReducer<Map<String, Task>, DeleteTaskAction>(_deleteTask),
+final taskReducer = combineReducers<TaskRepo>([
+  TypedReducer<TaskRepo, FetchTasksAction>(_fetchTasks),
+  TypedReducer<TaskRepo, CreateTaskAction>(_createTask),
+  TypedReducer<TaskRepo, UpdateTaskAction>(_updateTask),
+  TypedReducer<TaskRepo, DeleteTaskAction>(_deleteTask),
 ]);
 
-Map<String, Task> _fetchTasks(
-  Map<String, Task> tasks,
+TaskRepo _fetchTasks(
+  TaskRepo taskRepo,
   FetchTasksAction action,
 ) {
   Map<String, Task> newTasks = Map();
   Map<String, Task> existedTasks = Map();
   Set<String> removeUuids = Set();
 
+  int lastTS = taskRepo.lastTS;
+
   action.taskMap.forEach((uuid, element) {
-    if (tasks[uuid] == null) {
+    if (taskRepo.tasks[uuid] == null) {
       if (element.deleted == 0) {
         newTasks[uuid] = element;
       }
@@ -28,33 +31,45 @@ Map<String, Task> _fetchTasks(
     } else {
       removeUuids.add(element.uuid);
     }
+    if (element.ts > lastTS) {
+      lastTS = element.ts;
+    }
   });
 
   // merge
-  return Map.from(tasks).map((uuid, task) =>
-      MapEntry(uuid, existedTasks[uuid] != null ? existedTasks[uuid] : task))
-    ..addAll(newTasks)
-    ..removeWhere((uuid, task) => removeUuids.contains(uuid));
+  return taskRepo.copyWith(
+    tasks: Map.from(taskRepo.tasks).map((uuid, task) =>
+        MapEntry(uuid, existedTasks[uuid] != null ? existedTasks[uuid] : task))
+      ..addAll(newTasks)
+      ..removeWhere((uuid, task) => removeUuids.contains(uuid)),
+    lastTS: lastTS,
+  );
 }
 
-Map<String, Task> _createTask(
-  Map<String, Task> tasks,
+TaskRepo _createTask(
+  TaskRepo taskRepo,
   CreateTaskAction action,
 ) {
-  return Map.from(tasks)..addAll({action.task.uuid: action.task});
+  return taskRepo.copyWith(
+    tasks: Map.from(taskRepo.tasks)..addAll({action.task.uuid: action.task}),
+  );
 }
 
-Map<String, Task> _updateTask(
-  Map<String, Task> tasks,
+TaskRepo _updateTask(
+  TaskRepo taskRepo,
   UpdateTaskAction action,
 ) {
-  return Map.from(tasks).map((uuid, task) =>
-      MapEntry(uuid, uuid == action.task.uuid ? action.task : task));
+  return taskRepo.copyWith(
+    tasks: Map.from(taskRepo.tasks).map((uuid, task) =>
+        MapEntry(uuid, uuid == action.task.uuid ? action.task : task)),
+  );
 }
 
-Map<String, Task> _deleteTask(
-  Map<String, Task> tasks,
+TaskRepo _deleteTask(
+  TaskRepo taskRepo,
   DeleteTaskAction action,
 ) {
-  return Map.from(tasks)..remove(action.uuid);
+  return taskRepo.copyWith(
+    tasks: Map.from(taskRepo.tasks)..remove(action.uuid),
+  );
 }

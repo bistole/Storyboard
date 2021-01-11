@@ -78,7 +78,7 @@ class NetPhotos {
 
   Future<bool> netUploadPhoto(Store<AppState> store, {uuid: String}) async {
     try {
-      Photo photo = store.state.photos[uuid];
+      Photo photo = store.state.photoRepo.photos[uuid];
       if (photo == null) return true;
 
       final response = await _httpClient.send(
@@ -113,7 +113,7 @@ class NetPhotos {
 
   Future<bool> netDownloadPhoto(Store<AppState> store, {uuid: String}) async {
     try {
-      Photo photo = store.state.photos[uuid];
+      Photo photo = store.state.photoRepo.photos[uuid];
       if (photo == null) return true;
       if (photo.hasOrigin) return true;
 
@@ -135,7 +135,7 @@ class NetPhotos {
   Future<bool> netDownloadThumbnail(Store<AppState> store,
       {uuid: String}) async {
     try {
-      Photo photo = store.state.photos[uuid];
+      Photo photo = store.state.photoRepo.photos[uuid];
       if (photo == null) return true;
       if (photo.hasThumb) return true;
 
@@ -156,7 +156,7 @@ class NetPhotos {
 
   Future<bool> netDeletePhoto(Store<AppState> store, {uuid: String}) async {
     try {
-      Photo photo = store.state.photos[uuid];
+      Photo photo = store.state.photoRepo.photos[uuid];
       if (photo == null) return true;
 
       final responseStream = await _httpClient.send(

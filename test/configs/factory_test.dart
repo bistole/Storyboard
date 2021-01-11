@@ -23,7 +23,7 @@ class MockApp extends StatelessWidget {
 }
 
 void main() {
-  test('afterNewApp', () async {
+  test('initAfterAppCreated', () async {
     Factory f = getFactory();
     f.storage = MockStorage();
     f.channelManager = MockChannelManager();

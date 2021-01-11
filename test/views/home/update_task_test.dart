@@ -3,8 +3,10 @@ import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
+import 'package:storyboard/redux/models/photo_repo.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
+import 'package:storyboard/redux/models/task_repo.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/page.dart';
@@ -51,7 +53,11 @@ void main() {
           appReducer,
           initialState: AppState(
             status: Status.noParam(StatusKey.ListTask),
-            tasks: <String, Task>{uuid: Task.fromJson(taskJson)},
+            taskRepo: TaskRepo(
+              tasks: <String, Task>{uuid: Task.fromJson(taskJson)},
+              lastTS: 0,
+            ),
+            photoRepo: PhotoRepo(photos: {}, lastTS: 0),
           ),
         );
 
@@ -100,8 +106,8 @@ void main() {
 
         // Verify the redux state is correct
         expect(store.state.status.status, StatusKey.ListTask);
-        expect(store.state.tasks.length, 1);
-        expect(store.state.tasks[uuid].title, "Add updated list");
+        expect(store.state.taskRepo.tasks.length, 1);
+        expect(store.state.taskRepo.tasks[uuid].title, "Add updated list");
 
         // verify the UI is correct
         expect(find.byType(TextField), findsNothing);

@@ -105,7 +105,7 @@ class Photo {
   }
 
   Map<String, dynamic> toJson() {
-    Map<String, dynamic> map = new Map();
+    Map<String, dynamic> map = {};
     map['uuid'] = this.uuid;
     map['filename'] = this.filename;
     map['mime'] = this.mime;
@@ -120,23 +120,23 @@ class Photo {
   }
 }
 
-Map<String, Photo> buildPhotoMap(Map<String, dynamic> json) {
-  Map<String, Photo> map = json.map(
-    (uuid, element) => MapEntry(
-      uuid,
-      Photo(
-        uuid: element['uuid'],
-        filename: element['filename'],
-        mime: element['mime'],
-        size: element['size'],
-        hasOrigin: element['hasOrigin'] ?? false,
-        hasThumb: element['hasThumb'] ?? false,
-        deleted: element['deleted'],
-        updatedAt: element['updatedAt'],
-        createdAt: element['createdAt'],
-        ts: element['_ts'],
-      ),
-    ),
-  );
+Map<String, Photo> buildPhotoMap(List<dynamic> json) {
+  Map<String, Photo> map = <String, Photo>{};
+  json.forEach((element) {
+    var uuid = element['uuid'];
+    if (!(uuid is String)) return;
+    map[uuid] = Photo(
+      uuid: element['uuid'],
+      filename: element['filename'],
+      mime: element['mime'],
+      size: element['size'],
+      hasOrigin: element['hasOrigin'] ?? false,
+      hasThumb: element['hasThumb'] ?? false,
+      deleted: element['deleted'],
+      updatedAt: element['updatedAt'],
+      createdAt: element['createdAt'],
+      ts: element['_ts'],
+    );
+  });
   return map;
 }

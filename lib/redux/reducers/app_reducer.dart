@@ -8,8 +8,8 @@ import 'status_reducer.dart';
 AppState appReducer(AppState state, dynamic action) {
   return AppState(
     status: statusReducer(state.status, action),
-    tasks: taskReducer(state.tasks, action),
-    photos: photoReducer(state.photos, action),
+    taskRepo: taskReducer(state.taskRepo, action),
+    photoRepo: photoReducer(state.photoRepo, action),
     queue: queueReducer(state.queue, action),
   );
 }

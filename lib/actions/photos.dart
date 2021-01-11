@@ -82,7 +82,7 @@ class ActPhotos {
   }
 
   void actDeletePhoto(Store<AppState> store, String uuid) {
-    Photo photo = store.state.photos[uuid];
+    Photo photo = store.state.photoRepo.photos[uuid];
     int ts = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     Photo newPhoto = photo.copyWith(
       deleted: 1,

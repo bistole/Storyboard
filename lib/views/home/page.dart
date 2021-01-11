@@ -64,14 +64,14 @@ class HomePage extends StatelessWidget {
       body: StoreConnector<AppState, ReduxActions>(
         converter: (store) {
           List<Task> taskList = [];
-          store.state.tasks.forEach((uuid, task) {
+          store.state.taskRepo.tasks.forEach((uuid, task) {
             if (task.deleted == 0) {
               taskList.add(task);
             }
           });
 
           List<Photo> photoList = [];
-          store.state.photos.forEach((uuid, photo) {
+          store.state.photoRepo.photos.forEach((uuid, photo) {
             if (photo.deleted == 0) {
               photoList.add(photo);
             }

@@ -114,7 +114,7 @@ class PhotoWidget extends StatelessWidget {
           getThumb: () {
             getViewResource().actPhotos.actDownloadThumbnail(store, this.uuid);
           },
-          photo: store.state.photos[this.uuid],
+          photo: store.state.photoRepo.photos[this.uuid],
         );
       },
       builder: (context, ReduxActions redux) {

@@ -1,101 +1,121 @@
 import 'package:redux/redux.dart';
+import 'package:storyboard/redux/models/photo_repo.dart';
 
 import '../actions/actions.dart';
 import '../models/photo.dart';
 
-final photoReducer = combineReducers<Map<String, Photo>>([
-  TypedReducer<Map<String, Photo>, FetchPhotosAction>(_fetchPhotos),
-  TypedReducer<Map<String, Photo>, CreatePhotoAction>(_createPhoto),
-  TypedReducer<Map<String, Photo>, UpdatePhotoAction>(_updatePhoto),
-  TypedReducer<Map<String, Photo>, DownloadPhotoAction>(_downloadPhoto),
-  TypedReducer<Map<String, Photo>, ThumbnailPhotoAction>(_thumbnailPhoto),
-  TypedReducer<Map<String, Photo>, DeletePhotoAction>(_deletePhoto),
+final photoReducer = combineReducers<PhotoRepo>([
+  TypedReducer<PhotoRepo, FetchPhotosAction>(_fetchPhotos),
+  TypedReducer<PhotoRepo, CreatePhotoAction>(_createPhoto),
+  TypedReducer<PhotoRepo, UpdatePhotoAction>(_updatePhoto),
+  TypedReducer<PhotoRepo, DownloadPhotoAction>(_downloadPhoto),
+  TypedReducer<PhotoRepo, ThumbnailPhotoAction>(_thumbnailPhoto),
+  TypedReducer<PhotoRepo, DeletePhotoAction>(_deletePhoto),
 ]);
 
-Map<String, Photo> _fetchPhotos(
-    Map<String, Photo> photos, FetchPhotosAction action) {
+PhotoRepo _fetchPhotos(
+  PhotoRepo photoRepo,
+  FetchPhotosAction action,
+) {
   // new photos
   Map<String, Photo> newPhotos = Map();
   Map<String, Photo> existedPhotos = Map();
   Set<String> removeUuids = Set();
 
+  int lastTS = photoRepo.lastTS;
   action.photoMap.forEach((uuid, element) {
-    if (photos[uuid] == null) {
+    if (photoRepo.photos[uuid] == null) {
       if (element.deleted == 0) {
         newPhotos[uuid] = element;
       }
     } else if (element.deleted == 0) {
       existedPhotos[uuid] = element.copyWith(
-        hasOrigin: photos[uuid].hasOrigin,
-        hasThumb: photos[uuid].hasThumb,
+        hasOrigin: photoRepo.photos[uuid].hasOrigin,
+        hasThumb: photoRepo.photos[uuid].hasThumb,
       );
     } else {
       removeUuids.add(element.uuid);
     }
+    if (element.ts > lastTS) {
+      lastTS = element.ts;
+    }
   });
 
   // merge
-  return Map.from(photos).map((uuid, photo) =>
-      MapEntry(uuid, existedPhotos[uuid] != null ? existedPhotos[uuid] : photo))
-    ..addAll(newPhotos)
-    ..removeWhere((uuid, photo) => removeUuids.contains(uuid));
+  return photoRepo.copyWith(
+    photos: Map.from(photoRepo.photos).map((uuid, photo) => MapEntry(
+        uuid, existedPhotos[uuid] != null ? existedPhotos[uuid] : photo))
+      ..addAll(newPhotos)
+      ..removeWhere((uuid, photo) => removeUuids.contains(uuid)),
+    lastTS: lastTS,
+  );
 }
 
-Map<String, Photo> _createPhoto(
-  Map<String, Photo> photos,
+PhotoRepo _createPhoto(
+  PhotoRepo photoRepo,
   CreatePhotoAction action,
 ) {
   String uuid = action.photo.uuid;
-  return Map.from(photos)..addAll({uuid: action.photo});
+  return photoRepo.copyWith(
+    photos: Map.from(photoRepo.photos)..addAll({uuid: action.photo}),
+  );
 }
 
-Map<String, Photo> _updatePhoto(
-  Map<String, Photo> photos,
+PhotoRepo _updatePhoto(
+  PhotoRepo photoRepo,
   UpdatePhotoAction action,
 ) {
   String updatedUuid = action.photo.uuid;
-  return Map.from(photos).map(
-    (uuid, photo) => MapEntry(
-      uuid,
-      updatedUuid == uuid
-          ? action.photo.copyWith(
-              hasOrigin: photo.hasOrigin,
-              hasThumb: photo.hasThumb,
-            )
-          : photo,
+  return photoRepo.copyWith(
+    photos: Map.from(photoRepo.photos).map(
+      (uuid, photo) => MapEntry(
+        uuid,
+        updatedUuid == uuid
+            ? action.photo.copyWith(
+                hasOrigin: photo.hasOrigin,
+                hasThumb: photo.hasThumb,
+              )
+            : photo,
+      ),
     ),
   );
 }
 
-Map<String, Photo> _downloadPhoto(
-  Map<String, Photo> photos,
+PhotoRepo _downloadPhoto(
+  PhotoRepo photoRepo,
   DownloadPhotoAction action,
 ) {
   String updatedUuid = action.uuid;
-  return Map.from(photos).map(
-    (uuid, photo) => MapEntry(
-      uuid,
-      updatedUuid == uuid ? photo.copyWith(hasOrigin: true) : photo,
+  return photoRepo.copyWith(
+    photos: Map.from(photoRepo.photos).map(
+      (uuid, photo) => MapEntry(
+        uuid,
+        updatedUuid == uuid ? photo.copyWith(hasOrigin: true) : photo,
+      ),
     ),
   );
 }
 
-Map<String, Photo> _thumbnailPhoto(
-  Map<String, Photo> photos,
+PhotoRepo _thumbnailPhoto(
+  PhotoRepo photoRepo,
   ThumbnailPhotoAction action,
 ) {
   String updatedUuid = action.uuid;
-  return Map.from(photos).map(
-    (uuid, photo) => MapEntry(
-      uuid,
-      updatedUuid == uuid ? photo.copyWith(hasThumb: true) : photo,
+  return photoRepo.copyWith(
+    photos: Map.from(photoRepo.photos).map(
+      (uuid, photo) => MapEntry(
+        uuid,
+        updatedUuid == uuid ? photo.copyWith(hasThumb: true) : photo,
+      ),
     ),
   );
 }
 
-Map<String, Photo> _deletePhoto(
-  Map<String, Photo> photos,
+PhotoRepo _deletePhoto(
+  PhotoRepo photoRepo,
   DeletePhotoAction action,
 ) {
-  return Map.from(photos)..remove(action.uuid);
+  return photoRepo.copyWith(
+    photos: Map.from(photoRepo.photos)..remove(action.uuid),
+  );
 }

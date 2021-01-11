@@ -61,7 +61,7 @@ class NetTasks {
 
   Future<bool> netCreateTask(Store<AppState> store, {uuid: String}) async {
     try {
-      Task task = store.state.tasks[uuid];
+      Task task = store.state.taskRepo.tasks[uuid];
       if (task == null) return true;
 
       final response = await _httpClient.post(URLPrefix + "/tasks",
@@ -85,7 +85,7 @@ class NetTasks {
 
   Future<bool> netUpdateTask(Store<AppState> store, {uuid: String}) async {
     try {
-      Task task = store.state.tasks[uuid];
+      Task task = store.state.taskRepo.tasks[uuid];
       if (task == null) return true;
 
       final body = jsonEncode(task.toJson());
@@ -110,7 +110,7 @@ class NetTasks {
 
   Future<bool> netDeleteTask(Store<AppState> store, {uuid: String}) async {
     try {
-      Task task = store.state.tasks[uuid];
+      Task task = store.state.taskRepo.tasks[uuid];
       if (task == null) return true;
 
       final responseStream = await _httpClient.send(

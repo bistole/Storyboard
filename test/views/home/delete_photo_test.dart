@@ -9,9 +9,10 @@ import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
+import 'package:storyboard/redux/models/photo_repo.dart';
 import 'package:storyboard/redux/models/status.dart';
+import 'package:storyboard/redux/models/task_repo.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
-import 'package:storyboard/redux/store.dart';
 import 'package:storyboard/storage/storage.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/page.dart';
@@ -56,7 +57,11 @@ void main() {
         appReducer,
         initialState: AppState(
           status: Status.noParam(StatusKey.ListTask),
-          photos: <String, Photo>{uuid: Photo.fromJson(photoJson)},
+          photoRepo: PhotoRepo(
+            photos: <String, Photo>{uuid: Photo.fromJson(photoJson)},
+            lastTS: 0,
+          ),
+          taskRepo: TaskRepo(tasks: {}, lastTS: 0),
         ),
       );
 

@@ -3,11 +3,11 @@ import 'package:redux/redux.dart';
 import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
-import 'package:storyboard/redux/models/photo.dart';
+import 'package:storyboard/redux/models/photo_repo.dart';
 import 'package:storyboard/redux/models/queue.dart';
 import 'package:storyboard/redux/models/queue_item.dart';
 import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task.dart';
+import 'package:storyboard/redux/models/task_repo.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
 
 main() {
@@ -18,8 +18,8 @@ main() {
       appReducer,
       initialState: AppState(
         status: Status.noParam(StatusKey.ListTask),
-        photos: <String, Photo>{},
-        tasks: <String, Task>{},
+        photoRepo: PhotoRepo(photos: {}, lastTS: 0),
+        taskRepo: TaskRepo(tasks: {}, lastTS: 0),
         queue: queue,
       ),
     );

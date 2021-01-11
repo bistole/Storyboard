@@ -11,8 +11,10 @@ import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
+import 'package:storyboard/redux/models/photo_repo.dart';
 import 'package:storyboard/redux/models/queue_item.dart';
 import 'package:storyboard/redux/models/status.dart';
+import 'package:storyboard/redux/models/task_repo.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/storage/storage.dart';
 import 'package:storyboard/views/config/config.dart';
@@ -45,7 +47,8 @@ void main() {
           appReducer,
           initialState: AppState(
             status: Status.noParam(StatusKey.ListTask),
-            photos: <String, Photo>{},
+            photoRepo: PhotoRepo(photos: <String, Photo>{}, lastTS: 0),
+            taskRepo: TaskRepo(tasks: {}, lastTS: 0),
           ),
         );
 
@@ -108,10 +111,10 @@ void main() {
 
         // Photo is in redux list
         expect(store.state.status.status, StatusKey.ListTask);
-        expect(store.state.photos.length, 1);
+        expect(store.state.photoRepo.photos.length, 1);
 
         var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-        var photo = store.state.photos.values.first;
+        var photo = store.state.photoRepo.photos.values.first;
         expect(photo.filename, "photo_test.jpg");
         expect(photo.mime, "image/jpeg");
         expect(photo.size, "5938");

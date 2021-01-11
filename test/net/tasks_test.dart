@@ -8,10 +8,11 @@ import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/tasks.dart';
 import 'package:storyboard/redux/models/app.dart';
-import 'package:storyboard/redux/models/photo.dart';
+import 'package:storyboard/redux/models/photo_repo.dart';
 import 'package:storyboard/redux/models/queue.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
+import 'package:storyboard/redux/models/task_repo.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
 
 class MockHttpClient extends Mock implements http.Client {}
@@ -26,8 +27,8 @@ void main() {
       appReducer,
       initialState: AppState(
         status: Status.noParam(StatusKey.ListTask),
-        photos: <String, Photo>{},
-        tasks: tasks,
+        photoRepo: PhotoRepo(photos: {}, lastTS: 0),
+        taskRepo: TaskRepo(tasks: tasks, lastTS: 0),
         queue: Queue(),
       ),
     );
@@ -69,7 +70,7 @@ void main() {
 
       final responseBody = jsonEncode({
         'succ': true,
-        'tasks': {'uuid': getJsonTaskObject()},
+        'tasks': [getJsonTaskObject()],
       });
       when(httpClient.get(startsWith(URLPrefix))).thenAnswer((_) async {
         return http.Response(responseBody, 200);
@@ -80,7 +81,7 @@ void main() {
       var captured = verify(httpClient.get(captureAny)).captured.first;
       expect(captured, URLPrefix + '/tasks');
 
-      expect(store.state.tasks, {'uuid': getTaskObject()});
+      expect(store.state.taskRepo.tasks, {'uuid': getTaskObject()});
     });
 
     test('fetch existed task', () async {
@@ -94,7 +95,7 @@ void main() {
 
       final responseBody = jsonEncode({
         'succ': true,
-        'tasks': {'uuid': getJsonTaskObject()},
+        'tasks': [getJsonTaskObject()],
       });
 
       when(httpClient.get(startsWith(URLPrefix))).thenAnswer((_) async {
@@ -106,7 +107,7 @@ void main() {
       var captured = verify(httpClient.get(captureAny)).captured.first;
       expect(captured, URLPrefix + '/tasks');
 
-      expect(store.state.tasks, {
+      expect(store.state.taskRepo.tasks, {
         'uuid': getTaskObject(),
       });
     });
@@ -116,9 +117,9 @@ void main() {
 
       final responseBody = jsonEncode({
         'succ': true,
-        'tasks': {
-          'uuid': getJsonTaskObject()..addAll({'deleted': 1})
-        },
+        'tasks': [
+          getJsonTaskObject()..addAll({'deleted': 1})
+        ],
       });
 
       when(httpClient.get(startsWith(URLPrefix))).thenAnswer((_) async {
@@ -130,7 +131,7 @@ void main() {
       var captured = verify(httpClient.get(captureAny)).captured.first;
       expect(captured, URLPrefix + '/tasks');
 
-      expect(store.state.tasks, {});
+      expect(store.state.taskRepo.tasks, {});
     });
   });
 
@@ -172,7 +173,7 @@ void main() {
       expect(captured[1]['Content-Type'], 'application/json');
       expect(captured[2], jsonEncode(getTaskObject().copyWith(ts: 0).toJson()));
 
-      expect(store.state.tasks['uuid'].ts, 1606506017000);
+      expect(store.state.taskRepo.tasks['uuid'].ts, 1606506017000);
     });
   });
 
@@ -215,7 +216,7 @@ void main() {
       expect(captured[2],
           jsonEncode(getTaskObject().copyWith(ts: 1606500000000).toJson()));
 
-      expect(store.state.tasks['uuid'].ts, 1606506017000);
+      expect(store.state.taskRepo.tasks['uuid'].ts, 1606506017000);
     });
   });
 
@@ -247,7 +248,7 @@ void main() {
       expect(capHttp.url.toString(), URLPrefix + '/tasks/uuid');
       expect(capHttp.body, jsonEncode({"updatedAt": 1606506017}));
 
-      expect(store.state.tasks['uuid'], isNull);
+      expect(store.state.taskRepo.tasks['uuid'], isNull);
     });
   });
 }
