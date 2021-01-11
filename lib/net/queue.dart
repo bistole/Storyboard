@@ -4,7 +4,6 @@ import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/queue.dart';
 import 'package:storyboard/redux/models/queue_item.dart';
-import 'package:storyboard/redux/store.dart';
 
 enum NetQueueStatus {
   IDLE,
@@ -15,6 +14,11 @@ typedef void NetQueuePeriodicTriggerFunc();
 typedef Future<bool> NetQueueActionFunc(Store<AppState> state, {String uuid});
 
 class NetQueue {
+  int sleepInterval;
+
+  // required
+  Store<AppState> _store;
+
   NetQueueStatus _status = NetQueueStatus.IDLE;
   int _stamp;
   Timer _checker;
@@ -22,8 +26,14 @@ class NetQueue {
   List<NetQueuePeriodicTriggerFunc> _triggers = [];
 
   // init queue to listen redux changed
-  NetQueue() {
-    getStore().onChange.listen((event) {
+  NetQueue(this.sleepInterval);
+
+  void setStore(Store<AppState> store) {
+    _store = store;
+  }
+
+  void start() {
+    _store.onChange.listen((event) {
       if (event.queue.tick != _stamp) {
         _stamp = event.queue.tick;
         if (_status == NetQueueStatus.IDLE) {
@@ -32,8 +42,9 @@ class NetQueue {
       }
     });
 
-    if (getStore().state.queue.now != null) {
-      _queueLoop();
+    // run at once if queue is not empty
+    if (_store.state.queue.now != null || _store.state.queue.list.length > 0) {
+      Future.delayed(Duration(seconds: 1), _queueLoop);
     }
 
     _sleep();
@@ -45,23 +56,19 @@ class NetQueue {
         _checker.cancel();
       }
     }
-    _checker = Timer(
-      Duration(seconds: 60),
-      () {
-        if (_status == NetQueueStatus.IDLE) {
-          _periodicPushEvents();
-          _queueLoop();
-        }
-      },
-    );
+    _checker = Timer(Duration(seconds: sleepInterval), _periodicPushEvents);
   }
 
   void _periodicPushEvents() {
-    Queue queue = getStore().state.queue;
-    if (queue.list.length == 0 && queue.now == null) {
-      _triggers.forEach((element) {
-        element();
-      });
+    Queue queue = _store.state.queue;
+    if (_status == NetQueueStatus.IDLE) {
+      if (queue.list.length == 0 && queue.now == null) {
+        _triggers.forEach((element) {
+          element();
+        });
+      } else {
+        _queueLoop();
+      }
     }
   }
 
@@ -71,7 +78,7 @@ class NetQueue {
     QueueItemAction action,
     String uuid,
   ) {
-    getStore().dispatch(PushQueueItemAction(
+    _store.dispatch(PushQueueItemAction(
       type: type,
       action: action,
       uuid: uuid,
@@ -84,7 +91,7 @@ class NetQueue {
     QueueItemAction action,
     String uuid,
   ) {
-    getStore().dispatch(UnshiftQueueItemAction(
+    _store.dispatch(UnshiftQueueItemAction(
       type: type,
       action: action,
       uuid: uuid,
@@ -110,21 +117,20 @@ class NetQueue {
   Future<bool> _executeQueueItem(Store<AppState> store, QueueItem item) async {
     if (_actions[item.type] != null &&
         _actions[item.type][item.action] != null) {
-      return await _actions[item.type]
-          [item.action](getStore(), uuid: item.uuid);
+      return await _actions[item.type][item.action](_store, uuid: item.uuid);
     }
     return true;
   }
 
   void _queueLoop() {
     _status = NetQueueStatus.RUNNING;
-    Queue q = getStore().state.queue;
+    Queue q = _store.state.queue;
     if (q.now != null) {
       // process current one
-      _executeQueueItem(getStore(), q.now).then((bool succ) {
+      _executeQueueItem(_store, q.now).then((bool succ) {
         if (succ) {
           // if succ, remove first one and run again
-          getStore().dispatch(DoneQueueItemAction());
+          _store.dispatch(DoneQueueItemAction());
         } else {
           // failed, to sleep and try again later
           _sleep();
@@ -133,24 +139,11 @@ class NetQueue {
       });
     } else {
       if (q.list.length > 0) {
-        getStore().dispatch(ProcessQueueItemAction());
+        _store.dispatch(ProcessQueueItemAction());
       } else {
         _sleep();
       }
       _status = NetQueueStatus.IDLE;
     }
   }
-}
-
-NetQueue _netQueue;
-
-NetQueue getNetQueue() {
-  if (_netQueue == null) {
-    _netQueue = NetQueue();
-  }
-  return _netQueue;
-}
-
-setNetQueue(NetQueue netQueue) {
-  _netQueue = netQueue;
 }

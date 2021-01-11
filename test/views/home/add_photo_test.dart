@@ -3,8 +3,10 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
+import 'package:storyboard/actions/photos.dart';
 
 import 'package:storyboard/channel/command.dart';
+import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
@@ -12,8 +14,8 @@ import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/queue_item.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
-import 'package:storyboard/redux/store.dart';
 import 'package:storyboard/storage/storage.dart';
+import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/page.dart';
 
 import '../../common.dart';
@@ -39,18 +41,22 @@ void main() {
     "add photo",
     () {
       setUp(() {
-        store = Store<AppState>(
+        getFactory().store = store = Store<AppState>(
           appReducer,
           initialState: AppState(
             status: Status.noParam(StatusKey.ListTask),
             photos: <String, Photo>{},
           ),
         );
-        setStore(store);
+
+        Storage s = Storage();
+        s.dataHome = "project_home";
 
         netQueue = MockNetQueue();
-        setNetQueue(netQueue);
-        getStorage().dataHome = "project_home";
+        getViewResource().storage = s;
+        getViewResource().actPhotos = ActPhotos();
+        getViewResource().actPhotos.setNetQueue(netQueue);
+        getViewResource().actPhotos.setStorage(s);
       });
 
       testWidgets('add item succ', (WidgetTester tester) async {
@@ -59,12 +65,14 @@ void main() {
 
         MockCommandChannel mcc = MockCommandChannel();
         when(mcc.importPhoto()).thenAnswer((invoke) async {
-          getStore().dispatch(ChangeStatusWithPathAction(
-            status: StatusKey.AddingPhoto,
-            path: resourcePath,
-          ));
+          getFactory().store.dispatch(
+                ChangeStatusWithPathAction(
+                  status: StatusKey.AddingPhoto,
+                  path: resourcePath,
+                ),
+              );
         });
-        setCommandChannel(mcc);
+        getViewResource().command = mcc;
 
         var widget = buildTestableWidget(HomePage(title: 'title'));
         await tester.pumpWidget(widget);

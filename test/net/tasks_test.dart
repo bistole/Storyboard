@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
+import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/tasks.dart';
 import 'package:storyboard/redux/models/app.dart';
@@ -12,16 +13,16 @@ import 'package:storyboard/redux/models/queue.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
-import 'package:storyboard/redux/store.dart';
 
 class MockHttpClient extends Mock implements http.Client {}
 
 void main() {
   Store<AppState> store;
   MockHttpClient httpClient;
+  NetTasks netTasks;
 
   buildStore(Map<String, Task> tasks) {
-    store = Store<AppState>(
+    getFactory().store = store = Store<AppState>(
       appReducer,
       initialState: AppState(
         status: Status.noParam(StatusKey.ListTask),
@@ -30,7 +31,6 @@ void main() {
         queue: Queue(),
       ),
     );
-    setStore(store);
   }
 
   getJsonTaskObject() {
@@ -58,7 +58,9 @@ void main() {
   group("netFetchTasks", () {
     setUp(() {
       httpClient = MockHttpClient();
-      setHTTPClient(httpClient);
+
+      netTasks = NetTasks();
+      netTasks.setHttpClient(httpClient);
     });
 
     test("fetch new task", () async {
@@ -73,7 +75,7 @@ void main() {
         return http.Response(responseBody, 200);
       });
 
-      await getNetTasks().netFetchTasks(store);
+      await netTasks.netFetchTasks(store);
 
       var captured = verify(httpClient.get(captureAny)).captured.first;
       expect(captured, URLPrefix + '/tasks');
@@ -99,7 +101,7 @@ void main() {
         return http.Response(responseBody, 200);
       });
 
-      await getNetTasks().netFetchTasks(store);
+      await netTasks.netFetchTasks(store);
 
       var captured = verify(httpClient.get(captureAny)).captured.first;
       expect(captured, URLPrefix + '/tasks');
@@ -123,7 +125,7 @@ void main() {
         return http.Response(responseBody, 200);
       });
 
-      await getNetTasks().netFetchTasks(store);
+      await netTasks.netFetchTasks(store);
 
       var captured = verify(httpClient.get(captureAny)).captured.first;
       expect(captured, URLPrefix + '/tasks');
@@ -135,7 +137,8 @@ void main() {
   group('netCreateTask', () {
     setUp(() {
       httpClient = MockHttpClient();
-      setHTTPClient(httpClient);
+      netTasks = NetTasks();
+      netTasks.setHttpClient(httpClient);
     });
 
     test("create succ", () async {
@@ -156,7 +159,7 @@ void main() {
         return http.Response(responseBody, 200);
       });
 
-      await getNetTasks().netCreateTask(store, uuid: 'uuid');
+      await netTasks.netCreateTask(store, uuid: 'uuid');
 
       var captured = verify(httpClient.post(
         captureAny,
@@ -176,7 +179,9 @@ void main() {
   group('netUpdateTask', () {
     setUp(() {
       httpClient = MockHttpClient();
-      setHTTPClient(httpClient);
+
+      netTasks = NetTasks();
+      netTasks.setHttpClient(httpClient);
     });
 
     test('update succ', () async {
@@ -196,7 +201,7 @@ void main() {
         return http.Response(responseBody, 200);
       });
 
-      await getNetTasks().netUpdateTask(store, uuid: 'uuid');
+      await netTasks.netUpdateTask(store, uuid: 'uuid');
 
       var captured = verify(httpClient.post(
         captureAny,
@@ -217,7 +222,9 @@ void main() {
   group('netDeleteTask', () {
     setUp(() {
       httpClient = MockHttpClient();
-      setHTTPClient(httpClient);
+
+      netTasks = NetTasks();
+      netTasks.setHttpClient(httpClient);
     });
 
     test('delete succ', () async {
@@ -232,7 +239,7 @@ void main() {
             Stream.value(utf8.encode(responseBody)), 200);
       });
 
-      await getNetTasks().netDeleteTask(store, uuid: 'uuid');
+      await netTasks.netDeleteTask(store, uuid: 'uuid');
 
       var capHttp =
           verify(httpClient.send(captureAny)).captured.first as http.Request;

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:storyboard/configs/factory.dart';
 
 import 'package:storyboard/views/home/page.dart';
 import 'package:storyboard/redux/models/app.dart';
-import 'package:storyboard/redux/store.dart';
 import 'package:storyboard/views/photo/page.dart';
 
 class StoryBoardApp extends StatelessWidget {
@@ -39,18 +39,23 @@ class StoryBoardApp extends StatelessWidget {
     );
   }
 
+  Future<Store<AppState>> getFutureStore() async {
+    getFactory().initAfterAppCreated();
+    return getFactory().store;
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Store<AppState>>(
-      future: initStore(),
+      future: getFutureStore(),
       builder: (context, AsyncSnapshot<Store<AppState>> snapshot) {
         if (!snapshot.hasData) {
           return buildNotAvailableWidget();
         }
 
-        return new StoreProvider(
+        return StoreProvider(
           store: snapshot.data,
-          child: new MaterialApp(
+          child: MaterialApp(
             title: 'Flutter Demo',
             routes: {
               PhotoPage.routeName: (_) => PhotoPage(),

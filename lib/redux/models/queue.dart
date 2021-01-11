@@ -22,14 +22,14 @@ class Queue {
   }
 
   Queue push(QueueItem item) {
-    return Queue(
+    return copyWith(
       tick: tick + 1,
       list: List.unmodifiable([...list, item]),
     );
   }
 
   Queue unshift(QueueItem item) {
-    return Queue(
+    return copyWith(
       tick: tick + 1,
       list: List.unmodifiable([item, ...list]),
     );
@@ -46,7 +46,7 @@ class Queue {
   Queue done() {
     return Queue(
       tick: tick + 1,
-      now: null,
+      list: list,
     );
   }
 

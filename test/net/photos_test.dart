@@ -5,16 +5,16 @@ import 'package:redux/redux.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/photos.dart';
+
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/queue.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
-import 'package:storyboard/redux/store.dart';
 import 'package:storyboard/storage/storage.dart';
 
 import '../common.dart';
@@ -24,11 +24,13 @@ class MockHttpClient extends Mock implements http.Client {}
 class MockStorage extends Mock implements Storage {}
 
 void main() {
+  NetPhotos netPhotos;
   Store<AppState> store;
   MockHttpClient httpClient;
+  Storage storage;
 
   buildStore(Map<String, Photo> photos) {
-    store = Store<AppState>(
+    getFactory().store = store = Store<AppState>(
       appReducer,
       initialState: AppState(
         status: Status.noParam(StatusKey.ListTask),
@@ -37,7 +39,6 @@ void main() {
         queue: Queue(),
       ),
     );
-    setStore(store);
   }
 
   getJsonPhotoObject() {
@@ -71,7 +72,11 @@ void main() {
   group("netFetchPhotos", () {
     setUp(() {
       httpClient = MockHttpClient();
-      setHTTPClient(httpClient);
+      storage = MockStorage();
+
+      netPhotos = NetPhotos();
+      netPhotos.setHttpClient(httpClient);
+      netPhotos.setStorage(storage);
     });
 
     test("fetch new photo", () async {
@@ -86,7 +91,7 @@ void main() {
         return http.Response(responseBody, 200);
       });
 
-      await getNetPhotos().netFetchPhotos(store);
+      await netPhotos.netFetchPhotos(store);
 
       var captured = verify(httpClient.get(captureAny)).captured.first;
       expect(captured, URLPrefix + '/photos');
@@ -114,7 +119,7 @@ void main() {
         return http.Response(responseBody, 200);
       });
 
-      await getNetPhotos().netFetchPhotos(store);
+      await netPhotos.netFetchPhotos(store);
 
       var captured = verify(httpClient.get(captureAny)).captured.first;
       expect(captured, URLPrefix + '/photos');
@@ -128,9 +133,6 @@ void main() {
     });
 
     test('fetch deleting photo', () async {
-      MockStorage storage = MockStorage();
-      setStorage(storage);
-
       buildStore({
         'uuid': getPhotoObject().copyWith(
           hasThumb: true,
@@ -149,7 +151,7 @@ void main() {
         return http.Response(responseBody, 200);
       });
 
-      await getNetPhotos().netFetchPhotos(store);
+      await netPhotos.netFetchPhotos(store);
 
       var captured = verify(httpClient.get(captureAny)).captured.first;
       expect(captured, URLPrefix + '/photos');
@@ -165,12 +167,13 @@ void main() {
   group('netUploadPhoto', () {
     setUp(() {
       httpClient = MockHttpClient();
-      setHTTPClient(httpClient);
+
+      netPhotos = NetPhotos();
+      netPhotos.setHttpClient(httpClient);
     });
 
     test('upload succ', () async {
-      MockStorage storage = MockStorage();
-      setStorage(storage);
+      netPhotos.setStorage(storage);
 
       buildStore({
         'uuid': getPhotoObject().copyWith(
@@ -194,7 +197,7 @@ void main() {
       String resourcePath = getResourcePath("test_resources/photo_test.jpg");
       when(storage.getPhotoPathByUUID(any)).thenReturn(resourcePath);
 
-      await getNetPhotos().netUploadPhoto(store, uuid: 'uuid');
+      await netPhotos.netUploadPhoto(store, uuid: 'uuid');
 
       var captured = verify(httpClient.send(captureAny)).captured.single
           as http.MultipartRequest;
@@ -214,10 +217,11 @@ void main() {
   group('netDownloadPhoto', () {
     setUp(() {
       httpClient = MockHttpClient();
-      setHTTPClient(httpClient);
+      storage = MockStorage();
 
-      MockStorage storage = MockStorage();
-      setStorage(storage);
+      netPhotos = NetPhotos();
+      netPhotos.setHttpClient(httpClient);
+      netPhotos.setStorage(storage);
     });
 
     test('download succ', () async {
@@ -227,13 +231,13 @@ void main() {
         return http.Response("buffer", 200);
       });
 
-      await getNetPhotos().netDownloadPhoto(store, uuid: 'uuid');
+      await netPhotos.netDownloadPhoto(store, uuid: 'uuid');
 
       var capHttp = verify(httpClient.get(captureAny)).captured.first;
       expect(capHttp, URLPrefix + '/photos/uuid');
 
       var capStorage =
-          verify(getStorage().savePhotoByUUID(captureAny, captureAny)).captured;
+          verify(storage.savePhotoByUUID(captureAny, captureAny)).captured;
 
       expect(capStorage[0], 'uuid');
       expect(String.fromCharCodes(capStorage[1]), 'buffer');
@@ -244,10 +248,11 @@ void main() {
   group('netDownloadThumbnail', () {
     setUp(() {
       httpClient = MockHttpClient();
-      setHTTPClient(httpClient);
+      storage = MockStorage();
 
-      MockStorage storage = MockStorage();
-      setStorage(storage);
+      netPhotos = NetPhotos();
+      netPhotos.setHttpClient(httpClient);
+      netPhotos.setStorage(storage);
     });
 
     test('download succ', () async {
@@ -257,14 +262,13 @@ void main() {
         return http.Response("buffer", 200);
       });
 
-      await getNetPhotos().netDownloadThumbnail(store, uuid: 'uuid');
+      await netPhotos.netDownloadThumbnail(store, uuid: 'uuid');
 
       var capHttp = verify(httpClient.get(captureAny)).captured.first;
       expect(capHttp, URLPrefix + '/photos/uuid/thumbnail');
 
       var capStorage =
-          verify(getStorage().saveThumbailByUUID(captureAny, captureAny))
-              .captured;
+          verify(storage.saveThumbailByUUID(captureAny, captureAny)).captured;
 
       expect(capStorage[0], 'uuid');
       expect(String.fromCharCodes(capStorage[1]), 'buffer');
@@ -275,10 +279,9 @@ void main() {
   group('netDeletePhoto', () {
     setUp(() {
       httpClient = MockHttpClient();
-      setHTTPClient(httpClient);
-
-      MockStorage storage = MockStorage();
-      setStorage(storage);
+      storage = MockStorage();
+      netPhotos.setHttpClient(httpClient);
+      netPhotos.setStorage(storage);
     });
 
     test('delete succ', () async {
@@ -293,7 +296,7 @@ void main() {
             Stream.value(utf8.encode(responseBody)), 200);
       });
 
-      await getNetPhotos().netDeletePhoto(store, uuid: 'uuid');
+      await netPhotos.netDeletePhoto(store, uuid: 'uuid');
 
       var capHttp =
           verify(httpClient.send(captureAny)).captured.first as http.Request;
@@ -302,7 +305,7 @@ void main() {
       expect(capHttp.body, jsonEncode({"updatedAt": 1606506017}));
 
       var capStorage =
-          verify(getStorage().deletePhotoAndThumbByUUID(captureAny)).captured;
+          verify(storage.deletePhotoAndThumbByUUID(captureAny)).captured;
 
       expect(capStorage[0], 'uuid');
 

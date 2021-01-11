@@ -2,12 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/views/common/toolbar.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
+import 'package:storyboard/views/config/config.dart';
 
 class ReduxActions {
   final void Function(String) createPhoto;
@@ -62,7 +62,7 @@ class CreatePhotoWidget extends StatelessWidget {
         return ReduxActions(
           createPhoto: (String path) {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
-            getActPhotos().actUploadPhoto(store, path);
+            getViewResource().actPhotos.actUploadPhoto(store, path);
           },
           cancel: () {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));

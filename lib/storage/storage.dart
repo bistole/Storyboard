@@ -66,16 +66,3 @@ class Storage {
     await File(photoPath).writeAsBytes(bytes);
   }
 }
-
-Storage _storage;
-
-Storage getStorage() {
-  if (_storage == null) {
-    _storage = Storage();
-  }
-  return _storage;
-}
-
-void setStorage(Storage s) {
-  _storage = s;
-}

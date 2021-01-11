@@ -5,6 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:redux/redux.dart';
+import 'package:storyboard/actions/photos.dart';
+import 'package:storyboard/channel/command.dart';
+import 'package:storyboard/configs/factory.dart';
 
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/actions/actions.dart';
@@ -12,8 +15,8 @@ import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
-import 'package:storyboard/redux/store.dart';
 import 'package:storyboard/storage/storage.dart';
+import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/page.dart';
 import 'package:storyboard/views/photo/page.dart';
 
@@ -23,8 +26,11 @@ class MockNetQueue extends Mock implements NetQueue {}
 
 class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 
+class MockCommandChannel extends Mock implements CommandChannel {}
+
 void main() {
   Store<AppState> store;
+  MockNetQueue netQueue;
   MockNavigatorObserver naviObserver;
 
   final uuid = '04deb797-7ca0-4cd3-b4ef-c1e01aeea130';
@@ -56,19 +62,26 @@ void main() {
 
   group("update item", () {
     setUp(() {
-      store = Store<AppState>(
+      getFactory().store = store = Store<AppState>(
         appReducer,
         initialState: AppState(
           status: Status.noParam(StatusKey.ListTask),
           photos: <String, Photo>{uuid: Photo.fromJson(photoJson)},
         ),
       );
-      setStore(store);
 
       naviObserver = MockNavigatorObserver();
 
-      setNetQueue(MockNetQueue());
-      getStorage().dataHome = "project_home";
+      Storage s = Storage();
+      s.dataHome = "project_home";
+      getViewResource().storage = s;
+
+      netQueue = MockNetQueue();
+      getViewResource().storage = s;
+      getViewResource().actPhotos = ActPhotos();
+      getViewResource().actPhotos.setNetQueue(netQueue);
+      getViewResource().actPhotos.setStorage(s);
+      getViewResource().command = MockCommandChannel();
     });
 
     testWidgets("update item succ", (WidgetTester tester) async {
@@ -130,7 +143,7 @@ void main() {
           findsNothing);
 
       // download origin is succ
-      getStore().dispatch(DownloadPhotoAction(uuid: uuid));
+      getFactory().store.dispatch(DownloadPhotoAction(uuid: uuid));
       await tester.pumpAndSettle();
 
       expect(

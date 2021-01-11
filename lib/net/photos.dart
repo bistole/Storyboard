@@ -2,18 +2,30 @@ import 'dart:convert';
 import 'package:redux/redux.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/queue.dart';
 
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
-import 'package:storyboard/net/config.dart';
 import 'package:storyboard/redux/models/queue_item.dart';
 import 'package:storyboard/storage/storage.dart';
 
 var validMimeTypes = ["image/jpeg", "image/png", "image/gif"];
 
 class NetPhotos {
+  // reqiired
+  http.Client _httpClient;
+  void setHttpClient(http.Client httpClient) {
+    _httpClient = httpClient;
+  }
+
+  // required
+  Storage _storage;
+  void setStorage(Storage storage) {
+    _storage = storage;
+  }
+
   void registerToQueue(NetQueue netQueue) {
     netQueue.registerQueueItemAction(
       QueueItemType.Photo,
@@ -44,14 +56,14 @@ class NetPhotos {
 
   Future<bool> netFetchPhotos(Store<AppState> store, {uuid: String}) async {
     try {
-      final response = await getHTTPClient().get(URLPrefix + "/photos");
+      final response = await _httpClient.get(URLPrefix + "/photos");
       if (response.statusCode == 200) {
         Map<String, dynamic> object = jsonDecode(response.body);
         if (object['succ'] == true && object['photos'] != null) {
           var photoMap = buildPhotoMap(object['photos']);
           for (var photo in photoMap.values) {
             if (photo.deleted == 1) {
-              await getStorage().deletePhotoAndThumbByUUID(photo.uuid);
+              await _storage.deletePhotoAndThumbByUUID(photo.uuid);
             }
           }
           store.dispatch(FetchPhotosAction(photoMap: photoMap));
@@ -69,14 +81,14 @@ class NetPhotos {
       Photo photo = store.state.photos[uuid];
       if (photo == null) return true;
 
-      final response = await getHTTPClient().send(
+      final response = await _httpClient.send(
         http.MultipartRequest("POST", Uri.parse(URLPrefix + "/photos"))
           ..fields['uuid'] = photo.uuid
           ..fields['createdAt'] = photo.createdAt.toString()
           ..files.add(
             await http.MultipartFile.fromPath(
               'photo',
-              getStorage().getPhotoPathByUUID(uuid),
+              _storage.getPhotoPathByUUID(uuid),
               filename: photo.filename,
               contentType: MediaType.parse(photo.mime),
             ),
@@ -105,12 +117,12 @@ class NetPhotos {
       if (photo == null) return true;
       if (photo.hasOrigin) return true;
 
-      final response = await getHTTPClient().get(
+      final response = await _httpClient.get(
         URLPrefix + "/photos/" + uuid,
       );
 
       if (response.statusCode == 200) {
-        await getStorage().savePhotoByUUID(uuid, response.bodyBytes);
+        await _storage.savePhotoByUUID(uuid, response.bodyBytes);
         store.dispatch(DownloadPhotoAction(uuid: uuid));
         return true;
       }
@@ -127,12 +139,12 @@ class NetPhotos {
       if (photo == null) return true;
       if (photo.hasThumb) return true;
 
-      final response = await getHTTPClient().get(
+      final response = await _httpClient.get(
         URLPrefix + "/photos/" + uuid + '/thumbnail',
       );
 
       if (response.statusCode == 200) {
-        await getStorage().saveThumbailByUUID(uuid, response.bodyBytes);
+        await _storage.saveThumbailByUUID(uuid, response.bodyBytes);
         store.dispatch(ThumbnailPhotoAction(uuid: uuid));
         return true;
       }
@@ -147,7 +159,7 @@ class NetPhotos {
       Photo photo = store.state.photos[uuid];
       if (photo == null) return true;
 
-      final responseStream = await getHTTPClient().send(
+      final responseStream = await _httpClient.send(
         http.Request("DELETE", Uri.parse(URLPrefix + "/photos/" + photo.uuid))
           ..body = jsonEncode({"updatedAt": photo.updatedAt}),
       );
@@ -158,7 +170,7 @@ class NetPhotos {
         Map<String, dynamic> object = jsonDecode(body);
         if (object['succ'] == true && object['photo'] != null) {
           var photo = Photo.fromJson(object['photo']);
-          await getStorage().deletePhotoAndThumbByUUID(photo.uuid);
+          await _storage.deletePhotoAndThumbByUUID(photo.uuid);
           store.dispatch(DeletePhotoAction(uuid: photo.uuid));
         }
         return true;
@@ -168,13 +180,4 @@ class NetPhotos {
     }
     return false;
   }
-}
-
-NetPhotos _netPhotos;
-
-NetPhotos getNetPhotos() {
-  if (_netPhotos == null) {
-    _netPhotos = NetPhotos();
-  }
-  return _netPhotos;
 }

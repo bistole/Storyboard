@@ -1,9 +1,12 @@
+import 'package:storyboard/actions/tasks.dart';
+import 'package:storyboard/channel/command.dart';
+import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
-import 'package:storyboard/redux/store.dart';
+import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/page.dart';
 
 import 'package:flutter/material.dart';
@@ -14,10 +17,13 @@ import 'package:redux/redux.dart';
 
 class MockNetQueue extends Mock implements NetQueue {}
 
+class MockCommandChannel extends Mock implements CommandChannel {}
+
 Type typeof<T>() => T;
 
 void main() {
   Store<AppState> store;
+  MockNetQueue netQueue;
 
   final uuid = '04deb797-7ca0-4cd3-b4ef-c1e01aeea130';
   final taskJson = {
@@ -41,15 +47,18 @@ void main() {
     "delete item",
     () {
       setUp(() {
-        store = Store<AppState>(
+        getFactory().store = store = Store<AppState>(
           appReducer,
           initialState: AppState(
             status: Status.noParam(StatusKey.ListTask),
             tasks: <String, Task>{uuid: Task.fromJson(taskJson)},
           ),
         );
-        setStore(store);
-        setNetQueue(MockNetQueue());
+
+        netQueue = MockNetQueue();
+        getViewResource().actTasks = ActTasks();
+        getViewResource().actTasks.setNetQueue(netQueue);
+        getViewResource().command = MockCommandChannel();
       });
 
       testWidgets("delete item succ", (WidgetTester tester) async {

@@ -10,8 +10,20 @@ import 'package:storyboard/storage/storage.dart';
 import 'package:uuid/uuid.dart';
 
 class ActPhotos {
+  // required
+  NetQueue _netQueue;
+  void setNetQueue(NetQueue netQueue) {
+    _netQueue = netQueue;
+  }
+
+  // required
+  Storage _storage;
+  void setStorage(Storage storage) {
+    _storage = storage;
+  }
+
   void actFetchPhotos() {
-    getNetQueue().addQueueItem(
+    _netQueue.addQueueItem(
       QueueItemType.Photo,
       QueueItemAction.List,
       null,
@@ -19,7 +31,7 @@ class ActPhotos {
   }
 
   void actDownloadPhoto(Store<AppState> store, String uuid) {
-    getNetQueue().addQueueItem(
+    _netQueue.addQueueItem(
       QueueItemType.Photo,
       QueueItemAction.DownloadPhoto,
       uuid,
@@ -27,7 +39,7 @@ class ActPhotos {
   }
 
   void actDownloadThumbnail(Store<AppState> store, String uuid) {
-    getNetQueue().addQueueItem(
+    _netQueue.addQueueItem(
       QueueItemType.Photo,
       QueueItemAction.DownloadThumbnail,
       uuid,
@@ -60,9 +72,9 @@ class ActPhotos {
       createdAt: ts,
       ts: 0,
     );
-    getStorage().copyPhotoByUUID(uuid, File(path));
+    _storage.copyPhotoByUUID(uuid, File(path));
     store.dispatch(CreatePhotoAction(photo: photo));
-    getNetQueue().addQueueItem(
+    _netQueue.addQueueItem(
       QueueItemType.Photo,
       QueueItemAction.Upload,
       uuid,
@@ -77,19 +89,10 @@ class ActPhotos {
       updatedAt: ts,
     );
     store.dispatch(UpdatePhotoAction(photo: newPhoto));
-    getNetQueue().addQueueItem(
+    _netQueue.addQueueItem(
       QueueItemType.Photo,
       QueueItemAction.Delete,
       uuid,
     );
   }
-}
-
-ActPhotos _actPhotos;
-
-ActPhotos getActPhotos() {
-  if (_actPhotos == null) {
-    _actPhotos = ActPhotos();
-  }
-  return _actPhotos;
 }

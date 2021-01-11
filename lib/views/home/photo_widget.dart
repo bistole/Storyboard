@@ -3,12 +3,11 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/storage/storage.dart';
+import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/photo/page.dart';
 
 class ReduxActions {
@@ -79,7 +78,7 @@ class PhotoWidget extends StatelessWidget {
   }
 
   List<Widget> buildThumb(BuildContext context, ReduxActions redux) {
-    var photoPath = getStorage().getThumbnailPathByUUID(this.uuid);
+    var photoPath = getViewResource().storage.getThumbnailPathByUUID(this.uuid);
     return [
       Expanded(
         child: Container(
@@ -110,10 +109,10 @@ class PhotoWidget extends StatelessWidget {
         return ReduxActions(
           delete: () {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
-            getActPhotos().actDeletePhoto(store, this.uuid);
+            getViewResource().actPhotos.actDeletePhoto(store, this.uuid);
           },
           getThumb: () {
-            getActPhotos().actDownloadThumbnail(store, this.uuid);
+            getViewResource().actPhotos.actDownloadThumbnail(store, this.uuid);
           },
           photo: store.state.photos[this.uuid],
         );

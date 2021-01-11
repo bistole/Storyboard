@@ -5,12 +5,15 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'package:storyboard/actions/tasks.dart';
+import 'package:storyboard/channel/command.dart';
+import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
-import 'package:storyboard/redux/store.dart';
+import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/page.dart';
 
 import 'package:redux/redux.dart';
@@ -21,8 +24,11 @@ import 'package:mockito/mockito.dart';
 
 class MockNetQueue extends Mock implements NetQueue {}
 
+class MockCommandChannel extends Mock implements CommandChannel {}
+
 void main() {
   Store<AppState> store;
+  MockNetQueue netQueue;
 
   Widget buildTestableWidget(Widget widget) {
     return new StoreProvider(
@@ -37,16 +43,18 @@ void main() {
     "add item",
     () {
       setUp(() {
-        store = Store<AppState>(
+        getFactory().store = store = Store<AppState>(
           appReducer,
           initialState: AppState(
             status: Status.noParam(StatusKey.ListTask),
             tasks: <String, Task>{},
           ),
         );
-        setStore(store);
 
-        setNetQueue(MockNetQueue());
+        netQueue = MockNetQueue();
+        getViewResource().actTasks = ActTasks();
+        getViewResource().actTasks.setNetQueue(netQueue);
+        getViewResource().command = MockCommandChannel();
       });
 
       testWidgets('add item succ', (WidgetTester tester) async {

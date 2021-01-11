@@ -7,8 +7,14 @@ import 'package:storyboard/redux/models/task.dart';
 import 'package:uuid/uuid.dart';
 
 class ActTasks {
+  // required
+  NetQueue _netQueue;
+  void setNetQueue(NetQueue netQueue) {
+    _netQueue = netQueue;
+  }
+
   void actFetchTasks() {
-    getNetQueue().addQueueItem(
+    _netQueue.addQueueItem(
       QueueItemType.Task,
       QueueItemAction.List,
       null,
@@ -27,7 +33,7 @@ class ActTasks {
       ts: 0,
     );
     store.dispatch(CreateTaskAction(task: task));
-    getNetQueue().addQueueItem(
+    _netQueue.addQueueItem(
       QueueItemType.Task,
       QueueItemAction.Create,
       uuid,
@@ -42,7 +48,7 @@ class ActTasks {
       updatedAt: ts,
     );
     store.dispatch(UpdateTaskAction(task: newTask));
-    getNetQueue().addQueueItem(
+    _netQueue.addQueueItem(
       QueueItemType.Task,
       QueueItemAction.Update,
       uuid,
@@ -57,19 +63,10 @@ class ActTasks {
       updatedAt: ts,
     );
     store.dispatch(UpdateTaskAction(task: newTask));
-    getNetQueue().addQueueItem(
+    _netQueue.addQueueItem(
       QueueItemType.Task,
       QueueItemAction.Delete,
       uuid,
     );
   }
-}
-
-ActTasks _actTasks;
-
-ActTasks getActTasks() {
-  if (_actTasks == null) {
-    _actTasks = ActTasks();
-  }
-  return _actTasks;
 }

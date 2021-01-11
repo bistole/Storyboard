@@ -2,13 +2,12 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/views/common/toolbar.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
-import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
+import 'package:storyboard/views/config/config.dart';
 
 class ReduxActions {
   final void Function() startTask;
@@ -27,7 +26,7 @@ class CreateBarWidget extends StatelessWidget {
   Widget buildAddButton(ReduxActions redux) {
     return SBToolbar([
       SBToolbarButton("ADD TASK", redux.startTask),
-      SBToolbarButton("ADD PHOTO", getCommandChannel().importPhoto),
+      SBToolbarButton("ADD PHOTO", getViewResource().command.importPhoto),
     ]);
   }
 
@@ -59,7 +58,7 @@ class CreateBarWidget extends StatelessWidget {
           },
           createTask: (String title) {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
-            getActTasks().actCreateTask(store, title);
+            getViewResource().actTasks.actCreateTask(store, title);
           },
           cancel: () {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));

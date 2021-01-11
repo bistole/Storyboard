@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
+import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/photo/view_photo_widget.dart';
 import 'package:storyboard/views/common/toolbar.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
@@ -57,7 +57,7 @@ class PhotoPage extends StatelessWidget {
       converter: (Store<AppState> store) {
         return ReduxActions(
           getPhoto: () {
-            getActPhotos().actDownloadPhoto(store, args.uuid);
+            getViewResource().actPhotos.actDownloadPhoto(store, args.uuid);
           },
           photo: store.state.photos[args.uuid],
         );

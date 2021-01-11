@@ -1,11 +1,11 @@
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
+import 'package:storyboard/views/config/config.dart';
 
 class ReduxActions {
   final void Function() delete;
@@ -78,7 +78,7 @@ class TaskWidget extends StatelessWidget {
         return ReduxActions(
           delete: () {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
-            getActTasks().actDeleteTask(store, task.uuid);
+            getViewResource().actTasks.actDeleteTask(store, task.uuid);
           },
           update: () {
             // start to update
