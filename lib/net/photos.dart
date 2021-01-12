@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:redux/redux.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/queue.dart';
 
@@ -18,6 +19,12 @@ class NetPhotos {
   http.Client _httpClient;
   void setHttpClient(http.Client httpClient) {
     _httpClient = httpClient;
+  }
+
+  // required
+  ActPhotos _actPhotos;
+  void setActPhotos(ActPhotos actPhotos) {
+    _actPhotos = actPhotos;
   }
 
   // required
@@ -56,7 +63,9 @@ class NetPhotos {
 
   Future<bool> netFetchPhotos(Store<AppState> store, {uuid: String}) async {
     try {
-      final response = await _httpClient.get(URLPrefix + "/photos");
+      int ts = (store.state.photoRepo.lastTS + 1);
+      final response =
+          await _httpClient.get(URLPrefix + "/photos?ts=$ts&c=$countPerFetch");
       if (response.statusCode == 200) {
         Map<String, dynamic> object = jsonDecode(response.body);
         if (object['succ'] == true && object['photos'] != null) {
@@ -67,6 +76,9 @@ class NetPhotos {
             }
           }
           store.dispatch(FetchPhotosAction(photoMap: photoMap));
+          if (photoMap.length == countPerFetch) {
+            _actPhotos.actFetchPhotos();
+          }
         }
         return true;
       }

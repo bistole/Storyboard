@@ -5,6 +5,7 @@ import 'package:redux/redux.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/photos.dart';
@@ -22,12 +23,15 @@ import '../common.dart';
 
 class MockHttpClient extends Mock implements http.Client {}
 
+class MockActPhotos extends Mock implements ActPhotos {}
+
 class MockStorage extends Mock implements Storage {}
 
 void main() {
   NetPhotos netPhotos;
   Store<AppState> store;
   MockHttpClient httpClient;
+  ActPhotos actPhotos;
   Storage storage;
 
   buildStore(Map<String, Photo> photos) {
@@ -74,9 +78,11 @@ void main() {
     setUp(() {
       httpClient = MockHttpClient();
       storage = MockStorage();
+      actPhotos = MockActPhotos();
 
       netPhotos = NetPhotos();
       netPhotos.setHttpClient(httpClient);
+      netPhotos.setActPhotos(actPhotos);
       netPhotos.setStorage(storage);
     });
 
@@ -95,7 +101,7 @@ void main() {
       await netPhotos.netFetchPhotos(store);
 
       var captured = verify(httpClient.get(captureAny)).captured.first;
-      expect(captured, URLPrefix + '/photos');
+      expect(captured, URLPrefix + '/photos?ts=1&c=100');
 
       expect(store.state.photoRepo.photos, {'uuid': getPhotoObject()});
     });
@@ -123,7 +129,7 @@ void main() {
       await netPhotos.netFetchPhotos(store);
 
       var captured = verify(httpClient.get(captureAny)).captured.first;
-      expect(captured, URLPrefix + '/photos');
+      expect(captured, URLPrefix + '/photos?ts=1&c=100');
 
       expect(store.state.photoRepo.photos, {
         'uuid': getPhotoObject().copyWith(
@@ -155,7 +161,7 @@ void main() {
       await netPhotos.netFetchPhotos(store);
 
       var captured = verify(httpClient.get(captureAny)).captured.first;
-      expect(captured, URLPrefix + '/photos');
+      expect(captured, URLPrefix + '/photos?ts=1&c=100');
 
       expect(
           verify(storage.deletePhotoAndThumbByUUID(captureAny)).captured.single,
@@ -163,14 +169,71 @@ void main() {
 
       expect(store.state.photoRepo.photos, {});
     });
+
+    test('no retry', () async {
+      // backup
+      var savedCountPerFetch = countPerFetch;
+      countPerFetch = 2;
+      buildStore({});
+
+      final responseBody = jsonEncode({
+        'succ': true,
+        'photos': [
+          getJsonPhotoObject(),
+        ],
+      });
+      when(httpClient.get(startsWith(URLPrefix))).thenAnswer((_) async {
+        return http.Response(responseBody, 200);
+      });
+
+      await netPhotos.netFetchPhotos(store);
+
+      var captured = verify(httpClient.get(captureAny)).captured.first;
+      expect(captured, URLPrefix + '/photos?ts=1&c=2');
+
+      verifyNever(actPhotos.actFetchPhotos());
+
+      // restore
+      countPerFetch = savedCountPerFetch;
+    });
+
+    test('retry', () async {
+      // backup
+      var savedCountPerFetch = countPerFetch;
+      countPerFetch = 2;
+      buildStore({});
+
+      final responseBody = jsonEncode({
+        'succ': true,
+        'photos': [
+          getJsonPhotoObject(),
+          getJsonPhotoObject()..addAll({'uuid': 'uuid2'})
+        ],
+      });
+      when(httpClient.get(startsWith(URLPrefix))).thenAnswer((_) async {
+        return http.Response(responseBody, 200);
+      });
+
+      await netPhotos.netFetchPhotos(store);
+
+      var captured = verify(httpClient.get(captureAny)).captured.first;
+      expect(captured, URLPrefix + '/photos?ts=1&c=2');
+
+      verify(actPhotos.actFetchPhotos()).called(1);
+
+      // restore
+      countPerFetch = savedCountPerFetch;
+    });
   });
 
   group('netUploadPhoto', () {
     setUp(() {
       httpClient = MockHttpClient();
+      actPhotos = MockActPhotos();
 
       netPhotos = NetPhotos();
       netPhotos.setHttpClient(httpClient);
+      netPhotos.setActPhotos(actPhotos);
     });
 
     test('upload succ', () async {
@@ -219,9 +282,11 @@ void main() {
     setUp(() {
       httpClient = MockHttpClient();
       storage = MockStorage();
+      actPhotos = MockActPhotos();
 
       netPhotos = NetPhotos();
       netPhotos.setHttpClient(httpClient);
+      netPhotos.setActPhotos(actPhotos);
       netPhotos.setStorage(storage);
     });
 
@@ -250,9 +315,11 @@ void main() {
     setUp(() {
       httpClient = MockHttpClient();
       storage = MockStorage();
+      actPhotos = MockActPhotos();
 
       netPhotos = NetPhotos();
       netPhotos.setHttpClient(httpClient);
+      netPhotos.setActPhotos(actPhotos);
       netPhotos.setStorage(storage);
     });
 
@@ -281,7 +348,10 @@ void main() {
     setUp(() {
       httpClient = MockHttpClient();
       storage = MockStorage();
+      actPhotos = MockActPhotos();
+
       netPhotos.setHttpClient(httpClient);
+      netPhotos.setActPhotos(actPhotos);
       netPhotos.setStorage(storage);
     });
 

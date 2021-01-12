@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
+import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/tasks.dart';
@@ -17,9 +18,12 @@ import 'package:storyboard/redux/reducers/app_reducer.dart';
 
 class MockHttpClient extends Mock implements http.Client {}
 
+class MockActTasks extends Mock implements ActTasks {}
+
 void main() {
   Store<AppState> store;
   MockHttpClient httpClient;
+  ActTasks actTasks;
   NetTasks netTasks;
 
   buildStore(Map<String, Task> tasks) {
@@ -59,9 +63,11 @@ void main() {
   group("netFetchTasks", () {
     setUp(() {
       httpClient = MockHttpClient();
+      actTasks = MockActTasks();
 
       netTasks = NetTasks();
       netTasks.setHttpClient(httpClient);
+      netTasks.setActTasks(actTasks);
     });
 
     test("fetch new task", () async {
@@ -79,7 +85,7 @@ void main() {
       await netTasks.netFetchTasks(store);
 
       var captured = verify(httpClient.get(captureAny)).captured.first;
-      expect(captured, URLPrefix + '/tasks');
+      expect(captured, URLPrefix + '/tasks?ts=1&c=100');
 
       expect(store.state.taskRepo.tasks, {'uuid': getTaskObject()});
     });
@@ -105,7 +111,7 @@ void main() {
       await netTasks.netFetchTasks(store);
 
       var captured = verify(httpClient.get(captureAny)).captured.first;
-      expect(captured, URLPrefix + '/tasks');
+      expect(captured, URLPrefix + '/tasks?ts=1&c=100');
 
       expect(store.state.taskRepo.tasks, {
         'uuid': getTaskObject(),
@@ -129,17 +135,69 @@ void main() {
       await netTasks.netFetchTasks(store);
 
       var captured = verify(httpClient.get(captureAny)).captured.first;
-      expect(captured, URLPrefix + '/tasks');
+      expect(captured, URLPrefix + '/tasks?ts=1&c=100');
 
       expect(store.state.taskRepo.tasks, {});
+    });
+
+    test("no retry", () async {
+      var savedCountPerFetch = countPerFetch;
+      countPerFetch = 2;
+      buildStore({});
+
+      final responseBody = jsonEncode({
+        'succ': true,
+        'tasks': [getJsonTaskObject()],
+      });
+      when(httpClient.get(startsWith(URLPrefix))).thenAnswer((_) async {
+        return http.Response(responseBody, 200);
+      });
+
+      await netTasks.netFetchTasks(store);
+
+      var captured = verify(httpClient.get(captureAny)).captured.first;
+      expect(captured, URLPrefix + '/tasks?ts=1&c=2');
+
+      verifyNever(actTasks.actFetchTasks());
+
+      countPerFetch = savedCountPerFetch;
+    });
+
+    test("retry", () async {
+      var savedCountPerFetch = countPerFetch;
+      countPerFetch = 2;
+      buildStore({});
+
+      final responseBody = jsonEncode({
+        'succ': true,
+        'tasks': [
+          getJsonTaskObject(),
+          getJsonTaskObject()..addAll({'uuid': 'uuid2'}),
+        ],
+      });
+      when(httpClient.get(startsWith(URLPrefix))).thenAnswer((_) async {
+        return http.Response(responseBody, 200);
+      });
+
+      await netTasks.netFetchTasks(store);
+
+      var captured = verify(httpClient.get(captureAny)).captured.first;
+      expect(captured, URLPrefix + '/tasks?ts=1&c=2');
+
+      verify(actTasks.actFetchTasks()).called(1);
+
+      countPerFetch = savedCountPerFetch;
     });
   });
 
   group('netCreateTask', () {
     setUp(() {
       httpClient = MockHttpClient();
+      actTasks = MockActTasks();
+
       netTasks = NetTasks();
       netTasks.setHttpClient(httpClient);
+      netTasks.setActTasks(actTasks);
     });
 
     test("create succ", () async {
@@ -180,9 +238,11 @@ void main() {
   group('netUpdateTask', () {
     setUp(() {
       httpClient = MockHttpClient();
+      actTasks = MockActTasks();
 
       netTasks = NetTasks();
       netTasks.setHttpClient(httpClient);
+      netTasks.setActTasks(actTasks);
     });
 
     test('update succ', () async {
@@ -223,9 +283,11 @@ void main() {
   group('netDeleteTask', () {
     setUp(() {
       httpClient = MockHttpClient();
+      actTasks = MockActTasks();
 
       netTasks = NetTasks();
       netTasks.setHttpClient(httpClient);
+      netTasks.setActTasks(actTasks);
     });
 
     test('delete succ', () async {

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:redux/redux.dart';
+import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/queue.dart';
 
@@ -15,6 +16,12 @@ class NetTasks {
   http.Client _httpClient;
   void setHttpClient(http.Client httpClient) {
     _httpClient = httpClient;
+  }
+
+  // required
+  ActTasks _actTasks;
+  void setActTasks(ActTasks actTasks) {
+    _actTasks = actTasks;
   }
 
   void registerToQueue(NetQueue netQueue) {
@@ -43,13 +50,19 @@ class NetTasks {
 
   Future<bool> netFetchTasks(Store<AppState> store, {uuid: String}) async {
     try {
-      final response = await _httpClient.get(URLPrefix + "/tasks");
+      int ts = (store.state.photoRepo.lastTS + 1);
+      final response =
+          await _httpClient.get(URLPrefix + "/tasks?ts=$ts&c=$countPerFetch");
 
       if (response.statusCode == 200) {
         Map<String, dynamic> object = jsonDecode(response.body);
         if (object['succ'] == true && object['tasks'] != null) {
           var taskMap = buildTaskMap(object['tasks']);
           store.dispatch(FetchTasksAction(taskMap: taskMap));
+
+          if (taskMap.length == countPerFetch) {
+            _actTasks.actFetchTasks();
+          }
         }
         return true;
       }

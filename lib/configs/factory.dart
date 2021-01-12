@@ -50,10 +50,12 @@ class Factory {
     actTasks.setNetQueue(netQueue);
 
     netPhotos.setHttpClient(http.Client());
+    netPhotos.setActPhotos(actPhotos);
     netPhotos.setStorage(storage);
     netPhotos.registerToQueue(netQueue);
 
     netTasks.setHttpClient(http.Client());
+    netTasks.setActTasks(actTasks);
     netTasks.registerToQueue(netQueue);
 
     netQueue.registerPeriodicTrigger(actTasks.actFetchTasks);
