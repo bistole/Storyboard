@@ -1,25 +1,22 @@
 NOW
 ===
 
-Server Send Event
-- Generate UUID on client side [DONE]
-  - Backend [DONE]
-    - Func [DONE]
-    - Test-case [DONE]
-  - Frontend [DONE]
-- Only sync updated events
-- Trigger fetchTasks from last time by sync updated events
-- Pipeline requests [DONE]
-- Keepalive [DONE]
+- Running on mobile for import photo
+  - Android [DONE]
+  - iOS
+
+- Different behavior by get flutter environment
+- QR code to connect
+- Authenticate
+
+- Issue:
+  Stop retry to frequently if server is not available.
 
 TODO
 ====
 
-
 Communication
 - Notify Flutter when change happens in backend
-
-Authenticate
 
 Deployment
 - Build to App
@@ -100,3 +97,14 @@ Import Photo
 - Wrapper same layout attribute into widget [DONE]
   - Function bar [DONE]
   - Function button in bar [DONE]
+
+Server Send Event [DONE]
+- Generate UUID on client side [DONE]
+  - Backend [DONE]
+    - Func [DONE]
+    - Test-case [DONE]
+  - Frontend [DONE]
+- Only sync updated events [DONE]
+- Trigger fetchTasks from last time by sync updated events [DONE]
+- Pipeline requests [DONE]
+- Keepalive [DONE]

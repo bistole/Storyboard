@@ -33,13 +33,54 @@ go build -buildmode=exe
 ./backend 
 ```
 
-Run frontend
+Run frontend - macOS
 ---
 
 ```
 cd $PROJECT_HOME
 flutter run -d macos
 ```
+
+Run frontend - emulator - android
+---
+
+Solve android licenses:
+```
+flutter doctor --android-licenses
+```
+
+First need to fix android command line issue for java9 and above:
+
+```
+export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jre/jdk/Contents/Home/bin/java
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export ANDROID_SDK_ROOT=$HOME/Library/Android/sdk
+export ANDROID_AVD_HOME=$HOME/.android/avd
+export PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$PATH
+````
+
+Display the available avd and start it
+```
+emulator -list-avds
+emulator @devicename
+
+```
+
+Check the devices is connected and run app on this device.
+```
+flutter devices
+flutter run -d "devicename"
+```
+
+Run frontend - emulator - ios
+---
+
+```
+open -a Simulator
+flutter devices
+flutter run -d "device name"
+```
+
 
 Test
 ===
