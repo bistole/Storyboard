@@ -3,14 +3,17 @@ NOW
 
 - Running on mobile for import photo
   - Android [DONE]
-  - iOS
+  - iOS [DONE]
 
 - Different behavior by get flutter environment
+  - Change 'ADD PHOTO' to 'TAKE PHOTO'
+  
 - QR code to connect
 - Authenticate
 
 - Issue:
   Stop retry to frequently if server is not available.
+  iOS Layout - bottom line is not fit iPhone
 
 TODO
 ====

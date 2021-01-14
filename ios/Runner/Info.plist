@@ -41,5 +41,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>$(EXECUTABLE_NAME) requires to access camera for uploading images to server</string>
 </dict>
 </plist>
