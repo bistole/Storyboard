@@ -12,6 +12,7 @@ import Flutter
 class Commands : NSObject, PhotoCaptureDelegate {
     let COMMANDS = "/COMMANDS";
     let CMD_OPEN_DIALOG = "CMD:OPEN_DIALOG";
+    let CMD_TAKE_PHOTO = "CMD:TAKE_PHOTO";
     
     var delegate: FlutterAppDelegate?
     var methodChannel : FlutterMethodChannel?
@@ -20,7 +21,7 @@ class Commands : NSObject, PhotoCaptureDelegate {
     func methodInvoked(call: FlutterMethodCall, result: @escaping FlutterResult) -> Void {
         NSLog(call.method);
         switch(call.method) {
-        case self.CMD_OPEN_DIALOG:
+        case self.CMD_TAKE_PHOTO:
             self.result = result
             DispatchQueue.main.async {
                 let naviVC = self.delegate?.window?.rootViewController as! UINavigationController
@@ -54,7 +55,7 @@ class Commands : NSObject, PhotoCaptureDelegate {
             print("Write photo to: \(filename)");
             if let data = image.jpegData(compressionQuality: 1.0) {
                 try data.write(to: filename)
-                result?([filename.path])
+                result?(filename.path)
             }
         } catch {
             return

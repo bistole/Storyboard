@@ -5,6 +5,7 @@ import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
 
 const CMD_OPEN_DIALOG = 'CMD:OPEN_DIALOG';
+const CMD_TAKE_PHOTO = 'CMD:TAKE_PHOTO';
 
 class CommandChannel {
   // required
@@ -37,6 +38,18 @@ class CommandChannel {
         ChangeStatusWithPathAction(
           status: StatusKey.AddingPhoto,
           path: paths[0],
+        ),
+      );
+    }
+  }
+
+  Future<void> takePhoto() async {
+    String path = await _channel.invokeMethod<String>(CMD_TAKE_PHOTO);
+    if (path != null) {
+      _store.dispatch(
+        ChangeStatusWithPathAction(
+          status: StatusKey.AddingPhoto,
+          path: path,
         ),
       );
     }

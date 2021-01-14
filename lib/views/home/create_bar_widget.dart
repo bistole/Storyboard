@@ -24,9 +24,21 @@ class ReduxActions {
 
 class CreateBarWidget extends StatelessWidget {
   Widget buildAddButton(ReduxActions redux) {
+    SBToolbarButton photoActionButton;
+    if (getViewResource().deviceManager.isMobile()) {
+      photoActionButton = SBToolbarButton(
+        "TAKE PHOTO",
+        getViewResource().command.takePhoto,
+      );
+    } else {
+      photoActionButton = SBToolbarButton(
+        "ADD PHOTO",
+        getViewResource().command.importPhoto,
+      );
+    }
     return SBToolbar([
       SBToolbarButton("ADD TASK", redux.startTask),
-      SBToolbarButton("ADD PHOTO", getViewResource().command.importPhoto),
+      photoActionButton,
     ]);
   }
 

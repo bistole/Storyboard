@@ -21,6 +21,7 @@ class CommandChannel {
         var CHANNEL_COMMANDS = "/COMMANDS"
 
         var CMD_OPEN_DIALOG = "CMD:OPEN_DIALOG"
+        var CMD_TAKE_PHOTO = "CMD:TAKE_PHOTO";
 
         var REQUEST_IMAGE_CAPTURE = 1001
 
@@ -64,9 +65,9 @@ class CommandChannel {
         var packageName = activity.packageName
         MethodChannel(flutterEngine.dartExecutor, "$packageName$CHANNEL_COMMANDS").setMethodCallHandler{
             call, result ->
-            if (call.method.equals(CMD_OPEN_DIALOG)) {
+            if (call.method.equals(CMD_TAKE_PHOTO)) {
                 var args = call.arguments<Map<String, String>>();
-                Log.d(LOG_TAG, "CMD_OPEN_DIALOG Title: ${args["title"]}, Types: ${args["types"]}");
+                Log.d(LOG_TAG, "CMD_TAKE_PHOTO");
                 dispatchTakePictureIntent(activity, result);
             }
         }
@@ -75,8 +76,8 @@ class CommandChannel {
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) : Boolean {
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
             if (resultCode == FlutterActivity.RESULT_OK) {
-                Log.d(LOG_TAG, "CMD_OPEN_DIALOG got path: $currentAbsolutePath");
-                currentMethodChannelResult.success(listOf(currentAbsolutePath));
+                Log.d(LOG_TAG, "CMD_TAKE_PHOTO got path: $currentAbsolutePath");
+                currentMethodChannelResult.success(currentAbsolutePath);
             }
             return true;
         }

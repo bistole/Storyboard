@@ -7,6 +7,7 @@ import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/channel/menu.dart';
 import 'package:storyboard/configs/channel_manager.dart';
+import 'package:storyboard/configs/device_manager.dart';
 import 'package:storyboard/net/photos.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/net/tasks.dart';
@@ -19,6 +20,8 @@ const CHANNEL_MENU_EVENTS = "/MENU_EVENTS";
 const CHANNEL_COMMANDS = '/COMMANDS';
 
 class Factory {
+  DeviceManager deviceManager;
+
   ActPhotos actPhotos;
   ActTasks actTasks;
 
@@ -34,6 +37,7 @@ class Factory {
   Storage storage;
 
   Factory() {
+    deviceManager = DeviceManager();
     actPhotos = ActPhotos();
     actTasks = ActTasks();
 
@@ -61,6 +65,7 @@ class Factory {
     netQueue.registerPeriodicTrigger(actTasks.actFetchTasks);
     netQueue.registerPeriodicTrigger(actPhotos.actFetchPhotos);
 
+    getViewResource().deviceManager = deviceManager;
     getViewResource().storage = storage;
     getViewResource().actPhotos = actPhotos;
     getViewResource().actTasks = actTasks;

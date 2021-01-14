@@ -1,19 +1,19 @@
 NOW
 ===
 
-- Running on mobile for import photo
+- Running on mobile for import photo [DONE]
   - Android [DONE]
   - iOS [DONE]
-
-- Different behavior by get flutter environment
-  - Change 'ADD PHOTO' to 'TAKE PHOTO'
-  
-- QR code to connect
-- Authenticate
+- Different behavior by get flutter environment [DONE]
+  - Change 'ADD PHOTO' to 'TAKE PHOTO' [DONE]
 
 - Issue:
   Stop retry to frequently if server is not available.
   iOS Layout - bottom line is not fit iPhone
+
+- QR code to connect
+- Authenticate
+
 
 TODO
 ====
