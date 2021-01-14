@@ -72,23 +72,25 @@ class CreatePhotoAction {
 
 class DownloadPhotoAction {
   final String uuid;
+  final PhotoStatus status;
 
-  DownloadPhotoAction({@required this.uuid});
+  DownloadPhotoAction({@required this.uuid, @required this.status});
 
   @override
   String toString() {
-    return 'DownloadPhotoAction{uuid: $uuid}';
+    return 'DownloadPhotoAction{uuid: $uuid, status: $status}';
   }
 }
 
 class ThumbnailPhotoAction {
   final String uuid;
+  final PhotoStatus status;
 
-  ThumbnailPhotoAction({@required this.uuid});
+  ThumbnailPhotoAction({@required this.uuid, @required this.status});
 
   @override
   String toString() {
-    return 'ThumbnailPhotoAction{uuid: $uuid}';
+    return 'ThumbnailPhotoAction{uuid: $uuid, status: $status}';
   }
 }
 

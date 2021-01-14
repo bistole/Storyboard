@@ -127,7 +127,7 @@ class NetPhotos {
     try {
       Photo photo = store.state.photoRepo.photos[uuid];
       if (photo == null) return true;
-      if (photo.hasOrigin) return true;
+      if (photo.hasOrigin != PhotoStatus.Ready) return true;
 
       final response = await _httpClient.get(
         URLPrefix + "/photos/" + uuid,
@@ -135,7 +135,10 @@ class NetPhotos {
 
       if (response.statusCode == 200) {
         await _storage.savePhotoByUUID(uuid, response.bodyBytes);
-        store.dispatch(DownloadPhotoAction(uuid: uuid));
+        store.dispatch(DownloadPhotoAction(
+          uuid: uuid,
+          status: PhotoStatus.Ready,
+        ));
         return true;
       }
     } catch (e) {
@@ -149,7 +152,7 @@ class NetPhotos {
     try {
       Photo photo = store.state.photoRepo.photos[uuid];
       if (photo == null) return true;
-      if (photo.hasThumb) return true;
+      if (photo.hasThumb != PhotoStatus.Ready) return true;
 
       final response = await _httpClient.get(
         URLPrefix + "/photos/" + uuid + '/thumbnail',
@@ -157,7 +160,10 @@ class NetPhotos {
 
       if (response.statusCode == 200) {
         await _storage.saveThumbailByUUID(uuid, response.bodyBytes);
-        store.dispatch(ThumbnailPhotoAction(uuid: uuid));
+        store.dispatch(ThumbnailPhotoAction(
+          uuid: uuid,
+          status: PhotoStatus.Ready,
+        ));
         return true;
       }
     } catch (e) {

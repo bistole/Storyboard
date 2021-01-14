@@ -119,13 +119,13 @@ class PhotoWidget extends StatelessWidget {
       },
       builder: (context, ReduxActions redux) {
         // download if required
-        if (!redux.photo.hasThumb) {
+        if (redux.photo.hasThumb == PhotoStatus.None) {
           redux.getThumb();
         }
         return Row(
           children:
               // ...this.buildLoadingIndicator(),
-              redux.photo.hasThumb
+              redux.photo.hasThumb == PhotoStatus.Ready
                   ? this.buildThumb(context, redux)
                   : this.buildLoadingIndicator(context, redux),
         );

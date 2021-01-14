@@ -66,14 +66,13 @@ class CommandChannel {
         MethodChannel(flutterEngine.dartExecutor, "$packageName$CHANNEL_COMMANDS").setMethodCallHandler{
             call, result ->
             if (call.method.equals(CMD_TAKE_PHOTO)) {
-                var args = call.arguments<Map<String, String>>();
                 Log.d(LOG_TAG, "CMD_TAKE_PHOTO");
                 dispatchTakePictureIntent(activity, result);
             }
         }
     }
 
-    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) : Boolean {
+    fun onActivityResult(requestCode: Int, resultCode: Int) : Boolean {
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
             if (resultCode == FlutterActivity.RESULT_OK) {
                 Log.d(LOG_TAG, "CMD_TAKE_PHOTO got path: $currentAbsolutePath");

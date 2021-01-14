@@ -27,7 +27,7 @@ class MainActivity: FlutterActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        commandChannel.onActivityResult(requestCode, resultCode, data);
+        commandChannel.onActivityResult(requestCode, resultCode);
         super.onActivityResult(requestCode, resultCode, data)
     }
 }

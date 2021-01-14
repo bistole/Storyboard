@@ -118,8 +118,8 @@ void main() {
         expect(photo.filename, "photo_test.jpg");
         expect(photo.mime, "image/jpeg");
         expect(photo.size, "5938");
-        expect(photo.hasOrigin, true);
-        expect(photo.hasThumb, false);
+        expect(photo.hasOrigin, PhotoStatus.Ready);
+        expect(photo.hasThumb, PhotoStatus.None);
         expect(photo.deleted, 0);
         expect(photo.updatedAt, lessThan(now + 1000));
         expect(photo.updatedAt, greaterThan(now - 5000));

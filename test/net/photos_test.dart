@@ -65,8 +65,8 @@ void main() {
       filename: 'file.jpeg',
       mime: 'image/jpeg',
       size: "8384",
-      hasOrigin: false,
-      hasThumb: false,
+      hasOrigin: PhotoStatus.None,
+      hasThumb: PhotoStatus.None,
       deleted: 0,
       updatedAt: 1606506017,
       createdAt: 1606506017,
@@ -109,8 +109,8 @@ void main() {
     test('fetch existed photo', () async {
       buildStore({
         'uuid': getPhotoObject().copyWith(
-          hasThumb: true,
-          hasOrigin: true,
+          hasThumb: PhotoStatus.Ready,
+          hasOrigin: PhotoStatus.Ready,
           updatedAt: 1600000000,
           createdAt: 1600000000,
           ts: 1600000000000,
@@ -133,8 +133,8 @@ void main() {
 
       expect(store.state.photoRepo.photos, {
         'uuid': getPhotoObject().copyWith(
-          hasThumb: true,
-          hasOrigin: true,
+          hasThumb: PhotoStatus.Ready,
+          hasOrigin: PhotoStatus.Ready,
         )
       });
     });
@@ -142,8 +142,8 @@ void main() {
     test('fetch deleting photo', () async {
       buildStore({
         'uuid': getPhotoObject().copyWith(
-          hasThumb: true,
-          hasOrigin: true,
+          hasThumb: PhotoStatus.Ready,
+          hasOrigin: PhotoStatus.Ready,
         )
       });
 
@@ -241,7 +241,7 @@ void main() {
 
       buildStore({
         'uuid': getPhotoObject().copyWith(
-          hasOrigin: true,
+          hasOrigin: PhotoStatus.Ready,
           ts: 0,
         )
       });
@@ -272,8 +272,8 @@ void main() {
       expect(captured.files[0].contentType.mimeType, 'image/jpeg');
       expect(captured.files[0].length, await File(resourcePath).length());
 
-      expect(store.state.photoRepo.photos['uuid'].hasOrigin, true);
-      expect(store.state.photoRepo.photos['uuid'].hasThumb, false);
+      expect(store.state.photoRepo.photos['uuid'].hasOrigin, PhotoStatus.Ready);
+      expect(store.state.photoRepo.photos['uuid'].hasThumb, PhotoStatus.None);
       expect(store.state.photoRepo.photos['uuid'].ts, 1606506017000);
     });
   });
@@ -307,7 +307,7 @@ void main() {
 
       expect(capStorage[0], 'uuid');
       expect(String.fromCharCodes(capStorage[1]), 'buffer');
-      expect(store.state.photoRepo.photos['uuid'].hasOrigin, true);
+      expect(store.state.photoRepo.photos['uuid'].hasOrigin, PhotoStatus.Ready);
     });
   });
 

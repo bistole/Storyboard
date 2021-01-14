@@ -31,6 +31,10 @@ class ActPhotos {
   }
 
   void actDownloadPhoto(Store<AppState> store, String uuid) {
+    store.dispatch(DownloadPhotoAction(
+      uuid: uuid,
+      status: PhotoStatus.Loading,
+    ));
     _netQueue.addQueueItem(
       QueueItemType.Photo,
       QueueItemAction.DownloadPhoto,
@@ -39,6 +43,10 @@ class ActPhotos {
   }
 
   void actDownloadThumbnail(Store<AppState> store, String uuid) {
+    store.dispatch(ThumbnailPhotoAction(
+      uuid: uuid,
+      status: PhotoStatus.Loading,
+    ));
     _netQueue.addQueueItem(
       QueueItemType.Photo,
       QueueItemAction.DownloadThumbnail,
@@ -65,8 +73,8 @@ class ActPhotos {
       filename: filename,
       mime: mimeType,
       size: size,
-      hasOrigin: true,
-      hasThumb: false,
+      hasOrigin: PhotoStatus.Ready,
+      hasThumb: PhotoStatus.None,
       deleted: 0,
       updatedAt: ts,
       createdAt: ts,

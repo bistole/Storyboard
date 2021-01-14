@@ -90,7 +90,7 @@ PhotoRepo _downloadPhoto(
     photos: Map.from(photoRepo.photos).map(
       (uuid, photo) => MapEntry(
         uuid,
-        updatedUuid == uuid ? photo.copyWith(hasOrigin: true) : photo,
+        updatedUuid == uuid ? photo.copyWith(hasOrigin: action.status) : photo,
       ),
     ),
   );
@@ -105,7 +105,7 @@ PhotoRepo _thumbnailPhoto(
     photos: Map.from(photoRepo.photos).map(
       (uuid, photo) => MapEntry(
         uuid,
-        updatedUuid == uuid ? photo.copyWith(hasThumb: true) : photo,
+        updatedUuid == uuid ? photo.copyWith(hasThumb: action.status) : photo,
       ),
     ),
   );

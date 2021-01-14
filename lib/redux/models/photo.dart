@@ -1,13 +1,28 @@
 import 'package:flutter/material.dart';
 
+enum PhotoStatus {
+  None,
+  Loading,
+  Ready,
+}
+
+PhotoStatus decodeStatus(String statusAsString) {
+  for (PhotoStatus status in PhotoStatus.values) {
+    if (status.toString() == statusAsString) {
+      return status;
+    }
+  }
+  return null;
+}
+
 @immutable
 class Photo {
   final String uuid;
   final String filename;
   final String mime;
   final String size;
-  final bool hasOrigin;
-  final bool hasThumb;
+  final PhotoStatus hasOrigin;
+  final PhotoStatus hasThumb;
   final int deleted;
   final int updatedAt;
   final int createdAt;
@@ -31,8 +46,8 @@ class Photo {
     String filename,
     String mime,
     String size,
-    bool hasOrigin,
-    bool hasThumb,
+    PhotoStatus hasOrigin,
+    PhotoStatus hasThumb,
     int deleted,
     int updatedAt,
     int createdAt,
@@ -95,8 +110,8 @@ class Photo {
       filename: json['filename'],
       mime: json['mime'],
       size: json['size'],
-      hasOrigin: json['hasOrigin'] ?? false,
-      hasThumb: json['hasThumb'] ?? false,
+      hasOrigin: decodeStatus(json['hasOrigin']),
+      hasThumb: decodeStatus(json['hasThumb']),
       deleted: json['deleted'],
       updatedAt: json['updatedAt'],
       createdAt: json['createdAt'],
@@ -110,8 +125,8 @@ class Photo {
     map['filename'] = this.filename;
     map['mime'] = this.mime;
     map['size'] = this.size;
-    map['hasOrigin'] = this.hasOrigin;
-    map['hasThumb'] = this.hasThumb;
+    map['hasOrigin'] = this.hasOrigin.toString();
+    map['hasThumb'] = this.hasThumb.toString();
     map['deleted'] = this.deleted;
     map['updatedAt'] = this.updatedAt;
     map['createdAt'] = this.createdAt;
@@ -130,8 +145,8 @@ Map<String, Photo> buildPhotoMap(List<dynamic> json) {
       filename: element['filename'],
       mime: element['mime'],
       size: element['size'],
-      hasOrigin: element['hasOrigin'] ?? false,
-      hasThumb: element['hasThumb'] ?? false,
+      hasOrigin: decodeStatus(element['hasOrigin']),
+      hasThumb: decodeStatus(element['hasThumb']),
       deleted: element['deleted'],
       updatedAt: element['updatedAt'],
       createdAt: element['createdAt'],

@@ -8,8 +8,14 @@ NOW
   - Change 'ADD PHOTO' to 'TAKE PHOTO' [DONE]
 
 - Issue:
-  Stop retry to frequently if server is not available.
-  iOS Layout - bottom line is not fit iPhone
+  - Stop Retry to frequently if server is not available. [DONE]
+  - Make font larger for task
+  - Show flags on task/photo not uploaded
+    - Add 'local icon'
+    - Show thumbnail if only have origin
+  - iOS Layout - bottom line is not fit iPhone.
+  - Zoom in/out for detail photo in mobile.
+
 
 - QR code to connect
 - Authenticate

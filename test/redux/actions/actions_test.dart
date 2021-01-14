@@ -61,13 +61,13 @@ void main() {
   });
 
   test("DownloadPhotoAction", () {
-    final act = DownloadPhotoAction(uuid: "uuid");
-    expect(act.toString(), "DownloadPhotoAction{uuid: uuid}");
+    final act = DownloadPhotoAction(uuid: "uuid", status: PhotoStatus.Ready);
+    expect(act.toString(), "DownloadPhotoAction{uuid: uuid, status:Ready}");
   });
 
   test("ThumbnailPhotoAction", () {
-    final act = ThumbnailPhotoAction(uuid: "uuid");
-    expect(act.toString(), "ThumbnailPhotoAction{uuid: uuid}");
+    final act = ThumbnailPhotoAction(uuid: "uuid", status: PhotoStatus.Ready);
+    expect(act.toString(), "ThumbnailPhotoAction{uuid: uuid, status:Ready}");
   });
 
   test("UpdatePhotoAction", () {

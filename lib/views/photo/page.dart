@@ -63,7 +63,7 @@ class PhotoPage extends StatelessWidget {
         );
       },
       builder: (BuildContext context, ReduxActions redux) {
-        if (!redux.photo.hasOrigin) {
+        if (redux.photo.hasOrigin == PhotoStatus.None) {
           redux.getPhoto();
         }
         return Scaffold(
@@ -77,7 +77,7 @@ class PhotoPage extends StatelessWidget {
             )),
             child: Stack(
               children: [
-                redux.photo.hasOrigin
+                redux.photo.hasOrigin == PhotoStatus.Ready
                     ? buildPhotoWiget(context, redux)
                     : buildWaitingIndicator(),
                 Positioned(

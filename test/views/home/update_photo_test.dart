@@ -41,8 +41,8 @@ void main() {
     'filename': 'photo_test.jpg',
     'size': '8939',
     'mime': 'image/jpeg',
-    'hasOrigin': false,
-    'hasThumb': false,
+    'hasOrigin': PhotoStatus.None,
+    'hasThumb': PhotoStatus.None,
     'deleted': 0,
     'updatedAt': 1606406017,
     'createdAt': 1606406017,
@@ -100,7 +100,10 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
       // download thumbnail is succ
-      store.dispatch(ThumbnailPhotoAction(uuid: uuid));
+      store.dispatch(ThumbnailPhotoAction(
+        uuid: uuid,
+        status: PhotoStatus.Ready,
+      ));
       await tester.pumpAndSettle();
 
       expect(find.byType(CircularProgressIndicator), findsNothing);
@@ -149,7 +152,10 @@ void main() {
           findsNothing);
 
       // download origin is succ
-      getFactory().store.dispatch(DownloadPhotoAction(uuid: uuid));
+      getFactory().store.dispatch(DownloadPhotoAction(
+            uuid: uuid,
+            status: PhotoStatus.Ready,
+          ));
       await tester.pumpAndSettle();
 
       expect(
