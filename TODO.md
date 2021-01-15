@@ -16,9 +16,13 @@ NOW
   - iOS Layout - bottom line is not fit iPhone. [DONE]
 
 - Change text button to icon button
-  - Add Task
-  - Add Photo / Take Photo
-  - Add / Cancel to add photo
+  - Add Task [DONE]
+  - Add Photo / Take Photo [DONE]
+  - Add / Cancel to add photo [DONE]
+
+- Cancel does not work for mobile devices
+  - Update task
+  - Create task
 
 - Redesign display photo interface.
 - Take photo need not confirm again.

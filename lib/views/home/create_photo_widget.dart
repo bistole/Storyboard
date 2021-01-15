@@ -5,6 +5,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
+import 'package:storyboard/views/common/app_icons.dart';
 import 'package:storyboard/views/common/bottombar.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
 import 'package:storyboard/views/config/config.dart';
@@ -23,8 +24,16 @@ class ReduxActions {
 class CreatePhotoWidget extends StatelessWidget {
   Widget buildAddingPhotoToolbar(ReduxActions redux) {
     return SBBottombar([
-      SBToolbarButton("ADD", () => redux.createPhoto(redux.status.param1)),
-      SBToolbarButton("CANCEL", redux.cancel),
+      SBToolbarButton(
+        () => redux.createPhoto(redux.status.param1),
+        icon: Icon(AppIcons.ok),
+        text: "OK",
+      ),
+      SBToolbarButton(
+        redux.cancel,
+        icon: Icon(AppIcons.cancel),
+        text: "CANCEL",
+      ),
     ]);
   }
 

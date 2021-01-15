@@ -45,7 +45,10 @@ class PhotoPage extends StatelessWidget {
 
   Widget buildViewPhotoToolbar(ReduxActions redux) {
     return SBBottombar([
-      SBToolbarButton("RESET", () => {}),
+      SBToolbarButton(
+        () => {},
+        text: "RESET",
+      ),
     ]);
   }
 

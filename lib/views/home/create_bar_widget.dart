@@ -1,6 +1,7 @@
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:storyboard/views/common/app_icons.dart';
 
 import 'package:storyboard/views/common/toolbar.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
@@ -27,17 +28,23 @@ class CreateBarWidget extends StatelessWidget {
     SBToolbarButton photoActionButton;
     if (getViewResource().deviceManager.isMobile()) {
       photoActionButton = SBToolbarButton(
-        "TAKE PHOTO",
         getViewResource().command.takePhoto,
+        text: "TAKE PHOTO",
+        icon: Icon(AppIcons.picture),
       );
     } else {
       photoActionButton = SBToolbarButton(
-        "ADD PHOTO",
         getViewResource().command.importPhoto,
+        text: "ADD PHOTO",
+        icon: Icon(AppIcons.picture),
       );
     }
     return SBToolbar([
-      SBToolbarButton("ADD TASK", redux.startTask),
+      SBToolbarButton(
+        redux.startTask,
+        text: "ADD TASK",
+        icon: Icon(AppIcons.tasks),
+      ),
       photoActionButton,
     ]);
   }

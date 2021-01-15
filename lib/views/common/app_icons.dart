@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-class Icons {
+class AppIcons {
   static const _kFontFam = 'storyboard_icons';
   static const _kFontPkg = null;
 
