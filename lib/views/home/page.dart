@@ -25,7 +25,6 @@ class HomePage extends StatelessWidget {
 
   List<Widget> buildList(ReduxActions redux) {
     var children = <Widget>[];
-    children.add(CreateBarWidget());
 
     var updatedTaskList = List<Task>.from(redux.taskList);
     updatedTaskList.sort((Task a, Task b) {
@@ -38,7 +37,7 @@ class HomePage extends StatelessWidget {
               redux.status.param1 == task.uuid
           ? UpdateTaskWidget(task: task)
           : TaskWidget(task: task);
-      children.insert(1, w);
+      children.insert(0, w);
     });
 
     var updatedPhotoList = List<Photo>.from(redux.photoList);
@@ -49,7 +48,7 @@ class HomePage extends StatelessWidget {
     });
     updatedPhotoList.forEach((photo) {
       Widget w = PhotoWidget(uuid: photo.uuid);
-      children.insert(1, w);
+      children.insert(0, w);
     });
 
     return children;
@@ -88,9 +87,20 @@ class HomePage extends StatelessWidget {
             return CreatePhotoWidget();
           }
 
-          return ListView(
-            children: buildList(redux),
-          );
+          var padding = MediaQuery.of(context).padding;
+
+          return Column(children: [
+            CreateBarWidget(),
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.fromLTRB(
+                    padding.left, 0, padding.right, padding.bottom),
+                child: ListView(
+                  children: buildList(redux),
+                ),
+              ),
+            ),
+          ]);
         },
       ),
     );

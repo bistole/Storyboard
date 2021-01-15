@@ -13,16 +13,24 @@ NOW
   - Show flags on task/photo not uploaded [DONE]
     - Add 'local icon' [DONE]
     - Show origin as thumbnail if only have origin [DONE]
-  - iOS Layout - bottom line is not fit iPhone.
-  - Zoom in/out for detail photo in mobile.
+  - iOS Layout - bottom line is not fit iPhone. [DONE]
 
+- Change text button to icon button
+  - Add Task
+  - Add Photo / Take Photo
+  - Add / Cancel to add photo
 
-- QR code to connect
-- Authenticate
-- Change icon for app
+- Redesign display photo interface.
+- Take photo need not confirm again.
 
 TODO
 ====
+
+- Change icon for app
+- QR code to connect
+- Authenticate
+
+- Zoom in/out for detail photo in mobile. [?]
 
 Communication
 - Notify Flutter when change happens in backend

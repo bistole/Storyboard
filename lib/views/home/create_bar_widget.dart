@@ -23,7 +23,7 @@ class ReduxActions {
 }
 
 class CreateBarWidget extends StatelessWidget {
-  Widget buildAddButton(ReduxActions redux) {
+  Widget buildAddingToolbar(ReduxActions redux) {
     SBToolbarButton photoActionButton;
     if (getViewResource().deviceManager.isMobile()) {
       photoActionButton = SBToolbarButton(
@@ -82,7 +82,7 @@ class CreateBarWidget extends StatelessWidget {
         if (redux.status.status == StatusKey.AddingTask) {
           return buildWhenAddingTask(redux);
         }
-        return buildAddButton(redux);
+        return buildAddingToolbar(redux);
       },
     );
   }
