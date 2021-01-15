@@ -1,28 +1,6 @@
 NOW
 ===
 
-- Running on mobile for import photo [DONE]
-  - Android [DONE]
-  - iOS [DONE]
-- Different behavior by get flutter environment [DONE]
-  - Change 'ADD PHOTO' to 'TAKE PHOTO' [DONE]
-
-- Issue:
-  - Stop Retry to frequently if server is not available. [DONE]
-  - Make font larger for task [DONE]
-  - Show flags on task/photo not uploaded [DONE]
-    - Add 'local icon' [DONE]
-    - Show origin as thumbnail if only have origin [DONE]
-  - iOS Layout - bottom line is not fit iPhone. [DONE]
-
-- Change text button to icon button
-  - Add Task [DONE]
-  - Add Photo / Take Photo [DONE]
-  - Add / Cancel to add photo [DONE]
-
-- Cancel does not work for mobile devices
-  - Update task
-  - Create task
 
 - Redesign display photo interface.
 - Take photo need not confirm again.
@@ -129,3 +107,27 @@ Server Send Event [DONE]
 - Trigger fetchTasks from last time by sync updated events [DONE]
 - Pipeline requests [DONE]
 - Keepalive [DONE]
+
+
+- Running on mobile for import photo [DONE]
+  - Android [DONE]
+  - iOS [DONE]
+- Different behavior by get flutter environment [DONE]
+  - Change 'ADD PHOTO' to 'TAKE PHOTO' [DONE]
+
+- Issue:
+  - Stop Retry to frequently if server is not available. [DONE]
+  - Make font larger for task [DONE]
+  - Show flags on task/photo not uploaded [DONE]
+    - Add 'local icon' [DONE]
+    - Show origin as thumbnail if only have origin [DONE]
+  - iOS Layout - bottom line is not fit iPhone. [DONE]
+
+- Change text button to icon button [DONE]
+  - Add Task [DONE]
+  - Add Photo / Take Photo [DONE]
+  - Add / Cancel to add photo [DONE]
+
+- Cancel does not work for mobile devices [DONE]
+  - Update task [DONE]
+  - Create task [DONE]

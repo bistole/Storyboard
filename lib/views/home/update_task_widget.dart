@@ -25,8 +25,10 @@ class UpdateTaskWidget extends StatelessWidget {
       converter: (store) {
         return ReduxActions(
           update: (String value) {
-            getViewResource().actTasks.actUpdateTask(store, task.uuid, value);
             store.dispatch(new ChangeStatusAction(status: StatusKey.ListTask));
+            if (value.length > 0 && value != task.title) {
+              getViewResource().actTasks.actUpdateTask(store, task.uuid, value);
+            }
           },
           cancel: () {
             store.dispatch(new ChangeStatusAction(status: StatusKey.ListTask));

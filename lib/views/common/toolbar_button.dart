@@ -14,6 +14,10 @@ class SBToolbarButton extends StatelessWidget {
           onPressed: this.onPress,
           label: Text(this.text == null ? "" : this.text),
           icon: icon,
+          style: ButtonStyle(
+            padding:
+                MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 16)),
+          ),
         ),
         margin: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
       );
@@ -21,9 +25,10 @@ class SBToolbarButton extends StatelessWidget {
     return Container(
       child: TextButton(
         onPressed: this.onPress,
-        child: Container(
-          child: Text(this.text),
-          margin: EdgeInsets.symmetric(horizontal: 4),
+        child: Text(this.text),
+        style: ButtonStyle(
+          padding:
+              MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 16)),
         ),
       ),
       margin: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
