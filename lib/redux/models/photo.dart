@@ -6,7 +6,11 @@ enum PhotoStatus {
   Ready,
 }
 
-PhotoStatus decodeStatus(String statusAsString) {
+PhotoStatus decodeStatus(dynamic statusAsString) {
+  if (statusAsString == true) {
+    return PhotoStatus.Ready;
+  }
+
   for (PhotoStatus status in PhotoStatus.values) {
     if (status.toString() == statusAsString) {
       return status;
