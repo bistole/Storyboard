@@ -37,10 +37,11 @@ class UpdateTaskWidget extends StatelessWidget {
         return new ListTile(
           title: RawKeyboardListener(
             child: TextField(
+              style: Theme.of(context).textTheme.headline2,
               onSubmitted: (String value) {
                 redux.update(value);
               },
-              controller: new TextEditingController(text: task.title),
+              controller: TextEditingController(text: task.title),
               autofocus: true,
               decoration: InputDecoration(hintText: 'Put task name here'),
             ),

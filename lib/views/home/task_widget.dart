@@ -41,10 +41,35 @@ class TaskWidget extends StatelessWidget {
     );
   }
 
-  Widget buildTask(context) {
+  Widget buildTimeAndSync(context) {
     var fmt = new DateFormat('HH:mm a');
     var date = DateTime.fromMicrosecondsSinceEpoch(task.updatedAt * 1000);
 
+    if (task.ts == 0) {
+      // wait for sync
+      return Row(children: [
+        Expanded(
+          child: Text(fmt.format(date) + " (${task.ts})",
+              style: Theme.of(context).textTheme.headline3),
+        ),
+        Align(
+          child: Icon(
+            Icons.cloud_upload,
+            size: 16,
+            color: Colors.orange[700],
+          ),
+        ),
+      ]);
+    } else {
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: Text(fmt.format(date) + " (${task.ts})",
+            style: Theme.of(context).textTheme.headline3),
+      );
+    }
+  }
+
+  Widget buildTask(context) {
     return Expanded(
       child: Container(
         decoration: BoxDecoration(
@@ -58,13 +83,9 @@ class TaskWidget extends StatelessWidget {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(task.title,
-                  style: Theme.of(context).textTheme.headline3),
+                  style: Theme.of(context).textTheme.headline2),
             ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(fmt.format(date) + " (${task.ts})",
-                  style: Theme.of(context).textTheme.headline3),
-            ),
+            buildTimeAndSync(context),
           ],
         ),
       ),

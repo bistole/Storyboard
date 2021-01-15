@@ -12,7 +12,7 @@ PhotoStatus decodeStatus(String statusAsString) {
       return status;
     }
   }
-  return null;
+  return PhotoStatus.None;
 }
 
 @immutable

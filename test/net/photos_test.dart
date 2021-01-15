@@ -340,7 +340,7 @@ void main() {
 
       expect(capStorage[0], 'uuid');
       expect(String.fromCharCodes(capStorage[1]), 'buffer');
-      expect(store.state.photoRepo.photos['uuid'].hasThumb, true);
+      expect(store.state.photoRepo.photos['uuid'].hasThumb, PhotoStatus.Ready);
     });
   });
 

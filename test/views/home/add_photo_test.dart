@@ -119,16 +119,16 @@ void main() {
         expect(photo.mime, "image/jpeg");
         expect(photo.size, "5938");
         expect(photo.hasOrigin, PhotoStatus.Ready);
-        expect(photo.hasThumb, PhotoStatus.None);
+        expect(photo.hasThumb, PhotoStatus.Loading);
         expect(photo.deleted, 0);
         expect(photo.updatedAt, lessThan(now + 1000));
         expect(photo.updatedAt, greaterThan(now - 5000));
         expect(photo.updatedAt, photo.createdAt);
 
-        // No thumbnail, show indicator
+        // No thumbnail, but have origin, show origin
         expect(find.text('ADD PHOTO'), findsOneWidget);
-        expect(find.byType(Image), findsNothing);
-        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+        expect(find.byType(Image), findsOneWidget);
+        expect(find.byType(CircularProgressIndicator), findsNothing);
 
         verify(netQueue.addQueueItem(
           QueueItemType.Photo,

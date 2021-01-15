@@ -59,26 +59,64 @@ class PhotoWidget extends StatelessWidget {
 
   List<Widget> buildLoadingIndicator(BuildContext context, ReduxActions redux) {
     return [
-      Container(
-        decoration: BoxDecoration(
-          color: Colors.grey[100],
-          border: Border.all(width: 8, color: Colors.grey[100]),
-          borderRadius: BorderRadius.all(Radius.circular(4)),
-        ),
-        width: 48,
-        height: 48,
-        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        child: CircularProgressIndicator(
-          strokeWidth: 1,
+      Expanded(
+        child: Container(
+          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          decoration: BoxDecoration(
+            color: Colors.grey[100],
+            border: Border.all(width: 8, color: Colors.grey[100]),
+            borderRadius: BorderRadius.all(Radius.circular(4)),
+          ),
+          alignment: Alignment.center,
+          child: Row(children: [
+            Spacer(),
+            SizedBox(
+              width: 48,
+              height: 48,
+              child: CircularProgressIndicator(
+                strokeWidth: 1,
+              ),
+            ),
+            Spacer(),
+          ]),
         ),
       ),
-      Spacer(),
       this.buildPopupMenu(context, redux),
     ];
   }
 
   List<Widget> buildThumb(BuildContext context, ReduxActions redux) {
-    var photoPath = getViewResource().storage.getThumbnailPathByUUID(this.uuid);
+    var photoPath = redux.photo.hasThumb == PhotoStatus.Ready
+        ? getViewResource().storage.getThumbnailPathByUUID(this.uuid)
+        : getViewResource().storage.getPhotoPathByUUID(this.uuid);
+    List<Widget> children = [
+      Expanded(
+        child: FittedBox(
+          fit: BoxFit.contain,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minWidth: 1, minHeight: 1),
+            child: Image.file(
+              File(photoPath),
+            ),
+          ),
+        ),
+      ),
+    ];
+    if (redux.photo.ts == 0) {
+      children.add(
+        Container(
+          height: 128,
+          child: Align(
+            alignment: Alignment.bottomRight,
+            child: Icon(
+              Icons.cloud_upload,
+              size: 16,
+              color: Colors.orange[700],
+            ),
+          ),
+        ),
+      );
+    }
     return [
       Expanded(
         child: Container(
@@ -90,12 +128,7 @@ class PhotoWidget extends StatelessWidget {
           height: 128,
           padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
           margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: FittedBox(
-            fit: BoxFit.contain,
-            child: Image.file(
-              File(photoPath),
-            ),
-          ),
+          child: Row(children: children),
         ),
       ),
       this.buildPopupMenu(context, redux),
@@ -123,11 +156,10 @@ class PhotoWidget extends StatelessWidget {
           redux.getThumb();
         }
         return Row(
-          children:
-              // ...this.buildLoadingIndicator(),
-              redux.photo.hasThumb == PhotoStatus.Ready
-                  ? this.buildThumb(context, redux)
-                  : this.buildLoadingIndicator(context, redux),
+          children: redux.photo.hasThumb == PhotoStatus.Ready ||
+                  redux.photo.hasOrigin == PhotoStatus.Ready
+              ? this.buildThumb(context, redux)
+              : this.buildLoadingIndicator(context, redux),
         );
       },
     );

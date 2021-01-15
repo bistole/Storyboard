@@ -9,17 +9,17 @@ NOW
 
 - Issue:
   - Stop Retry to frequently if server is not available. [DONE]
-  - Make font larger for task
-  - Show flags on task/photo not uploaded
-    - Add 'local icon'
-    - Show thumbnail if only have origin
+  - Make font larger for task [DONE]
+  - Show flags on task/photo not uploaded [DONE]
+    - Add 'local icon' [DONE]
+    - Show origin as thumbnail if only have origin [DONE]
   - iOS Layout - bottom line is not fit iPhone.
   - Zoom in/out for detail photo in mobile.
 
 
 - QR code to connect
 - Authenticate
-
+- Change icon for app
 
 TODO
 ====

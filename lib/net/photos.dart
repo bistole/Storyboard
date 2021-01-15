@@ -127,7 +127,7 @@ class NetPhotos {
     try {
       Photo photo = store.state.photoRepo.photos[uuid];
       if (photo == null) return true;
-      if (photo.hasOrigin != PhotoStatus.Ready) return true;
+      if (photo.hasOrigin == PhotoStatus.Ready) return true;
 
       final response = await _httpClient.get(
         URLPrefix + "/photos/" + uuid,
@@ -152,7 +152,7 @@ class NetPhotos {
     try {
       Photo photo = store.state.photoRepo.photos[uuid];
       if (photo == null) return true;
-      if (photo.hasThumb != PhotoStatus.Ready) return true;
+      if (photo.hasThumb == PhotoStatus.Ready) return true;
 
       final response = await _httpClient.get(
         URLPrefix + "/photos/" + uuid + '/thumbnail',

@@ -26,7 +26,10 @@ PhotoRepo _fetchPhotos(
   action.photoMap.forEach((uuid, element) {
     if (photoRepo.photos[uuid] == null) {
       if (element.deleted == 0) {
-        newPhotos[uuid] = element;
+        newPhotos[uuid] = element.copyWith(
+          hasOrigin: PhotoStatus.None,
+          hasThumb: PhotoStatus.None,
+        );
       }
     } else if (element.deleted == 0) {
       existedPhotos[uuid] = element.copyWith(

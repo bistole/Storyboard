@@ -21,6 +21,8 @@ void main() {
     'filename': 'image.jpeg',
     'mime': 'image/jpeg',
     'size': '100',
+    'hasOrigin': 'PhotoStatus.None',
+    'hasThumb': 'PhotoStatus.None',
     'deleted': 1,
     'updatedAt': 1000,
     'createdAt': 1000,
@@ -57,23 +59,25 @@ void main() {
   test("CreatePhotoAction", () {
     final act = CreatePhotoAction(photo: photo);
     expect(act.toString(),
-        "CreatePhotoAction{photo: Photo{uuid: uuid, filename: image.jpeg, mime: image/jpeg, size: 100, hasOrigin: false, hasThumb: false, deleted: 1, updatedAt: 1000, createdAt: 1000}}");
+        "CreatePhotoAction{photo: Photo{uuid: uuid, filename: image.jpeg, mime: image/jpeg, size: 100, hasOrigin: PhotoStatus.None, hasThumb: PhotoStatus.None, deleted: 1, updatedAt: 1000, createdAt: 1000}}");
   });
 
   test("DownloadPhotoAction", () {
     final act = DownloadPhotoAction(uuid: "uuid", status: PhotoStatus.Ready);
-    expect(act.toString(), "DownloadPhotoAction{uuid: uuid, status:Ready}");
+    expect(act.toString(),
+        "DownloadPhotoAction{uuid: uuid, status: PhotoStatus.Ready}");
   });
 
   test("ThumbnailPhotoAction", () {
     final act = ThumbnailPhotoAction(uuid: "uuid", status: PhotoStatus.Ready);
-    expect(act.toString(), "ThumbnailPhotoAction{uuid: uuid, status:Ready}");
+    expect(act.toString(),
+        "ThumbnailPhotoAction{uuid: uuid, status: PhotoStatus.Ready}");
   });
 
   test("UpdatePhotoAction", () {
     final act = UpdatePhotoAction(photo: photo);
     expect(act.toString(),
-        "UpdatePhotoAction{photo: Photo{uuid: uuid, filename: image.jpeg, mime: image/jpeg, size: 100, hasOrigin: false, hasThumb: false, deleted: 1, updatedAt: 1000, createdAt: 1000}}");
+        "UpdatePhotoAction{photo: Photo{uuid: uuid, filename: image.jpeg, mime: image/jpeg, size: 100, hasOrigin: PhotoStatus.None, hasThumb: PhotoStatus.None, deleted: 1, updatedAt: 1000, createdAt: 1000}}");
   });
 
   test("DeletePhotoAction", () {
