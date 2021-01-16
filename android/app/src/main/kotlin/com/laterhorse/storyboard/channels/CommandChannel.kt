@@ -7,6 +7,7 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.annotation.NonNull
 import androidx.core.content.FileProvider
+import com.google.zxing.integration.android.IntentIntegrator
 import com.laterhorse.storyboard.MainActivity
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -20,8 +21,8 @@ class CommandChannel {
     companion object {
         var CHANNEL_COMMANDS = "/COMMANDS"
 
-        var CMD_OPEN_DIALOG = "CMD:OPEN_DIALOG"
         var CMD_TAKE_PHOTO = "CMD:TAKE_PHOTO";
+        var CMD_TAKE_QRCODE = "CMD:TAKE_QRCODE";
 
         var REQUEST_IMAGE_CAPTURE = 1001
 
@@ -61,6 +62,15 @@ class CommandChannel {
         }
     }
 
+    private fun dispatchTakeQRCodeIntent(activity: MainActivity, result: MethodChannel.Result) {
+        var intent = IntentIntegrator(activity)
+        intent.setBeepEnabled(false)
+        intent.setCameraId(0)
+        intent.setPrompt("SCAN")
+        intent.setBarcodeImageEnabled(false)
+        intent.initiateScan()
+    }
+
     fun registerEngine(activity: MainActivity, @NonNull flutterEngine: FlutterEngine) {
         var packageName = activity.packageName
         MethodChannel(flutterEngine.dartExecutor, "$packageName$CHANNEL_COMMANDS").setMethodCallHandler{
@@ -68,11 +78,24 @@ class CommandChannel {
             if (call.method.equals(CMD_TAKE_PHOTO)) {
                 Log.d(LOG_TAG, "CMD_TAKE_PHOTO");
                 dispatchTakePictureIntent(activity, result);
+            } else if (call.method.equals(CMD_TAKE_QRCODE)) {
+                Log.d(LOG_TAG, "CMD_TAKE_QRCODE");
+                dispatchTakeQRCodeIntent(activity, result);
             }
         }
     }
 
-    fun onActivityResult(requestCode: Int, resultCode: Int) : Boolean {
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) : Boolean {
+        // qr code scan
+        var result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
+        if (result != null) {
+            if (result.contents != null) {
+                // succ
+                currentMethodChannelResult.success(result.contents)
+            }
+            return true;
+        }
+
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
             if (resultCode == FlutterActivity.RESULT_OK) {
                 Log.d(LOG_TAG, "CMD_TAKE_PHOTO got path: $currentAbsolutePath");
