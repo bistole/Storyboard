@@ -63,8 +63,11 @@ class CommandChannel {
     }
 
     private fun dispatchTakeQRCodeIntent(activity: MainActivity, result: MethodChannel.Result) {
+        currentMethodChannelResult = result;
+
         var intent = IntentIntegrator(activity)
         intent.setBeepEnabled(false)
+        intent.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE);
         intent.setCameraId(0)
         intent.setPrompt("SCAN")
         intent.setBarcodeImageEnabled(false)

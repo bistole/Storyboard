@@ -4,6 +4,8 @@ import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
+import 'package:storyboard/views/auth/page.dart';
+import 'package:storyboard/views/common/app_icons.dart';
 import 'package:storyboard/views/home/create_photo_widget.dart';
 import 'package:storyboard/views/home/photo_widget.dart';
 
@@ -59,6 +61,20 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(this.title),
+        actions: [
+          TextButton.icon(
+            onPressed: () {
+              Navigator.of(context).pushNamed(
+                AuthPage.routeName,
+              );
+            },
+            style: ButtonStyle(
+              foregroundColor: MaterialStateProperty.all(Colors.white),
+            ),
+            icon: Icon(AppIcons.qrcode),
+            label: Text(""),
+          ),
+        ],
       ),
       body: StoreConnector<AppState, ReduxActions>(
         converter: (store) {

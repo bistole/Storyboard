@@ -8,15 +8,22 @@
 import Foundation
 
 protocol CameraController {
-    func prepare(completionHandler: @escaping (Error?) -> Void)
+    func prepare(for: CameraControllerTarget, completionHandler: @escaping (Error?) -> Void)
     
     func captureImage(completionHandler: @escaping (UIImage?, Error?) -> Void)
+    
+    func captureQRCode(completionHandler: @escaping (String?, Error?) -> Void)
     
     func displayPreview(on view: UIView) throws
     
     func layoutPreview(on view: UIView)
     
     func switchCamera() throws
+}
+
+enum CameraControllerTarget {
+    case photo
+    case qr
 }
 
 enum CameraControllerError: Swift.Error {

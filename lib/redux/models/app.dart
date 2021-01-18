@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:storyboard/redux/models/setting.dart';
 
 import 'package:storyboard/redux/models/task_repo.dart';
 import 'package:storyboard/redux/models/photo_repo.dart';
@@ -11,12 +12,14 @@ class AppState {
   final TaskRepo taskRepo;
   final PhotoRepo photoRepo;
   final Queue queue;
+  final Setting setting;
 
   AppState({
     this.status,
     this.taskRepo,
     this.photoRepo,
     this.queue,
+    this.setting,
   });
 
   AppState copyWith({
@@ -24,18 +27,24 @@ class AppState {
     TaskRepo taskRepo,
     PhotoRepo photoRepo,
     Queue queue,
+    Setting setting,
   }) {
     return AppState(
       status: status ?? this.status,
       taskRepo: taskRepo ?? this.taskRepo,
       photoRepo: photoRepo ?? this.photoRepo,
       queue: queue ?? this.queue,
+      setting: setting ?? this.setting,
     );
   }
 
   @override
   int get hashCode =>
-      status.hashCode ^ taskRepo.hashCode ^ photoRepo.hashCode ^ queue.hashCode;
+      status.hashCode ^
+      taskRepo.hashCode ^
+      photoRepo.hashCode ^
+      queue.hashCode ^
+      setting.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -44,11 +53,12 @@ class AppState {
           status == other.status &&
           taskRepo == other.taskRepo &&
           photoRepo == other.photoRepo &&
-          queue == other.queue);
+          queue == other.queue &&
+          setting == other.setting);
 
   @override
   String toString() {
-    return 'AppState{status: $status, taskRepo: $taskRepo, photoRepo: $photoRepo, queue: $queue}';
+    return 'AppState{status: $status, taskRepo: $taskRepo, photoRepo: $photoRepo, queue: $queue, setting: $setting}';
   }
 
   static AppState fromJson(dynamic json) {
@@ -67,11 +77,17 @@ class AppState {
       queue = Queue.fromJson(json['queue']);
     }
 
+    var setting = Setting();
+    if (json is Map && json['setting'] is Map) {
+      setting = Setting.fromJson(json['setting']);
+    }
+
     return AppState(
       status: Status.noParam(StatusKey.ListTask),
       taskRepo: taskRepo ?? TaskRepo(tasks: {}, lastTS: 0),
       photoRepo: photoRepo ?? PhotoRepo(photos: {}, lastTS: 0),
       queue: queue,
+      setting: setting,
     );
   }
 
@@ -80,6 +96,7 @@ class AppState {
       "tasks": taskRepo.toJson(),
       "photos": photoRepo.toJson(),
       'queue': queue.toJson(),
+      'setting': setting.toJson(),
     };
   }
 }

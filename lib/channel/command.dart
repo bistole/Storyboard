@@ -6,6 +6,7 @@ import 'package:storyboard/redux/models/status.dart';
 
 const CMD_OPEN_DIALOG = 'CMD:OPEN_DIALOG';
 const CMD_TAKE_PHOTO = 'CMD:TAKE_PHOTO';
+const CMD_TAKE_QRCODE = "CMD:TAKE_QRCODE";
 
 class CommandChannel {
   // required
@@ -52,6 +53,13 @@ class CommandChannel {
           path: path,
         ),
       );
+    }
+  }
+
+  Future<void> takeQRCode() async {
+    String code = await _channel.invokeMethod<String>(CMD_TAKE_QRCODE);
+    if (code != null) {
+      _store.dispatch(SettingServerKeyAction(serverKey: code));
     }
   }
 }

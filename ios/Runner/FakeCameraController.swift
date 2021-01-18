@@ -8,21 +8,37 @@
 import Foundation
 
 class FakeCamerController : NSObject, CameraController {
+    var type: CameraControllerTarget?
     var previewLayer = CALayer()
     var rearImage = UIImage(named: "RearCamera")!
     var frontImage = UIImage(named: "FrontCamera")!
     var cameraPosition = CameraControllerPosition.front
     
-    func prepare(completionHandler: @escaping (Error?) -> Void) {
+    func prepare(for type: CameraControllerTarget, completionHandler: @escaping (Error?) -> Void) {
         setPreviewFrame(image: frontImage)
+        self.type = type;
         completionHandler(nil)
     }
     
     func captureImage(completionHandler: @escaping (UIImage?, Error?) -> Void) {
+        if self.type != .photo {
+            return completionHandler(nil, CameraControllerError.invalidOperation)
+        }
         if self.cameraPosition == CameraControllerPosition.front {
             return completionHandler(frontImage, nil);
         } else {
             return completionHandler(rearImage, nil);
+        }
+    }
+    
+    func captureQRCode(completionHandler: @escaping (String?, Error?) -> Void) {
+        if self.type != .qr {
+            return completionHandler(nil, CameraControllerError.invalidOperation)
+        }
+        if cameraPosition == .front {
+            return completionHandler("THIS IS MOCK CODE", nil)
+        } else {
+            return completionHandler("THIS IS REAR MOCK CODE", nil)
         }
     }
     

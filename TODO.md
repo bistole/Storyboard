@@ -1,16 +1,32 @@
 NOW
 ===
 
+- QR code to connect [IN_PROGRESS]
+  - Server-side
+    - Find IP address on backend
+    - Deliever IP info to flutter
+    - Show qr code [DONE]
+    - Show server key in string
+  - iPhone
+    - Scan MOCK [DONE]
+    - Scan
+  - Android [DONE]
+    - Scan basic func [DONE]
+    - Customiz QR Code scanner's UI
+  - Share
+    - Save scaned code to store [DONE]
+    - Manually edit server key
+    - Connect to server
 
-- Redesign display photo interface.
-- Take photo need not confirm again.
+- Authenticate
 
 TODO
 ====
 
+- Redesign display photo interface.
+- Take photo need not confirm again.
+
 - Change icon for app
-- QR code to connect
-- Authenticate
 
 - Zoom in/out for detail photo in mobile. [?]
 

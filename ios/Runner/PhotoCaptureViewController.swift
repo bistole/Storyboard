@@ -126,7 +126,7 @@ class PhotoCaptureViewController : UIViewController, AVCapturePhotoCaptureDelega
     }
         
     func startSession() {
-        cameraController.prepare { err in
+        cameraController.prepare(for: .photo) { err in
             if let err = err {
                 debugPrint("Failed to start camera: \(err)")
             }

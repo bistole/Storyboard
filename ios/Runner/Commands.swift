@@ -9,10 +9,11 @@
 import Foundation
 import Flutter
 
-class Commands : NSObject, PhotoCaptureDelegate {
+class Commands : NSObject {
     let COMMANDS = "/COMMANDS";
     let CMD_OPEN_DIALOG = "CMD:OPEN_DIALOG";
     let CMD_TAKE_PHOTO = "CMD:TAKE_PHOTO";
+    let CMD_TAKE_QRCODE = "CMD:TAKE_QRCODE";
     
     var delegate: FlutterAppDelegate?
     var methodChannel : FlutterMethodChannel?
@@ -30,11 +31,31 @@ class Commands : NSObject, PhotoCaptureDelegate {
                 naviVC.pushViewController(photoCaptureVC, animated: true)
             }
             break;
+        case self.CMD_TAKE_QRCODE:
+            self.result = result
+            DispatchQueue.main.async {
+                let naviVC = self.delegate?.window?.rootViewController as! UINavigationController
+                let QRCaptureVC = QRCaptureViewController()
+                QRCaptureVC.setDelegate(delegate: self)
+                naviVC.pushViewController(QRCaptureVC, animated: true)
+            }
         default:
             result(FlutterMethodNotImplemented);
         }
     }
-    
+
+    func register(delegate: FlutterAppDelegate, withBinaryMessager bm: FlutterBinaryMessenger) {
+        self.delegate = delegate
+
+        // create a method channel
+        let channelName = (Bundle.main.infoDictionary?["CFBundleIdentifier"] as! String) + COMMANDS
+        methodChannel = FlutterMethodChannel.init(name: channelName, binaryMessenger: bm)
+        methodChannel?.setMethodCallHandler(self.methodInvoked(call:result:));
+    }
+
+}
+
+extension Commands : PhotoCaptureDelegate {
     func photoCaptureFailed() {
         let naviVC = delegate?.window?.rootViewController as! UINavigationController
         naviVC.popViewController(animated: true)
@@ -60,15 +81,18 @@ class Commands : NSObject, PhotoCaptureDelegate {
         } catch {
             return
         }
-        
+    }
+}
+
+extension Commands : QRCaptureDelegate {
+    func QRCaptureFailed() {
+        let naviVC = delegate?.window?.rootViewController as! UINavigationController
+        naviVC.popViewController(animated: true)
     }
     
-    func register(delegate: FlutterAppDelegate, withBinaryMessager bm: FlutterBinaryMessenger) {
-        self.delegate = delegate
-
-        // create a method channel
-        let channelName = (Bundle.main.infoDictionary?["CFBundleIdentifier"] as! String) + COMMANDS
-        methodChannel = FlutterMethodChannel.init(name: channelName, binaryMessenger: bm)
-        methodChannel?.setMethodCallHandler(self.methodInvoked(call:result:));
+    func QRCaptureSucceed(code: String) {
+        let naviVC = delegate?.window?.rootViewController as! UINavigationController
+        naviVC.popViewController(animated: true)
+        result?(code)
     }
 }

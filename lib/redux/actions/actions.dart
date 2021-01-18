@@ -4,6 +4,17 @@ import 'package:storyboard/redux/models/queue_item.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
 
+class SettingServerKeyAction {
+  final String serverKey;
+
+  SettingServerKeyAction({@required this.serverKey});
+
+  @override
+  String toString() {
+    return 'SettingServerKeyAction{serverKey: $serverKey}';
+  }
+}
+
 class FetchTasksAction {
   final Map<String, Task> taskMap;
 

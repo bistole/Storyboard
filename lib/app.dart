@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:storyboard/configs/factory.dart';
+import 'package:storyboard/views/auth/page.dart';
 
 import 'package:storyboard/views/home/page.dart';
 import 'package:storyboard/redux/models/app.dart';
@@ -56,9 +57,10 @@ class StoryBoardApp extends StatelessWidget {
         return StoreProvider(
           store: snapshot.data,
           child: MaterialApp(
-            title: 'Flutter Demo',
+            title: 'Storyboard',
             routes: {
               PhotoPage.routeName: (_) => PhotoPage(),
+              AuthPage.routeName: (_) => AuthPage(),
             },
             theme: ThemeData(
               primarySwatch: Colors.green,

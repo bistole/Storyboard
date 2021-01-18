@@ -19,8 +19,11 @@ class RealCameraController : NSObject, CameraController {
     private var photoOutput : AVCapturePhotoOutput?
     private var photoOutputLayer: AVCaptureVideoPreviewLayer?
     private var photoCaptureCompletionBlock: ((UIImage?, Error?) -> Void)?
+    
+    private var qrOutput : AVCaptureMetadataOutput?
+    private var qrCaptureCompletionBlock: ((String?, Error?) -> Void)?
 
-    func prepare(completionHandler: @escaping (Error?) -> Void) {
+    func prepare(for type: CameraControllerTarget, completionHandler: @escaping (Error?) -> Void) {
         func createCaptureSession() {
             self.captureSession = AVCaptureSession()
             print("captureSession: \(self.captureSession!)")
@@ -88,6 +91,17 @@ class RealCameraController : NSObject, CameraController {
             }
         }
         
+        func configureQrOutput() throws {
+            guard let captureSession = self.captureSession else {
+                throw CameraControllerError.captureSessionIsMissing
+            }
+
+            self.qrOutput = AVCaptureMetadataOutput();
+            if captureSession.canAddOutput(self.qrOutput!) {
+                captureSession.addOutput(self.qrOutput!)
+            }
+        }
+        
         func startSession() throws {
             guard let captureSession = self.captureSession else {
                 throw CameraControllerError.captureSessionIsMissing
@@ -100,7 +114,13 @@ class RealCameraController : NSObject, CameraController {
                 createCaptureSession()
                 try configureCaptureDevices()
                 try configureDeviceInputs()
-                try configurePhotoOutput()
+                if type == .photo {
+                    self.qrOutput = nil
+                    try configurePhotoOutput()
+                } else {
+                    self.photoOutput = nil
+                    try configureQrOutput()
+                }
                 try startSession()
             } catch {
                 DispatchQueue.main.async {
@@ -141,9 +161,28 @@ class RealCameraController : NSObject, CameraController {
             return
         }
         
-        let settings = AVCapturePhotoSettings()
-        self.photoCaptureCompletionBlock = completionHandler
-        self.photoOutput?.capturePhoto(with: settings, delegate: self)
+        if self.photoOutput != nil {
+            let settings = AVCapturePhotoSettings()
+            self.photoCaptureCompletionBlock = completionHandler
+            self.photoOutput?.capturePhoto(with: settings, delegate: self)
+        } else {
+            completionHandler(nil, CameraControllerError.invalidOperation)
+        }
+    }
+    
+    func captureQRCode(completionHandler: @escaping (String?, Error?) -> Void) {
+        guard let captureSession = self.captureSession, captureSession.isRunning else {
+            completionHandler(nil, CameraControllerError.captureSessionIsMissing)
+            return
+        }
+        
+        if let qrOutput = self.qrOutput {
+            qrOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
+            qrOutput.metadataObjectTypes = [.qr]
+            self.qrCaptureCompletionBlock = completionHandler
+        } else {
+            completionHandler(nil, CameraControllerError.invalidOperation)
+        }
     }
 
     func switchCamera() throws {
@@ -225,3 +264,21 @@ extension RealCameraController : AVCapturePhotoCaptureDelegate {
     }
 }
 
+extension RealCameraController :AVCaptureMetadataOutputObjectsDelegate {
+    func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
+        captureSession?.stopRunning()
+        
+        if let metadataObject = metadataObjects.first {
+            guard let readableObject = metadataObject as? AVMetadataMachineReadableCodeObject else {
+                self.qrCaptureCompletionBlock?(nil, CameraControllerError.unknown)
+                return
+            }
+            
+            if let code = readableObject.stringValue {
+                self.qrCaptureCompletionBlock?(code, nil)
+            } else {
+                self.qrCaptureCompletionBlock?(nil, CameraControllerError.unknown)
+            }
+        }
+    }
+}
