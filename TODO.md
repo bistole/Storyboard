@@ -15,7 +15,7 @@ NOW
     - Customiz QR Code scanner's UI
   - Share
     - Save scaned code to store [DONE]
-    - Manually edit server key
+    - Manually edit server key [DONE]
     - Connect to server
 
 - Authenticate
