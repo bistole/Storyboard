@@ -8,6 +8,8 @@ import (
 
 // Task is defined in interfaces
 type Task = interfaces.Task
+
+// Photo is defined in interfaces
 type Photo = interfaces.Photo
 
 // ConfigMock to mock config
@@ -15,6 +17,10 @@ type ConfigMock struct {
 	GetVendorNameFn   func() string
 	GetAppNameFn      func() string
 	GetDatabaseNameFn func() string
+	GetIPFn           func() string
+	GetPortFn         func() int
+	SetIPFn           func(string)
+	SetPortFn         func(int)
 }
 
 // GetVendorName mock config GetVendorName
@@ -30,6 +36,26 @@ func (c *ConfigMock) GetAppName() string {
 // GetDatabaseName mock config GetDatabaseName
 func (c *ConfigMock) GetDatabaseName() string {
 	return c.GetDatabaseNameFn()
+}
+
+// GetIP get ip
+func (c *ConfigMock) GetIP() string {
+	return c.GetIPFn()
+}
+
+// SetIP set ip
+func (c *ConfigMock) SetIP(ip string) {
+	c.SetIPFn(ip)
+}
+
+// GetPort get port
+func (c *ConfigMock) GetPort() int {
+	return c.GetPortFn()
+}
+
+// SetPort set port
+func (c *ConfigMock) SetPort(port int) {
+	c.SetPortFn(port)
 }
 
 // DatabaseMock to mock database service
@@ -136,8 +162,11 @@ func (p *PhotoRepoMock) GetPhotoMetaByTS(ts int64, limit int, offset int) ([]Pho
 
 // RESTMock to mock REST service
 type RESTMock struct {
-	StartFn func()
-	StopFn  func()
+	StartFn        func()
+	StopFn         func()
+	GetCurrentIPFn func() string
+	SetCurrentIPFn func(string)
+	GetServerIPsFn func() map[string]string
 }
 
 // Start mock REST service
@@ -148,4 +177,19 @@ func (r *RESTMock) Start() {
 // Stop mock REST service
 func (r *RESTMock) Stop() {
 	r.StopFn()
+}
+
+// GetCurrentIP get current ip
+func (r *RESTMock) GetCurrentIP() string {
+	return r.GetCurrentIPFn()
+}
+
+// SetCurrentIP set current ip
+func (r *RESTMock) SetCurrentIP(ip string) {
+	r.SetCurrentIPFn(ip)
+}
+
+// GetServerIPs get valid ips
+func (r *RESTMock) GetServerIPs() map[string]string {
+	return r.GetServerIPsFn()
 }

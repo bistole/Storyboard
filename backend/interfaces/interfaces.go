@@ -33,6 +33,10 @@ type ConfigService interface {
 	GetVendorName() string
 	GetAppName() string
 	GetDatabaseName() string
+	GetIP() string
+	SetIP(string)
+	GetPort() int
+	SetPort(int)
 }
 
 // DatabaseService is interface of database package
@@ -68,4 +72,7 @@ type PhotoRepo interface {
 type RESTService interface {
 	Start()
 	Stop()
+	GetCurrentIP() string
+	SetCurrentIP(string)
+	GetServerIPs() map[string]string
 }

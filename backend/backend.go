@@ -4,6 +4,7 @@ import "C"
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
 	"storyboard/backend/config"
@@ -42,7 +43,7 @@ func Backend_Start() {
 	photoRepo = photorepo.NewPhotoRepo(db)
 
 	// server
-	ss = server.NewRESTServer(taskRepo, photoRepo)
+	ss = server.NewRESTServer(c, taskRepo, photoRepo)
 	go ss.Start()
 }
 
@@ -61,6 +62,28 @@ func Backend_Stop() {
 	db = nil
 	c = nil
 	inited = false
+}
+
+//export Backend_GetCurrentIP
+func Backend_GetCurrentIP() *C.char {
+	var ip = ss.GetCurrentIP()
+	return C.CString(ip)
+}
+
+//export Backend_SetCurrentIP
+func Backend_SetCurrentIP(ip *C.char) {
+	ss.SetCurrentIP(C.GoString(ip))
+}
+
+//export Backend_GetAvailableIPs
+func Backend_GetAvailableIPs() *C.char {
+	var ipsMap = ss.GetServerIPs()
+	var ipsBytes, err = json.Marshal(ipsMap)
+	if err != nil {
+		return C.CString("{}")
+	}
+	var ipsStr = string(ipsBytes)
+	return C.CString(ipsStr)
 }
 
 func console() {

@@ -12,7 +12,10 @@ class SBButton extends StatelessWidget {
       return Container(
         child: ElevatedButton.icon(
           onPressed: this.onPress,
-          label: Text(this.text == null ? "" : this.text),
+          label: Text(
+            this.text == null ? "" : this.text,
+            style: TextStyle(color: Colors.white),
+          ),
           icon: icon,
           style: ButtonStyle(
             padding:
@@ -27,7 +30,10 @@ class SBButton extends StatelessWidget {
     return Container(
       child: ElevatedButton(
         onPressed: this.onPress,
-        child: Text(this.text),
+        child: Text(
+          this.text,
+          style: TextStyle(color: Colors.white),
+        ),
         style: ButtonStyle(
           padding:
               MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 4)),

@@ -3,10 +3,15 @@ NOW
 
 - QR code to connect [IN_PROGRESS]
   - Server-side
-    - Find IP address on backend
-    - Deliever IP info to flutter
+    - Find IP address on backend [DONE]
+    - Deliever IP info to flutter [DONE]
     - Show qr code [DONE]
-    - Show server key in string
+    - Show server key in string [DONE]
+    - Switch IP from UI [DONE]
+    - Connect to backend by settings
+      - Happy path
+      - If current IP is lost, reconnect with new IP.
+      - If current IP is lost, hint user to sync mobile app again.
   - iPhone
     - Scan MOCK [DONE]
     - Scan
@@ -17,6 +22,8 @@ NOW
     - Save scaned code to store [DONE]
     - Manually edit server key [DONE]
     - Connect to server
+      - Happy path
+      - If failed, ask for update the connection
 
 - Authenticate
 
