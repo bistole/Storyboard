@@ -65,7 +65,8 @@ bool handleNetworkSucc(Store<AppState> store) {
 bool handleNetworkError(Store<AppState> store, Exception e) {
   if (e is SocketException) {
     if (e.osError.errorCode == 61 /* Connection refused */ ||
-        e.osError.errorCode == 60 /* Operation timed out */) {
+        e.osError.errorCode == 60 /* Operation timed out */ ||
+        e.osError.errorCode == 111 /* Connection refused */) {
       store.dispatch(SettingServerReachableAction(reachable: false));
       print(e.toString());
       return true;
