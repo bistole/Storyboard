@@ -63,9 +63,12 @@ class NetPhotos {
 
   Future<bool> netFetchPhotos(Store<AppState> store, {uuid: String}) async {
     try {
+      String prefix = getURLPrefix(store);
+      if (prefix == null) return false;
+
       int ts = (store.state.photoRepo.lastTS + 1);
       final response =
-          await _httpClient.get(URLPrefix + "/photos?ts=$ts&c=$countPerFetch");
+          await _httpClient.get(prefix + "/photos?ts=$ts&c=$countPerFetch");
       if (response.statusCode == 200) {
         Map<String, dynamic> object = jsonDecode(response.body);
         if (object['succ'] == true && object['photos'] != null) {
@@ -80,21 +83,26 @@ class NetPhotos {
             _actPhotos.actFetchPhotos();
           }
         }
+        handleNetworkSucc(store);
         return true;
       }
     } catch (e) {
       print("netFetchPhotos failed: $e");
+      handleNetworkError(store, e);
     }
     return false;
   }
 
   Future<bool> netUploadPhoto(Store<AppState> store, {uuid: String}) async {
     try {
+      String prefix = getURLPrefix(store);
+      if (prefix == null) return false;
+
       Photo photo = store.state.photoRepo.photos[uuid];
       if (photo == null) return true;
 
       final response = await _httpClient.send(
-        http.MultipartRequest("POST", Uri.parse(URLPrefix + "/photos"))
+        http.MultipartRequest("POST", Uri.parse(prefix + "/photos"))
           ..fields['uuid'] = photo.uuid
           ..fields['createdAt'] = photo.createdAt.toString()
           ..files.add(
@@ -115,22 +123,27 @@ class NetPhotos {
           var photo = Photo.fromJson(object['photo']);
           store.dispatch(UpdatePhotoAction(photo: photo));
         }
+        handleNetworkSucc(store);
         return true;
       }
     } catch (e) {
       print("netUploadPhoto failed: $e");
+      handleNetworkError(store, e);
     }
     return false;
   }
 
   Future<bool> netDownloadPhoto(Store<AppState> store, {uuid: String}) async {
     try {
+      String prefix = getURLPrefix(store);
+      if (prefix == null) return false;
+
       Photo photo = store.state.photoRepo.photos[uuid];
       if (photo == null) return true;
       if (photo.hasOrigin == PhotoStatus.Ready) return true;
 
       final response = await _httpClient.get(
-        URLPrefix + "/photos/" + uuid,
+        prefix + "/photos/" + uuid,
       );
 
       if (response.statusCode == 200) {
@@ -139,10 +152,12 @@ class NetPhotos {
           uuid: uuid,
           status: PhotoStatus.Ready,
         ));
+        handleNetworkSucc(store);
         return true;
       }
     } catch (e) {
       print("netDownloadPhoto failed: $e");
+      handleNetworkError(store, e);
     }
     return false;
   }
@@ -150,12 +165,15 @@ class NetPhotos {
   Future<bool> netDownloadThumbnail(Store<AppState> store,
       {uuid: String}) async {
     try {
+      String prefix = getURLPrefix(store);
+      if (prefix == null) return false;
+
       Photo photo = store.state.photoRepo.photos[uuid];
       if (photo == null) return true;
       if (photo.hasThumb == PhotoStatus.Ready) return true;
 
       final response = await _httpClient.get(
-        URLPrefix + "/photos/" + uuid + '/thumbnail',
+        prefix + "/photos/" + uuid + '/thumbnail',
       );
 
       if (response.statusCode == 200) {
@@ -164,21 +182,26 @@ class NetPhotos {
           uuid: uuid,
           status: PhotoStatus.Ready,
         ));
+        handleNetworkSucc(store);
         return true;
       }
     } catch (e) {
       print("netDownloadThumbnail failed: $e");
+      handleNetworkError(store, e);
     }
     return false;
   }
 
   Future<bool> netDeletePhoto(Store<AppState> store, {uuid: String}) async {
     try {
+      String prefix = getURLPrefix(store);
+      if (prefix == null) return false;
+
       Photo photo = store.state.photoRepo.photos[uuid];
       if (photo == null) return true;
 
       final responseStream = await _httpClient.send(
-        http.Request("DELETE", Uri.parse(URLPrefix + "/photos/" + photo.uuid))
+        http.Request("DELETE", Uri.parse(prefix + "/photos/" + photo.uuid))
           ..body = jsonEncode({"updatedAt": photo.updatedAt}),
       );
 
@@ -191,10 +214,12 @@ class NetPhotos {
           await _storage.deletePhotoAndThumbByUUID(photo.uuid);
           store.dispatch(DeletePhotoAction(uuid: photo.uuid));
         }
+        handleNetworkSucc(store);
         return true;
       }
     } catch (e) {
       print("netDeletePhoto failed: $e");
+      handleNetworkError(store, e);
     }
     return false;
   }

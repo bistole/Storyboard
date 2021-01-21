@@ -8,9 +8,12 @@ import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/channel/menu.dart';
 import 'package:storyboard/configs/channel_manager.dart';
 import 'package:storyboard/configs/device_manager.dart';
+import 'package:storyboard/net/auth.dart';
+import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/photos.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/net/tasks.dart';
+import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/store.dart';
 import 'package:storyboard/storage/storage.dart';
@@ -25,6 +28,7 @@ class Factory {
   ActPhotos actPhotos;
   ActTasks actTasks;
 
+  NetAuth netAuth;
   NetPhotos netPhotos;
   NetTasks netTasks;
   NetQueue netQueue;
@@ -41,6 +45,7 @@ class Factory {
     actPhotos = ActPhotos();
     actTasks = ActTasks();
 
+    netAuth = NetAuth();
     netPhotos = NetPhotos();
     netTasks = NetTasks();
     netQueue = NetQueue(60);
@@ -52,6 +57,8 @@ class Factory {
     actPhotos.setStorage(storage);
 
     actTasks.setNetQueue(netQueue);
+
+    netAuth.setHttpClient(http.Client());
 
     netPhotos.setHttpClient(http.Client());
     netPhotos.setActPhotos(actPhotos);
@@ -69,10 +76,35 @@ class Factory {
     getViewResource().storage = storage;
     getViewResource().actPhotos = actPhotos;
     getViewResource().actTasks = actTasks;
+    getViewResource().netAuth = netAuth;
   }
 
   Future<MethodChannel> createChannelByName(String name) =>
       channelManager.createChannel(name);
+
+  void checkServerKeyOnDesktop() {
+    command.getCurrentIp().then((localIp) {
+      var newServeKey = encodeServerKey(localIp, 3000);
+      if (store.state.setting.serverKey != newServeKey) {
+        // only first time when serverKey is updated
+        store.onChange
+            .any((state) => state.setting.serverKey == newServeKey)
+            .then((_) => netAuth.netPing(store));
+
+        // backend ip is changed, lets change frontend ip too
+        store.dispatch(SettingServerKeyAction(serverKey: newServeKey));
+      } else {
+        // local ip does not changed, check reachable only
+        netAuth.netPing(store);
+      }
+    });
+  }
+
+  void checkServerKeyOnMobile() {
+    if (store.state.setting.serverKey != null) {
+      netAuth.netPing(store);
+    }
+  }
 
   Future<void> initAfterAppCreated() async {
     await storage.initDataHome();
@@ -91,6 +123,12 @@ class Factory {
     menu.setCommandChannel(command);
 
     getViewResource().command = command;
+
+    if (deviceManager.isDesktop()) {
+      checkServerKeyOnDesktop();
+    } else {
+      checkServerKeyOnMobile();
+    }
   }
 }
 

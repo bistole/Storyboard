@@ -15,7 +15,7 @@ class AuthPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Authentication'),
+        title: Text('Server Configuration'),
       ),
       body: getViewResource().deviceManager.isDesktop()
           ? ServerWidget()

@@ -11,6 +11,7 @@ import 'package:storyboard/net/tasks.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo_repo.dart';
 import 'package:storyboard/redux/models/queue.dart';
+import 'package:storyboard/redux/models/setting.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
 import 'package:storyboard/redux/models/task_repo.dart';
@@ -19,6 +20,9 @@ import 'package:storyboard/redux/reducers/app_reducer.dart';
 class MockHttpClient extends Mock implements http.Client {}
 
 class MockActTasks extends Mock implements ActTasks {}
+
+const mockServerKey = 'localhost:3000';
+const mockURLPrefix = 'http://' + mockServerKey;
 
 void main() {
   Store<AppState> store;
@@ -34,6 +38,7 @@ void main() {
         photoRepo: PhotoRepo(photos: {}, lastTS: 0),
         taskRepo: TaskRepo(tasks: tasks, lastTS: 0),
         queue: Queue(),
+        setting: Setting(serverKey: mockServerKey),
       ),
     );
   }
@@ -78,14 +83,14 @@ void main() {
         'succ': true,
         'tasks': [getJsonTaskObject()],
       });
-      when(httpClient.get(startsWith(URLPrefix))).thenAnswer((_) async {
+      when(httpClient.get(startsWith(mockURLPrefix))).thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
       await netTasks.netFetchTasks(store);
 
       var captured = verify(httpClient.get(captureAny)).captured.first;
-      expect(captured, URLPrefix + '/tasks?ts=1&c=100');
+      expect(captured, mockURLPrefix + '/tasks?ts=1&c=100');
 
       expect(store.state.taskRepo.tasks, {'uuid': getTaskObject()});
     });
@@ -104,14 +109,14 @@ void main() {
         'tasks': [getJsonTaskObject()],
       });
 
-      when(httpClient.get(startsWith(URLPrefix))).thenAnswer((_) async {
+      when(httpClient.get(startsWith(mockURLPrefix))).thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
       await netTasks.netFetchTasks(store);
 
       var captured = verify(httpClient.get(captureAny)).captured.first;
-      expect(captured, URLPrefix + '/tasks?ts=1&c=100');
+      expect(captured, mockURLPrefix + '/tasks?ts=1&c=100');
 
       expect(store.state.taskRepo.tasks, {
         'uuid': getTaskObject(),
@@ -128,14 +133,14 @@ void main() {
         ],
       });
 
-      when(httpClient.get(startsWith(URLPrefix))).thenAnswer((_) async {
+      when(httpClient.get(startsWith(mockURLPrefix))).thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
       await netTasks.netFetchTasks(store);
 
       var captured = verify(httpClient.get(captureAny)).captured.first;
-      expect(captured, URLPrefix + '/tasks?ts=1&c=100');
+      expect(captured, mockURLPrefix + '/tasks?ts=1&c=100');
 
       expect(store.state.taskRepo.tasks, {});
     });
@@ -149,14 +154,14 @@ void main() {
         'succ': true,
         'tasks': [getJsonTaskObject()],
       });
-      when(httpClient.get(startsWith(URLPrefix))).thenAnswer((_) async {
+      when(httpClient.get(startsWith(mockURLPrefix))).thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
       await netTasks.netFetchTasks(store);
 
       var captured = verify(httpClient.get(captureAny)).captured.first;
-      expect(captured, URLPrefix + '/tasks?ts=1&c=2');
+      expect(captured, mockURLPrefix + '/tasks?ts=1&c=2');
 
       verifyNever(actTasks.actFetchTasks());
 
@@ -175,14 +180,14 @@ void main() {
           getJsonTaskObject()..addAll({'uuid': 'uuid2'}),
         ],
       });
-      when(httpClient.get(startsWith(URLPrefix))).thenAnswer((_) async {
+      when(httpClient.get(startsWith(mockURLPrefix))).thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
       await netTasks.netFetchTasks(store);
 
       var captured = verify(httpClient.get(captureAny)).captured.first;
-      expect(captured, URLPrefix + '/tasks?ts=1&c=2');
+      expect(captured, mockURLPrefix + '/tasks?ts=1&c=2');
 
       verify(actTasks.actFetchTasks()).called(1);
 
@@ -210,7 +215,7 @@ void main() {
       });
 
       when(httpClient.post(
-        startsWith(URLPrefix),
+        startsWith(mockURLPrefix),
         headers: anyNamed('headers'),
         body: anyNamed('body'),
         encoding: Encoding.getByName('utf-8'),
@@ -227,7 +232,7 @@ void main() {
         encoding: Encoding.getByName('utf-8'),
       )).captured;
 
-      expect(captured[0], URLPrefix + '/tasks');
+      expect(captured[0], mockURLPrefix + '/tasks');
       expect(captured[1]['Content-Type'], 'application/json');
       expect(captured[2], jsonEncode(getTaskObject().copyWith(ts: 0).toJson()));
 
@@ -254,7 +259,7 @@ void main() {
       });
 
       when(httpClient.post(
-        startsWith(URLPrefix),
+        startsWith(mockURLPrefix),
         headers: anyNamed('headers'),
         body: anyNamed('body'),
         encoding: Encoding.getByName('utf-8'),
@@ -271,7 +276,7 @@ void main() {
         encoding: Encoding.getByName('utf-8'),
       )).captured;
 
-      expect(captured[0], URLPrefix + '/tasks/uuid');
+      expect(captured[0], mockURLPrefix + '/tasks/uuid');
       expect(captured[1]['Content-Type'], 'application/json');
       expect(captured[2],
           jsonEncode(getTaskObject().copyWith(ts: 1606500000000).toJson()));
@@ -307,7 +312,7 @@ void main() {
       var capHttp =
           verify(httpClient.send(captureAny)).captured.first as http.Request;
       expect(capHttp.method, 'DELETE');
-      expect(capHttp.url.toString(), URLPrefix + '/tasks/uuid');
+      expect(capHttp.url.toString(), mockURLPrefix + '/tasks/uuid');
       expect(capHttp.body, jsonEncode({"updatedAt": 1606506017}));
 
       expect(store.state.taskRepo.tasks['uuid'], isNull);

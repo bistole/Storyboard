@@ -15,6 +15,17 @@ class SettingServerKeyAction {
   }
 }
 
+class SettingServerReachableAction {
+  final bool reachable;
+
+  SettingServerReachableAction({@required this.reachable});
+
+  @override
+  String toString() {
+    return 'SettingServerReachableAction{reachable: $reachable}';
+  }
+}
+
 class FetchTasksAction {
   final Map<String, Task> taskMap;
 

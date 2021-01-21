@@ -50,9 +50,12 @@ class NetTasks {
 
   Future<bool> netFetchTasks(Store<AppState> store, {uuid: String}) async {
     try {
+      String prefix = getURLPrefix(store);
+      if (prefix == null) return false;
+
       int ts = (store.state.photoRepo.lastTS + 1);
       final response =
-          await _httpClient.get(URLPrefix + "/tasks?ts=$ts&c=$countPerFetch");
+          await _httpClient.get(prefix + "/tasks?ts=$ts&c=$countPerFetch");
 
       if (response.statusCode == 200) {
         Map<String, dynamic> object = jsonDecode(response.body);
@@ -64,20 +67,25 @@ class NetTasks {
             _actTasks.actFetchTasks();
           }
         }
+        handleNetworkSucc(store);
         return true;
       }
     } catch (e) {
       print("netFetchTasks failed: $e");
+      handleNetworkError(store, e);
     }
     return false;
   }
 
   Future<bool> netCreateTask(Store<AppState> store, {uuid: String}) async {
     try {
+      String prefix = getURLPrefix(store);
+      if (prefix == null) return false;
+
       Task task = store.state.taskRepo.tasks[uuid];
       if (task == null) return true;
 
-      final response = await _httpClient.post(URLPrefix + "/tasks",
+      final response = await _httpClient.post(prefix + "/tasks",
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode(task.toJson()),
           encoding: Encoding.getByName("utf-8"));
@@ -88,21 +96,26 @@ class NetTasks {
           var task = Task.fromJson(object['task']);
           store.dispatch(UpdateTaskAction(task: task));
         }
+        handleNetworkSucc(store);
         return true;
       }
     } catch (e) {
       print("netCreateTask failed: $e");
+      handleNetworkError(store, e);
     }
     return false;
   }
 
   Future<bool> netUpdateTask(Store<AppState> store, {uuid: String}) async {
     try {
+      String prefix = getURLPrefix(store);
+      if (prefix == null) return false;
+
       Task task = store.state.taskRepo.tasks[uuid];
       if (task == null) return true;
 
       final body = jsonEncode(task.toJson());
-      final response = await _httpClient.post(URLPrefix + "/tasks/" + task.uuid,
+      final response = await _httpClient.post(prefix + "/tasks/" + task.uuid,
           headers: {'Content-Type': 'application/json'},
           body: body,
           encoding: Encoding.getByName("utf-8"));
@@ -113,21 +126,26 @@ class NetTasks {
           var task = Task.fromJson(object['task']);
           store.dispatch(UpdateTaskAction(task: task));
         }
+        handleNetworkSucc(store);
         return true;
       }
     } catch (e) {
       print("netUpdateTask failed: $e");
+      handleNetworkError(store, e);
     }
     return false;
   }
 
   Future<bool> netDeleteTask(Store<AppState> store, {uuid: String}) async {
     try {
+      String prefix = getURLPrefix(store);
+      if (prefix == null) return false;
+
       Task task = store.state.taskRepo.tasks[uuid];
       if (task == null) return true;
 
       final responseStream = await _httpClient.send(
-        http.Request("DELETE", Uri.parse(URLPrefix + "/tasks/" + task.uuid))
+        http.Request("DELETE", Uri.parse(prefix + "/tasks/" + task.uuid))
           ..body = jsonEncode({"updatedAt": task.updatedAt}),
       );
 
@@ -139,10 +157,12 @@ class NetTasks {
           var task = Task.fromJson(object['task']);
           store.dispatch(DeleteTaskAction(uuid: task.uuid));
         }
+        handleNetworkSucc(store);
         return true;
       }
     } catch (e) {
       print("netDeleteTask failed: $e");
+      handleNetworkError(store, e);
     }
     return false;
   }

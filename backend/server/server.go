@@ -37,6 +37,7 @@ func NewRESTServer(config interfaces.ConfigService, taskRepo interfaces.TaskRepo
 
 func (rs RESTServer) route() *mux.Router {
 	r := mux.NewRouter()
+	r.HandleFunc("/ping", rs.Ping).Methods("GET")
 	r.HandleFunc("/tasks", rs.GetTasks).Methods("GET")
 	r.HandleFunc("/tasks", rs.CreateTask).Methods("POST")
 	r.HandleFunc("/tasks/{id}", rs.GetTask).Methods("GET")
@@ -66,7 +67,7 @@ func (rs *RESTServer) Start() {
 			rs.Wg.Done()
 		}()
 
-		fmt.Println("Started: $v", ip)
+		fmt.Println("Started: ", ip)
 		if err := rs.Server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("ListenAndServe(): %v", err)
 		}

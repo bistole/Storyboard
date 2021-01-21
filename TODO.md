@@ -2,16 +2,15 @@ NOW
 ===
 
 - QR code to connect [IN_PROGRESS]
-  - Server-side
+  - Server-side [DONE]
     - Find IP address on backend [DONE]
     - Deliever IP info to flutter [DONE]
     - Show qr code [DONE]
     - Show server key in string [DONE]
     - Switch IP from UI [DONE]
-    - Connect to backend by settings
-      - Happy path
-      - If current IP is lost, reconnect with new IP.
-      - If current IP is lost, hint user to sync mobile app again.
+    - Connect to backend by settings [DONE]
+      - Happy path [DONE]
+      - Check status of backend [DONE]
   - iPhone
     - Scan MOCK [DONE]
     - Scan
@@ -34,6 +33,7 @@ TODO
 - Take photo need not confirm again.
 
 - Change icon for app
+- Set minsize of desktop application
 
 - Zoom in/out for detail photo in mobile. [?]
 

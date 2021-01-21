@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:storyboard/net/config.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/views/common/button.dart';
@@ -93,7 +94,8 @@ class _ClientWidgetState extends State<ClientWidget> {
                   endEditing();
                 },
                 autofocus: true,
-                decoration: InputDecoration(hintText: '127.0.0.1:3000'),
+                decoration: InputDecoration(
+                    hintText: encodeServerKey('127.0.0.1', 3000)),
               ),
               focusNode: FocusNode(),
               onKey: (RawKeyEvent event) {
