@@ -20,28 +20,29 @@ NOW
   - Share
     - Save scaned code to store [DONE]
     - Manually edit server key [DONE]
-    - Connect to server
-      - Happy path
-      - If failed, ask for update the connection
-
-- Authenticate
+    - Connect to server [DONE]
+      - Happy path [DONE]
+      - If failed, ask for update the connection [DONE]
 
 TODO
 ====
+- Authenticate
+
+- Change icon for app.
+- Set minsize of desktop application.
+- Deployment
 
 - Redesign display photo interface.
+
+- Notify Frontend when change happens in backend
+- Force to retry connection
+
+
+ISSUE
+=====
+- Should have warning bar when can not connect server
 - Take photo need not confirm again.
-
-- Change icon for app
-- Set minsize of desktop application
-
 - Zoom in/out for detail photo in mobile. [?]
-
-Communication
-- Notify Flutter when change happens in backend
-
-Deployment
-- Build to App
 
 DONE
 ====

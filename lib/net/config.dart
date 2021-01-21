@@ -22,6 +22,8 @@ String encodeServerKey(String ip, int port) {
 }
 
 String decodeServerKey(String code) {
+  if (code.length != 12) return null;
+
   const c2hex = '0123456789abcdef';
 
   var result = '';
@@ -29,14 +31,18 @@ String decodeServerKey(String code) {
     if (result.length > 0) {
       result += '.';
     }
-    var ipsegVal =
-        c2hex.indexOf(code[i * 2]) * 16 + c2hex.indexOf(code[i * 2 + 1]);
+    var hiByte = c2hex.indexOf(code[i * 2]);
+    var loByte = c2hex.indexOf(code[i * 2 + 1]);
+    if (hiByte < 0 || loByte < 0) return null;
+    var ipsegVal = hiByte * 16 + loByte;
     result += '$ipsegVal';
   }
 
-  int port = 0;
+  var port = 0;
   for (var i = 0; i < 4; i++) {
-    port = port * 16 + c2hex.indexOf(code[8 + i]);
+    var byte = c2hex.indexOf(code[8 + i]);
+    if (byte < 0) return null;
+    port = port * 16 + byte;
   }
   result += ':$port';
   return result;

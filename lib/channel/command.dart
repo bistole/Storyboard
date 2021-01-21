@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:redux/redux.dart';
+import 'package:storyboard/net/config.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
@@ -77,7 +78,12 @@ class CommandChannel {
   Future<void> takeQRCode() async {
     String code = await _channel.invokeMethod<String>(CMD_TAKE_QRCODE);
     if (code != null) {
+      if (decodeServerKey(code) == null) {
+        throw new Exception("invalid");
+      }
       _store.dispatch(SettingServerKeyAction(serverKey: code));
+      return true;
     }
+    return false;
   }
 }
