@@ -2,17 +2,25 @@ package mocks
 
 import (
 	"database/sql"
+	"io"
 	"storyboard/backend/interfaces"
 )
 
 // Task is defined in interfaces
 type Task = interfaces.Task
 
+// Photo is defined in interfaces
+type Photo = interfaces.Photo
+
 // ConfigMock to mock config
 type ConfigMock struct {
 	GetVendorNameFn   func() string
 	GetAppNameFn      func() string
 	GetDatabaseNameFn func() string
+	GetIPFn           func() string
+	GetPortFn         func() int
+	SetIPFn           func(string)
+	SetPortFn         func(int)
 }
 
 // GetVendorName mock config GetVendorName
@@ -28,6 +36,26 @@ func (c *ConfigMock) GetAppName() string {
 // GetDatabaseName mock config GetDatabaseName
 func (c *ConfigMock) GetDatabaseName() string {
 	return c.GetDatabaseNameFn()
+}
+
+// GetIP get ip
+func (c *ConfigMock) GetIP() string {
+	return c.GetIPFn()
+}
+
+// SetIP set ip
+func (c *ConfigMock) SetIP(ip string) {
+	c.SetIPFn(ip)
+}
+
+// GetPort get port
+func (c *ConfigMock) GetPort() int {
+	return c.GetPortFn()
+}
+
+// SetPort set port
+func (c *ConfigMock) SetPort(port int) {
+	c.SetPortFn(port)
 }
 
 // DatabaseMock to mock database service
@@ -62,7 +90,7 @@ func (d *DatabaseMock) Close() {
 type TaskRepoMock struct {
 	CreateTaskFn    func(Task) (*Task, error)
 	UpdateTaskFn    func(string, Task) (*Task, error)
-	DeleteTaskFn    func(string) (*Task, error)
+	DeleteTaskFn    func(string, int64) (*Task, error)
 	GetTaskByUUIDFn func(string) (*Task, error)
 	GetTasksByTSFn  func(ts int64, limit int, offset int) ([]Task, error)
 }
@@ -78,8 +106,8 @@ func (t *TaskRepoMock) UpdateTask(UUID string, task Task) (*Task, error) {
 }
 
 // DeleteTask mock task repo
-func (t *TaskRepoMock) DeleteTask(UUID string) (*Task, error) {
-	return t.DeleteTaskFn(UUID)
+func (t *TaskRepoMock) DeleteTask(UUID string, updatedAt int64) (*Task, error) {
+	return t.DeleteTaskFn(UUID, updatedAt)
 }
 
 // GetTaskByUUID mock task repo
@@ -92,10 +120,53 @@ func (t *TaskRepoMock) GetTasksByTS(ts int64, limit int, offset int) ([]Task, er
 	return t.GetTasksByTSFn(ts, limit, offset)
 }
 
+// PhotoRepoMock to mock photo repo
+type PhotoRepoMock struct {
+	AddPhotoFn          func(string, string, string, string, io.Reader, int64) (*Photo, error)
+	DeletePhotoFn       func(string, int64) (*Photo, error)
+	GetPhotoFn          func(string) (io.ReadCloser, error)
+	GetPhotoThumbnailFn func(string) (io.ReadCloser, error)
+	GetPhotoMetaFn      func(string) (*Photo, error)
+	GetPhotoMetaByTSFn  func(ts int64, limit int, offset int) ([]Photo, error)
+}
+
+// AddPhoto mock photo repo
+func (p *PhotoRepoMock) AddPhoto(uuid string, filename string, mime string, size string, src io.Reader, createdAt int64) (*Photo, error) {
+	return p.AddPhotoFn(uuid, filename, mime, size, src, createdAt)
+}
+
+// DeletePhoto mock photo repo
+func (p *PhotoRepoMock) DeletePhoto(UUID string, updatedAt int64) (*Photo, error) {
+	return p.DeletePhotoFn(UUID, updatedAt)
+}
+
+// GetPhoto mock photo repo
+func (p *PhotoRepoMock) GetPhoto(UUID string) (io.ReadCloser, error) {
+	return p.GetPhotoFn(UUID)
+}
+
+// GetPhotoThumbnail mock photo repo
+func (p *PhotoRepoMock) GetPhotoThumbnail(UUID string) (io.ReadCloser, error) {
+	return p.GetPhotoThumbnailFn(UUID)
+}
+
+// GetPhotoMeta mock photo repo
+func (p *PhotoRepoMock) GetPhotoMeta(UUID string) (*Photo, error) {
+	return p.GetPhotoMetaFn(UUID)
+}
+
+// GetPhotoMetaByTS mock photo repo
+func (p *PhotoRepoMock) GetPhotoMetaByTS(ts int64, limit int, offset int) ([]Photo, error) {
+	return p.GetPhotoMetaByTSFn(ts, limit, offset)
+}
+
 // RESTMock to mock REST service
 type RESTMock struct {
-	StartFn func()
-	StopFn  func()
+	StartFn        func()
+	StopFn         func()
+	GetCurrentIPFn func() string
+	SetCurrentIPFn func(string)
+	GetServerIPsFn func() map[string]string
 }
 
 // Start mock REST service
@@ -106,4 +177,19 @@ func (r *RESTMock) Start() {
 // Stop mock REST service
 func (r *RESTMock) Stop() {
 	r.StopFn()
+}
+
+// GetCurrentIP get current ip
+func (r *RESTMock) GetCurrentIP() string {
+	return r.GetCurrentIPFn()
+}
+
+// SetCurrentIP set current ip
+func (r *RESTMock) SetCurrentIP(ip string) {
+	r.SetCurrentIPFn(ip)
+}
+
+// GetServerIPs get valid ips
+func (r *RESTMock) GetServerIPs() map[string]string {
+	return r.GetServerIPsFn()
 }

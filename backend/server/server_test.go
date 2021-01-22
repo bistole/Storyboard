@@ -6,8 +6,10 @@ import (
 )
 
 func TestServerStartup(t *testing.T) {
+	var configMock = &mocks.ConfigMock{}
 	var taskRepoMock = &mocks.TaskRepoMock{}
-	ss := NewRESTServer(taskRepoMock)
+	var photoRepoMock = &mocks.PhotoRepoMock{}
+	ss := NewRESTServer(configMock, taskRepoMock, photoRepoMock)
 	ss.Start()
 	ss.Stop()
 }

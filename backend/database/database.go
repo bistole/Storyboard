@@ -66,7 +66,7 @@ func (d Database) createDBInstance(dirPath string, dbName string) (fullPath stri
 }
 
 func (d Database) initDBInstance() {
-	// create table
+	// create task table
 	_, err := d.connDB.Exec("CREATE TABLE IF NOT EXISTS `tasks` (" +
 		"`id` INTEGER PRIMARY KEY AUTOINCREMENT," +
 		"`uuid` VARCHAR(36) NOT NULL UNIQUE," +
@@ -78,9 +78,28 @@ func (d Database) initDBInstance() {
 		")")
 	processError("initDBInstance", err)
 
-	// create ts index
+	// create task ts index
 	_, err = d.connDB.Exec("CREATE INDEX IF NOT EXISTS `index_tasks_ts` " +
 		" ON `tasks` ( `_ts` )")
+	processError("initDBInstance", err)
+
+	// create photo table
+	_, err = d.connDB.Exec("CREATE TABLE IF NOT EXISTS `photos` (" +
+		"`id` INTEGER PRIMARY KEY AUTOINCREMENT," +
+		"`uuid` VARCHAR(36) NOT NULL UNIQUE," +
+		"`filename` TEXT NOT NULL," +
+		"`size` VARCHAR(16) NOT NULL," +
+		"`mime` VARCHAR(24) NOT NULL," +
+		"`deleted` INTEGER NOT NULL DEFAULT 0," +
+		"`updatedAt` INTEGER NOT NULL," +
+		"`createdAt` INTEGER NOT NULL," +
+		"`_ts` INTEGER NOT NULL" +
+		")")
+	processError("initDBInstance", err)
+
+	// create photo ts index
+	_, err = d.connDB.Exec("CREATE INDEX IF NOT EXISTS `index_photos_ts` " +
+		" ON `photos` ( `_ts` )")
 	processError("initDBInstance", err)
 }
 
@@ -88,16 +107,14 @@ func (d Database) initDBInstance() {
 func (d *Database) Init() {
 	// create folder if required
 	dirPath := d.GetDataFolder()
-	fullPath, existed := d.createDBInstance(dirPath, d.config.GetDatabaseName())
+	fullPath, _ := d.createDBInstance(dirPath, d.config.GetDatabaseName())
 
 	db, err := sql.Open("sqlite3", fullPath)
 	processError("Init", err)
 
 	d.connDB = db
 
-	if !existed {
-		d.initDBInstance()
-	}
+	d.initDBInstance()
 }
 
 // Close database connection
