@@ -38,6 +38,13 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name=".channels.QRCodeScannerActivity"
+            android:screenOrientation="fullSensor"
+            android:stateNotNeeded="true"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
+            android:windowSoftInputMode="stateAlwaysHidden">
+        </activity>
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.laterhorse.storyboard.fileprovider"

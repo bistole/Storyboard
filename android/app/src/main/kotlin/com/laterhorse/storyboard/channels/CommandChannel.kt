@@ -66,11 +66,13 @@ class CommandChannel {
         currentMethodChannelResult = result;
 
         var intent = IntentIntegrator(activity)
-        intent.setBeepEnabled(false)
-        intent.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE);
+        intent.captureActivity = QRCodeScannerActivity::class.java
+        intent.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
         intent.setCameraId(0)
-        intent.setPrompt("SCAN")
+        intent.setPrompt("")
+        intent.setBeepEnabled(false)
         intent.setBarcodeImageEnabled(false)
+        intent.setOrientationLocked(false)
         intent.initiateScan()
     }
 
@@ -90,10 +92,10 @@ class CommandChannel {
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) : Boolean {
         // qr code scan
+        Log.d(LOG_TAG, "onActivityResult")
         var result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         if (result != null) {
             if (result.contents != null) {
-                // succ
                 currentMethodChannelResult.success(result.contents)
             }
             return true;

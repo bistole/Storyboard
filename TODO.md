@@ -16,7 +16,7 @@ NOW
     - Scan
   - Android [DONE]
     - Scan basic func [DONE]
-    - Customiz QR Code scanner's UI
+    - Customiz QR Code scanner's UI [DONE]
   - Share
     - Save scaned code to store [DONE]
     - Manually edit server key [DONE]
@@ -32,6 +32,8 @@ TODO
 - Set minsize of desktop application.
 - Deployment
 
+- Create a website to publish service.
+
 - Redesign display photo interface.
 
 - Notify Frontend when change happens in backend
@@ -41,6 +43,7 @@ TODO
 ISSUE
 =====
 - Should have warning bar when can not connect server
+- Allow change PORT of backend service
 - Take photo need not confirm again.
 - Zoom in/out for detail photo in mobile. [?]
 

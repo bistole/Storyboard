@@ -52,7 +52,7 @@ flutter doctor --android-licenses
 First need to fix android command line issue for java9 and above:
 
 ```
-export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jre/jdk/Contents/Home/bin/java
+export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jre/jdk/Contents/Home
 export ANDROID_HOME=$HOME/Library/Android/sdk
 export ANDROID_SDK_ROOT=$HOME/Library/Android/sdk
 export ANDROID_AVD_HOME=$HOME/.android/avd
