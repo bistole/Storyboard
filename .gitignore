@@ -18,5 +18,6 @@
 .flutter-plugins
 .flutter-plugins-dependencies
 .idea
+.vs
 coverage/
 build/
