@@ -41,6 +41,19 @@ cd $PROJECT_HOME
 flutter run -d macos
 ```
 
+Run frontend - Windows
+---
+
+Should follow the [Instruction](https://flutter.dev/docs/get-started/install/windows`)
+
+In order to build backend, also need to install [TDM64-GCC](https://jmeubank.github.io/tdm-gcc/download/)
+
+
+```
+cd $PROJECT_HOME
+flutter run -d windows
+```
+
 Run frontend - emulator - android
 ---
 
@@ -135,6 +148,15 @@ go build -buildmode=c-archive
 cd $PROJECT_HOME/c
 gcc -I. main.c ../backend/backend.a -v
 ```
+
+Programming windows version on mac
+----
+
+Install vcpkg - 
+https://docs.microsoft.com/en-us/cpp/build/install-vcpkg
+
+Integrate with vc - 
+./vcpkg integrate install
 
 References
 ===

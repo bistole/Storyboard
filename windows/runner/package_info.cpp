@@ -2,9 +2,7 @@
 #include "package_info.h"
 
 #include <flutter/standard_method_codec.h>
-#include <flutter/method_codec.h>
 
-#include <tchar.h>
 #include <windows.h>
 
 #include <string>
@@ -12,13 +10,11 @@
 
 using namespace std;
 
-PackageInfo::PackageInfo()
-{
-	binary_messenger_ = nullptr;
-}
+PackageInfo::PackageInfo() : binary_messenger_(nullptr), method_channel_(nullptr) {}
 
 PackageInfo::~PackageInfo()
 {
+	binary_messenger_ = nullptr;
 	if (method_channel_ != nullptr) {
 		delete method_channel_;
 		method_channel_ = nullptr;
@@ -43,7 +39,7 @@ void PackageInfo::methodChannelHandler(
 	std::unique_ptr<MethodResult<EncodableValue>>& result)
 {
 	if (call.method_name().compare("getAll") == 0) {
-		cout << "receive getAll action\n";
+		printf("receive getAll action\n");
 
 		std::string appName(APP_NAME);
 		std::string packageName(PACKAGE_NAME);

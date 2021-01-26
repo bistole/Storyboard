@@ -1,17 +1,17 @@
-#ifndef RUNNER_MENU_H_
-#define RUNNER_MENU_H_
+#ifndef RUNNER_MENU_EVENTS_H_
+#define RUNNER_MENU_EVENTS_H_
 
 #include <flutter/flutter_engine.h>
 #include <flutter/method_channel.h>
 
 using namespace flutter;
 
-class Menu {
+class MenuEvents {
 public:
-	Menu();
-	~Menu();
+	MenuEvents();
+	~MenuEvents();
 
-	void registerMessager(BinaryMessenger* binary_messenger);
+	void registerMessenger(BinaryMessenger* binary_messenger);
 	void importPhoto();
 
 private:

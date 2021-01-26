@@ -1,44 +1,34 @@
 NOW
 ===
 
-- QR code to connect [IN_PROGRESS]
-  - Server-side [DONE]
-    - Find IP address on backend [DONE]
-    - Deliever IP info to flutter [DONE]
-    - Show qr code [DONE]
-    - Show server key in string [DONE]
-    - Switch IP from UI [DONE]
-    - Connect to backend by settings [DONE]
-      - Happy path [DONE]
-      - Check status of backend [DONE]
-  - iPhone
-    - Scan MOCK [DONE]
-    - Scan
-  - Android [DONE]
-    - Scan basic func [DONE]
-    - Customiz QR Code scanner's UI [DONE]
-  - Share
-    - Save scaned code to store [DONE]
-    - Manually edit server key [DONE]
-    - Connect to server [DONE]
-      - Happy path [DONE]
-      - If failed, ask for update the connection [DONE]
+Compile as windows services
+- Install under windows [DONE]
+- Add methodChannel in windows' code [DONE]
+- Add open file
+- Change script to build backend in windows
+- Compile backend.lib with app
+- Start backend from windows code
+- Use methodChannel to communicate with backend from flutter [DONE]
 
 TODO
 ====
 - Authenticate
+- Notify Frontend when change happens in backend
+- Force to retry connection
 
 - Change icon for app.
 - Set minsize of desktop application.
 - Deployment
-
+  - Android
+  - MacOS
+  - Windows
 - Create a website to publish service.
+  - Automatic build
 
 - Redesign display photo interface.
 
-- Notify Frontend when change happens in backend
-- Force to retry connection
 
+- QR Code for real device
 
 ISSUE
 =====
@@ -158,3 +148,25 @@ Server Send Event [DONE]
 - Cancel does not work for mobile devices [DONE]
   - Update task [DONE]
   - Create task [DONE]
+
+- QR code to connect [IN_PROGRESS]
+  - Server-side [DONE]
+    - Find IP address on backend [DONE]
+    - Deliever IP info to flutter [DONE]
+    - Show qr code [DONE]
+    - Show server key in string [DONE]
+    - Switch IP from UI [DONE]
+    - Connect to backend by settings [DONE]
+      - Happy path [DONE]
+      - Check status of backend [DONE]
+  - iPhone
+    - Scan MOCK [DONE]
+  - Android [DONE]
+    - Scan basic func [DONE]
+    - Customiz QR Code scanner's UI [DONE]
+  - Share 
+    - Save scaned code to store [DONE]
+    - Manually edit server key [DONE]
+    - Connect to server [DONE]
+      - Happy path [DONE]
+      - If failed, ask for update the connection [DONE]

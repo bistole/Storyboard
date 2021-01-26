@@ -6,7 +6,7 @@
 
 FlutterWindow::FlutterWindow(RunLoop* run_loop,
                              const flutter::DartProject& project)
-    : run_loop_(run_loop), project_(project), menu_(nullptr), package_info_(nullptr) {}
+    : run_loop_(run_loop), project_(project), commands_(nullptr), menu_events_(nullptr), package_info_(nullptr) {}
 
 FlutterWindow::~FlutterWindow() {}
 
@@ -30,8 +30,11 @@ bool FlutterWindow::OnCreate() {
   package_info_ = new PackageInfo();
   package_info_->registerMessenger(flutter_controller_->engine()->messenger());
 
-  menu_ = new Menu();
-  menu_->registerMessager(flutter_controller_->engine()->messenger());
+  commands_ = new Commands();
+  commands_->registerMessenger(flutter_controller_->engine()->messenger());
+
+  menu_events_ = new MenuEvents();
+  menu_events_->registerMessenger(flutter_controller_->engine()->messenger());
 
   run_loop_->RegisterFlutterInstance(flutter_controller_->engine());
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
@@ -44,8 +47,14 @@ void FlutterWindow::OnDestroy() {
     flutter_controller_ = nullptr;
   }
 
-  if (menu_) {
-      menu_ = nullptr;
+  if (package_info_) {
+    package_info_ = nullptr;
+  }
+  if (menu_events_) {
+      menu_events_ = nullptr;
+  }
+  if (commands_) {
+    commands_ = nullptr;
   }
 
   Win32Window::OnDestroy();
