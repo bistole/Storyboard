@@ -3,6 +3,10 @@
 #include "struct_mapping/struct_mapping.h"
 
 #include <stdio.h>
+#include <iostream>
+#include <map>
+#include <sstream>
+#include <string>
 
 #include <flutter/standard_method_codec.h>
 
@@ -47,16 +51,36 @@ void Commands::methodChannelHandler(
     } else if (method_name.compare(CMD_GET_CURRENT_IP) == 0) {
         printf("CMD_GET_CURRENT_IP\n");
 		char *ip = "127.0.0.1";
-		result->Success(app);
+		std::string ipstr(ip);
+		result->Success(ipstr);
     } else if (method_name.compare(CMD_SET_CURRENT_IP) == 0) {
-		std::string& ip = call.arguments;
-		char *ipchar = ip.c_str();
-        printf("CMD_SET_CURRENT_IP: %s\n", ipchar);
+		const EncodableValue* value = call.arguments();
+		if (std::holds_alternative<std::string>(*value)) {
+			std::string ip = std::get<std::string>(*value);
+			const char* ipchar = ip.c_str();
+			printf("CMD_SET_CURRENT_IP: %s\n", ipchar);
+		}
     } else if (method_name.compare(CMD_GET_SERVER_IPS) == 0) {
-		char *ips = "{}";
-		std::map<std::string, std::string> map;
-		struct_mapping::map_json_to_struct(map, ips);
-		printf("CMD_GET_SERVER_IPS: %v\n", map);
+		printf("CMD_GET_SERVER_IPS\n");
+
+		struct IPS {
+			std::map<std::string, std::string> ips;
+		};
+
+		struct_mapping::reg(&IPS::ips, "ips");
+		IPS ipsStruct;
+
+		const char* ips = "{\"en0\":\"127.0.0.1\"}";
+		std::string ipstr = std::string("{\"ips\":") + ips + std::string("}");
+		std::cout << "CMD_GET_SERVER_IPS:" << ipstr << std::endl;
+		std::istringstream json_data(ipstr);
+
+		struct_mapping::map_json_to_struct(ipsStruct, json_data);
+		std::map<EncodableValue, EncodableValue> map;
+		for (auto [name, ip] : ipsStruct.ips) {
+			map[name] = ip;
+			std::cout << name << ":" << ip << std::endl;
+		}
 		result->Success(map);
 	}
 }
