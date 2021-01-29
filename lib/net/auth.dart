@@ -27,7 +27,7 @@ class NetAuth {
           return true;
         }
       }
-    } on TimeoutException catch (e) {
+    } on TimeoutException catch (_) {
       print("netPing timeout");
       store.dispatch(SettingServerReachableAction(reachable: false));
     } catch (e) {

@@ -8,15 +8,15 @@ using namespace flutter;
 
 class MenuEvents {
 public:
-	MenuEvents();
-	~MenuEvents();
+    MenuEvents();
+    ~MenuEvents();
 
-	void registerMessenger(BinaryMessenger* binary_messenger);
-	void importPhoto();
+    void registerMessenger(BinaryMessenger* binary_messenger);
+    void importPhoto();
 
 private:
-	BinaryMessenger* binary_messenger_;
-	MethodChannel<EncodableValue>* method_channel_;
+    BinaryMessenger* binary_messenger_;
+    MethodChannel<EncodableValue>* method_channel_;
 };
 
 #endif
