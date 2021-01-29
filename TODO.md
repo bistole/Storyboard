@@ -5,9 +5,9 @@ Compile as windows services
 - Install under windows [DONE]
 - Add methodChannel in windows' code [DONE]
 - Add open file
-- Change script to build backend in windows [IN_PROGRESS]
-- Compile backend.lib with app [IN_PROGRESS]
-- Start backend from windows code [IN_PROGRESS]
+- Change script to build backend in windows [DONE]
+- Compile backend.lib with app [DONE]
+- Start backend from windows code [DONE]
 - Use methodChannel to communicate with backend from flutter [DONE]
 
 TODO

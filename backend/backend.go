@@ -52,14 +52,20 @@ func Backend_Stop() {
 	fmt.Println("Goodbye, Backend Server")
 
 	// server
-	ss.Stop()
+	if ss != nil {
+		ss.Stop()
+		ss = nil
+	}
+
+	taskRepo = nil
+	photoRepo = nil
 
 	// database
-	db.Close()
+	if db != nil {
+		db.Close()
+		db = nil
+	}
 
-	ss = nil
-	taskRepo = nil
-	db = nil
 	c = nil
 	inited = false
 }

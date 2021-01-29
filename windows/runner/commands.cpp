@@ -1,7 +1,7 @@
 #include "config.h"
 #include "commands.h"
 #include "struct_mapping/struct_mapping.h"
-#include "libBackend.h"
+#include "backend/libBackend.h"
 
 #include <stdio.h>
 #include <iostream>

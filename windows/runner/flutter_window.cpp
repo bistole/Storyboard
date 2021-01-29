@@ -1,5 +1,4 @@
 #include "flutter_window.h"
-#include "libBackend.h"
 #include <optional>
 
 #include "flutter/generated_plugin_registrant.h"
@@ -14,8 +13,6 @@ bool FlutterWindow::OnCreate() {
   if (!Win32Window::OnCreate()) {
     return false;
   }
-
-  Backend_Start();
   
   RECT frame = GetClientArea();
 
@@ -58,8 +55,6 @@ void FlutterWindow::OnDestroy() {
   if (commands_) {
     commands_ = nullptr;
   }
-
-  Backend_Stop();
 
   Win32Window::OnDestroy();
 }

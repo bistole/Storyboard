@@ -3,6 +3,7 @@
 #include <windows.h>
 
 #include "flutter_window.h"
+#include "backend/libBackend.h"
 #include "run_loop.h"
 #include "utils.h"
 
@@ -35,7 +36,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   }
   window.SetQuitOnClose(true);
 
+  Backend_Start();
   run_loop.Run();
+
+  Backend_Stop();
 
   ::CoUninitialize();
   return EXIT_SUCCESS;
