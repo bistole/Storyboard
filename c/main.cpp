@@ -6,7 +6,7 @@ int main(int argc, char **argv) {
 
     while (true) {
         char c = getchar();
-        if (c == EOF) break;
+        if (c == 'q') break;
         putchar(c);
     }
 

@@ -1,6 +1,7 @@
 #include "config.h"
 #include "commands.h"
 #include "struct_mapping/struct_mapping.h"
+#include "backend/libBackend.h"
 
 #include <stdio.h>
 #include <iostream>
@@ -50,7 +51,8 @@ void Commands::methodChannelHandler(
         printf("CMD_OPEN_DIALOG\n");
     } else if (method_name.compare(CMD_GET_CURRENT_IP) == 0) {
         printf("CMD_GET_CURRENT_IP\n");
-		char *ip = "127.0.0.1";
+		char *ip = Backend_GetCurrentIP();
+		// char *ip = "127.0.0.1";
 		std::string ipstr(ip);
 		result->Success(ipstr);
     } else if (method_name.compare(CMD_SET_CURRENT_IP) == 0) {
@@ -58,7 +60,10 @@ void Commands::methodChannelHandler(
 		if (std::holds_alternative<std::string>(*value)) {
 			std::string ip = std::get<std::string>(*value);
 			const char* ipchar = ip.c_str();
-			printf("CMD_SET_CURRENT_IP: %s\n", ipchar);
+			char* ipcharDump = _strdup(ipchar);
+			printf("CMD_SET_CURRENT_IP: %s\n", ipcharDump);
+			Backend_SetCurrentIP(ipcharDump);
+			free(ipcharDump);
 		}
     } else if (method_name.compare(CMD_GET_SERVER_IPS) == 0) {
 		printf("CMD_GET_SERVER_IPS\n");
@@ -70,7 +75,8 @@ void Commands::methodChannelHandler(
 		struct_mapping::reg(&IPS::ips, "ips");
 		IPS ipsStruct;
 
-		const char* ips = "{\"en0\":\"127.0.0.1\"}";
+		// const char* ips = "{\"en0\":\"127.0.0.1\"}";
+		const char* ips = Backend_GetAvailableIPs();
 		std::string ipstr = std::string("{\"ips\":") + ips + std::string("}");
 		std::cout << "CMD_GET_SERVER_IPS:" << ipstr << std::endl;
 		std::istringstream json_data(ipstr);
