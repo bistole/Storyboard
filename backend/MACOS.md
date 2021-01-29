@@ -1,0 +1,1 @@
+run `build_macos.sh` to build and copy libBackend to `$PROJECT_HOME/macos`
