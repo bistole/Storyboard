@@ -17,6 +17,11 @@ private:
 	BinaryMessenger* binary_messenger_;
 	MethodChannel<EncodableValue>* method_channel_;
 
+	void setCurrentIP(std::string& ip);
+	std::string getCurrentIP();
+	std::map<EncodableValue, EncodableValue> Commands::getServerIPs();
+	std::vector<EncodableValue> Commands::openFileDialog(std::string& ttle, std::vector<std::string>& types);
+
     void methodChannelHandler(
 		const MethodCall<EncodableValue>& call,
 		std::unique_ptr<MethodResult<EncodableValue>>& result);
