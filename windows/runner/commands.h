@@ -14,8 +14,8 @@ public:
     void registerMessenger(BinaryMessenger* binary_messenger);
 
 private:
-	BinaryMessenger* binary_messenger_;
-	MethodChannel<EncodableValue>* method_channel_;
+    BinaryMessenger* binary_messenger_;
+    MethodChannel<EncodableValue>* method_channel_;
 
 	void setCurrentIP(std::string& ip);
 	std::string getCurrentIP();
@@ -23,8 +23,8 @@ private:
 	std::vector<EncodableValue> Commands::openFileDialog(std::string& ttle, std::vector<std::string>& types);
 
     void methodChannelHandler(
-		const MethodCall<EncodableValue>& call,
-		std::unique_ptr<MethodResult<EncodableValue>>& result);
+        const MethodCall<EncodableValue>& call,
+        std::unique_ptr<MethodResult<EncodableValue>>& result);
 };
 
 #endif

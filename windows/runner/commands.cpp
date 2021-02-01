@@ -23,25 +23,25 @@ Commands::Commands() : binary_messenger_(nullptr), method_channel_(nullptr) {}
 
 Commands::~Commands() {
     binary_messenger_ = nullptr;
-	if (method_channel_ != nullptr) {
-		delete method_channel_;
-		method_channel_ = nullptr;
-	}
+    if (method_channel_ != nullptr) {
+        delete method_channel_;
+        method_channel_ = nullptr;
+    }
 }
 
 void Commands::registerMessenger(BinaryMessenger* binary_messenger)
 {
-	std::string channel_name(PACKAGE_NAME);
+    std::string channel_name(PACKAGE_NAME);
     channel_name += COMMANDS;
 
-	const StandardMethodCodec& codec = StandardMethodCodec::GetInstance();
-	method_channel_ = new MethodChannel<EncodableValue>(binary_messenger, channel_name, &codec);
+    const StandardMethodCodec& codec = StandardMethodCodec::GetInstance();
+    method_channel_ = new MethodChannel<EncodableValue>(binary_messenger, channel_name, &codec);
 
-	method_channel_->SetMethodCallHandler([this](
-		const MethodCall<EncodableValue>& call,
-		std::unique_ptr<MethodResult<EncodableValue>> result) {
-		this->methodChannelHandler(call, result);
-	});
+    method_channel_->SetMethodCallHandler([this](
+        const MethodCall<EncodableValue>& call,
+        std::unique_ptr<MethodResult<EncodableValue>> result) {
+        this->methodChannelHandler(call, result);
+    });
 }
 
 std::vector<EncodableValue> Commands::openFileDialog(std::string& title, std::vector<std::string>& types) {
@@ -159,11 +159,11 @@ std::map<EncodableValue, EncodableValue> Commands::getServerIPs() {
 }
 
 void Commands::methodChannelHandler(
-	const MethodCall<EncodableValue>& call,
-	std::unique_ptr<MethodResult<EncodableValue>>& result)
+    const MethodCall<EncodableValue>& call,
+    std::unique_ptr<MethodResult<EncodableValue>>& result)
 {
     const std::string& method_name = call.method_name();
-	if (method_name.compare(CMD_OPEN_DIALOG) == 0) {
+    if (method_name.compare(CMD_OPEN_DIALOG) == 0) {
         printf("CMD_OPEN_DIALOG\n");
 		const EncodableValue* value = call.arguments();
 		if (std::holds_alternative<EncodableMap>(*value)) {
