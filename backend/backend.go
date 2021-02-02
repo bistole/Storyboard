@@ -49,8 +49,7 @@ func Backend_Start() {
 
 //export Backend_Stop
 func Backend_Stop() {
-	fmt.Println("Goodbye, Backend Server")
-
+	fmt.Println("Closing Backend Service")
 	// server
 	if ss != nil {
 		ss.Stop()
@@ -68,6 +67,7 @@ func Backend_Stop() {
 
 	c = nil
 	inited = false
+	fmt.Println("Goodbye, Backend Server")
 }
 
 //export Backend_GetCurrentIP

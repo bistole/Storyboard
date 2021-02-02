@@ -14,12 +14,13 @@ import (
 
 // RESTServer is wrapper for http server and wait group
 type RESTServer struct {
-	Config    interfaces.ConfigService
-	ServerIP  string
-	Server    *http.Server
-	Wg        *sync.WaitGroup
-	TaskRepo  interfaces.TaskRepo
-	PhotoRepo interfaces.PhotoRepo
+	Config      interfaces.ConfigService
+	ServerIP    string
+	Server      *http.Server
+	Wg          *sync.WaitGroup
+	TaskRepo    interfaces.TaskRepo
+	PhotoRepo   interfaces.PhotoRepo
+	EventServer eventServer
 }
 
 // NewRESTServer create REST server
@@ -55,10 +56,23 @@ func (rs RESTServer) route() *mux.Router {
 // Start to build RESTful API Server
 func (rs *RESTServer) Start() {
 	rs.Wg.Add(1)
+	var route = rs.route()
+
+	// add event server to standard route
+	rs.EventServer = eventServer{
+		make(map[chan []byte]bool),
+		make(chan chan []byte),
+		make(chan chan []byte),
+		make(chan []byte),
+		make(chan bool),
+		make(chan bool),
+	}
+	rs.EventServer.Start(route)
+
 	ip := rs.GetCurrentIP()
 	rs.Server = &http.Server{
 		Addr:    ip + ":3000",
-		Handler: rs.route(),
+		Handler: route,
 	}
 
 	go func() {
@@ -81,6 +95,9 @@ func (rs *RESTServer) Stop() {
 		5*time.Second,
 	)
 	defer cancelFunc()
+
+	// stop event server
+	rs.EventServer.End()
 
 	err := rs.Server.Shutdown(ctx)
 	if err != nil {
