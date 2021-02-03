@@ -12,6 +12,7 @@ import 'package:storyboard/net/auth.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/photos.dart';
 import 'package:storyboard/net/queue.dart';
+import 'package:storyboard/net/sse.dart';
 import 'package:storyboard/net/tasks.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
@@ -31,6 +32,7 @@ class Factory {
   NetAuth netAuth;
   NetPhotos netPhotos;
   NetTasks netTasks;
+  NetSSE netSSE;
   NetQueue netQueue;
 
   ChannelManager channelManager;
@@ -48,6 +50,7 @@ class Factory {
     netAuth = NetAuth();
     netPhotos = NetPhotos();
     netTasks = NetTasks();
+    netSSE = NetSSE();
     netQueue = NetQueue(60);
 
     channelManager = ChannelManager();
@@ -68,6 +71,8 @@ class Factory {
     netTasks.setHttpClient(http.Client());
     netTasks.setActTasks(actTasks);
     netTasks.registerToQueue(netQueue);
+
+    netSSE.setGetHttpClient(() => http.Client());
 
     netQueue.registerPeriodicTrigger(actTasks.actFetchTasks);
     netQueue.registerPeriodicTrigger(actPhotos.actFetchPhotos);
@@ -129,6 +134,9 @@ class Factory {
     } else {
       checkServerKeyOnMobile();
     }
+
+    // try to sse backend
+    netSSE.connect(store);
   }
 }
 

@@ -12,7 +12,7 @@ import 'package:storyboard/redux/models/queue_item.dart';
 import 'package:storyboard/redux/models/task.dart';
 
 class NetTasks {
-  // reqiired
+  // required
   http.Client _httpClient;
   void setHttpClient(http.Client httpClient) {
     _httpClient = httpClient;

@@ -1,20 +1,19 @@
 NOW
 ===
 
-Compile as windows services
-- Install under windows [DONE]
-- Add methodChannel in windows' code [DONE]
-- Add open file
-- Change script to build backend in windows [DONE]
-- Compile backend.lib with app [DONE]
-- Start backend from windows code [DONE]
-- Use methodChannel to communicate with backend from flutter [DONE]
+- Notify Frontend when change happens in backend
+  - Server side events [https://github.com/kljensen/golang-html5-sse-example/blob/master/server.go]
+    - Backend [IN_PROGRESS]
+      - Implement [DONE]
+      - Notify via SSE
+    - Frontend [IN_PROGRESS]
+      - Implement [DONE]
+      - Trigger to fetch photo/task list
+
+- Authenticate
 
 TODO
 ====
-- Authenticate
-- Notify Frontend when change happens in backend
-- Force to retry connection
 
 - Change icon for app.
 - Set minsize of desktop application.
@@ -170,3 +169,12 @@ Server Send Event [DONE]
     - Connect to server [DONE]
       - Happy path [DONE]
       - If failed, ask for update the connection [DONE]
+
+Compile as windows services [DONE]
+- Install under windows [DONE]
+- Add methodChannel in windows' code [DONE]
+- Add open file [DONE]
+- Change script to build backend in windows [DONE]
+- Compile backend.lib with app [DONE]
+- Start backend from windows code [DONE]
+- Use methodChannel to communicate with backend from flutter [DONE]
