@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:storyboard/net/config.dart';
-import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/views/common/app_icons.dart';
 import 'package:storyboard/views/config/config.dart';
@@ -159,12 +158,7 @@ class _ServerPickerState extends State<ServerPicker> {
     return StoreConnector<AppState, ReduxActions>(converter: (store) {
       return ReduxActions(
         changeServerKey: (String serverKey) {
-          store.onChange
-              .any((state) => state.setting.serverKey == serverKey)
-              .then((_) => {getViewResource().netAuth.netPing(store)});
-          store.dispatch(
-            SettingServerKeyAction(serverKey: serverKey),
-          );
+          getViewResource().actServer.actChangeServerKey(store, serverKey);
         },
       );
     }, builder: (context, ReduxActions redux) {

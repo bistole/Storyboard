@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:redux/redux.dart';
 
 import 'package:storyboard/actions/photos.dart';
+import 'package:storyboard/actions/server.dart';
 import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/channel/menu.dart';
@@ -26,6 +27,7 @@ const CHANNEL_COMMANDS = '/COMMANDS';
 class Factory {
   DeviceManager deviceManager;
 
+  ActServer actServer;
   ActPhotos actPhotos;
   ActTasks actTasks;
 
@@ -44,6 +46,7 @@ class Factory {
 
   Factory() {
     deviceManager = DeviceManager();
+    actServer = ActServer();
     actPhotos = ActPhotos();
     actTasks = ActTasks();
 
@@ -55,6 +58,8 @@ class Factory {
 
     channelManager = ChannelManager();
     storage = Storage();
+
+    actServer.setNetSSE(netSSE);
 
     actPhotos.setNetQueue(netQueue);
     actPhotos.setStorage(storage);
@@ -74,14 +79,14 @@ class Factory {
 
     netSSE.setGetHttpClient(() => http.Client());
 
-    netQueue.registerPeriodicTrigger(actTasks.actFetchTasks);
-    netQueue.registerPeriodicTrigger(actPhotos.actFetchPhotos);
+    netSSE.registerUpdateFunc(notifyTypeTask, actTasks.actFetchTasks);
+    netSSE.registerUpdateFunc(notifyTypePhoto, actPhotos.actFetchPhotos);
 
     getViewResource().deviceManager = deviceManager;
     getViewResource().storage = storage;
     getViewResource().actPhotos = actPhotos;
     getViewResource().actTasks = actTasks;
-    getViewResource().netAuth = netAuth;
+    getViewResource().actServer = actServer;
   }
 
   Future<MethodChannel> createChannelByName(String name) =>
@@ -94,20 +99,20 @@ class Factory {
         // only first time when serverKey is updated
         store.onChange
             .any((state) => state.setting.serverKey == newServeKey)
-            .then((_) => netAuth.netPing(store));
+            .then((_) => netSSE.connect(store));
 
         // backend ip is changed, lets change frontend ip too
         store.dispatch(SettingServerKeyAction(serverKey: newServeKey));
       } else {
         // local ip does not changed, check reachable only
-        netAuth.netPing(store);
+        netSSE.connect(store);
       }
     });
   }
 
   void checkServerKeyOnMobile() {
     if (store.state.setting.serverKey != null) {
-      netAuth.netPing(store);
+      netSSE.connect(store);
     }
   }
 
@@ -122,6 +127,7 @@ class Factory {
     MethodChannel mcCommand = await createChannelByName(CHANNEL_COMMANDS);
     command = CommandChannel(mcCommand);
     command.setStore(store);
+    command.setActServer(actServer);
 
     MethodChannel mcMenu = await createChannelByName(CHANNEL_MENU_EVENTS);
     menu = MenuChannel(mcMenu);
@@ -134,9 +140,6 @@ class Factory {
     } else {
       checkServerKeyOnMobile();
     }
-
-    // try to sse backend
-    netSSE.connect(store);
   }
 }
 

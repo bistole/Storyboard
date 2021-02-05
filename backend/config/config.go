@@ -2,8 +2,8 @@ package config
 
 import (
 	"database/sql"
-	"fmt"
 	"io/ioutil"
+	"log"
 	"path"
 
 	"github.com/adrg/xdg"
@@ -65,10 +65,10 @@ func (c Config) LoadFromConfigFile() {
 // SaveToConfigFile save config to config.yaml file
 func (c Config) SaveToConfigFile() {
 	filename := path.Join(xdg.DataHome, vendorName, appName, "config.yaml")
-	fmt.Println("config file: " + filename)
+	log.Println("config file: " + filename)
 	data, err := yaml.Marshal(c.props)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 	ioutil.WriteFile(filename, data, 0777)

@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"storyboard/backend/interfaces"
@@ -56,18 +55,14 @@ func (rs RESTServer) route() *mux.Router {
 // Start to build RESTful API Server
 func (rs *RESTServer) Start() {
 	rs.Wg.Add(1)
-	var route = rs.route()
 
+	rs.EventServer = *createEventServer()
+
+	var route = rs.route()
 	// add event server to standard route
-	rs.EventServer = eventServer{
-		make(map[chan []byte]bool),
-		make(chan chan []byte),
-		make(chan chan []byte),
-		make(chan []byte),
-		make(chan bool),
-		make(chan bool),
-	}
-	rs.EventServer.Start(route)
+	rs.EventServer.route(route)
+	go rs.EventServer.MainLoop()
+	go rs.EventServer.KeepAlive()
 
 	ip := rs.GetCurrentIP()
 	rs.Server = &http.Server{
@@ -81,7 +76,7 @@ func (rs *RESTServer) Start() {
 			rs.Wg.Done()
 		}()
 
-		fmt.Println("Started: ", ip)
+		log.Println("Started: ", ip)
 		if err := rs.Server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("ListenAndServe(): %v", err)
 		}
@@ -106,7 +101,7 @@ func (rs *RESTServer) Stop() {
 
 	rs.Wg.Wait()
 
-	fmt.Println("Stopped")
+	log.Println("Stopped")
 }
 
 // GetCurrentIP set current ip

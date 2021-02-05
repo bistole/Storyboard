@@ -10,6 +10,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+const clientNobody = "NOBODY"
+
 // Ping to check server status
 func (rs RESTServer) Ping(w http.ResponseWriter, r *http.Request) {
 	type Succ struct {
@@ -21,26 +23,105 @@ func (rs RESTServer) Ping(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
+const keepAliveInterval = time.Second * 60
+
+const actionNotify string = "notify"
+const actionKeepalive string = "alive"
+const actionWelcome string = "welcome"
+const actionError string = "error"
+const actionClose string = "close"
+
+type serverEventData struct {
+	Action string            `json:"action"`
+	Params map[string]string `json:"params"`
+	TS     int64             `json:"ts"`
+}
+
+type serverEvent struct {
+	clientID string
+	data     serverEventData
+}
+
+type eventServerClient struct {
+	channel  chan []byte
+	clientID string
+}
+
 type eventServer struct {
-	clients       map[chan []byte]bool
-	newClient     chan chan []byte
-	closingClient chan chan []byte
-	message       chan []byte
+	clients       map[string]chan []byte
+	newClient     chan eventServerClient
+	closingClient chan eventServerClient
+	message       chan serverEvent
 	kldone        chan bool
 	done          chan bool
 }
 
-type eventServerPack struct {
-	Action string            `json:"action"`
-	Params map[string]string `json:"params"`
-	TS     int64             `json:"ts"`
+func createEventServer() *eventServer {
+	return &eventServer{
+		make(map[string]chan []byte),
+		make(chan eventServerClient),
+		make(chan eventServerClient),
+		make(chan serverEvent),
+		make(chan bool),
+		make(chan bool),
+	}
+}
+
+func (es *eventServer) sendEvent(clientID string, action string, params *map[string]string) bool {
+	blankParams := map[string]string{}
+
+	pack := serverEvent{
+		clientID: clientID,
+		data: serverEventData{
+			Action: action,
+			TS:     time.Now().Unix(),
+		},
+	}
+	if params != nil {
+		pack.data.Params = *params
+	} else {
+		pack.data.Params = blankParams
+	}
+
+	if es.message != nil {
+		es.message <- pack
+		return true
+	}
+	return false
+}
+
+func (es *eventServer) sendWelcome(channel chan []byte) {
+	data := serverEventData{
+		Action: actionWelcome,
+		TS:     time.Now().Unix(),
+	}
+	msg, err := json.Marshal(data)
+	if err == nil {
+		channel <- msg
+		log.Println("ES Welcome: Sent")
+	}
 }
 
 // EventClient is server-side event handle
 func (es *eventServer) Handler(w http.ResponseWriter, r *http.Request) {
 	f, ok := w.(http.Flusher)
 	if !ok {
-		http.Error(w, "HTTP: Streaming unsupported!", http.StatusInternalServerError)
+		http.Error(w, "ES Handler: Streaming unsupported!", http.StatusInternalServerError)
+		return
+	}
+
+	clientID := r.Header.Get(headerNameClientID)
+	if clientID == "" {
+		log.Println("ES Handler: Missing client-id")
+		data := serverEventData{
+			Action: actionError,
+			Params: map[string]string{
+				"message": "header " + headerNameClientID + " is missing",
+			},
+			TS: time.Now().Unix(),
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(data)
 		return
 	}
 
@@ -50,15 +131,20 @@ func (es *eventServer) Handler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Transfer-Encoding", "chunked")
 
 	messageChan := make(chan []byte)
-	log.Println("ES HTTP: New client connected.")
-	es.newClient <- messageChan
+	clientChan := eventServerClient{
+		channel:  messageChan,
+		clientID: clientID,
+	}
+
+	log.Println("ES Handler: New client connected.")
+	es.newClient <- clientChan
 
 	// get notified when client is closed.
 	notify := w.(http.CloseNotifier).CloseNotify()
 	go func() {
 		<-notify
-		es.closingClient <- messageChan
-		log.Println("ES HTTP: Client disconnected.")
+		es.closingClient <- clientChan
+		log.Println("ES Handler: Client disconnected.")
 	}()
 
 	for {
@@ -69,69 +155,71 @@ func (es *eventServer) Handler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "%s\n\n", msg)
 		f.Flush()
 	}
-	log.Println("ES HTTP: Server closed client connection.")
+	log.Println("ES Handler: Server closed client connection.")
 }
 
-// EventServerStart start server side event
-func (es *eventServer) Start(r *mux.Router) {
+func (es *eventServer) route(r *mux.Router) {
 	r.HandleFunc("/events", es.Handler).Methods("GET")
+}
 
-	// keepalive
+func (es *eventServer) KeepAlive() {
+	log.Println("ES Keep-alive is on.")
+	var live = true
 	go func() {
-		var live = true
-		go func() {
-			<-es.kldone
-			live = false
-		}()
-
-		for live {
-			Pack := eventServerPack{
-				Action: "alive",
-				Params: make(map[string]string),
-				TS:     time.Now().Unix(),
-			}
-			msg, err := json.Marshal(Pack)
-			if err != nil {
-				continue
-			}
-
-			if live {
-				log.Println("ES ALIVE: Sent")
-				es.message <- msg
-				time.Sleep(time.Second * 5)
-			}
-		}
-		log.Println("ES ALIVE: End")
+		<-es.kldone
+		live = false
 	}()
 
-	// main loop
+	for live {
+		ret := es.sendEvent(clientNobody, actionKeepalive, nil)
+		if ret {
+			log.Println("ES Keep-alive: Sent")
+		}
+		time.Sleep(keepAliveInterval)
+	}
+	log.Println("ES Keep-alive is closed")
+}
+
+// main loop
+func (es *eventServer) MainLoop() {
 	go func() {
 		var alive = true
 		for alive {
 			select {
 			case s := <-es.newClient:
 				{
-					es.clients[s] = true
-					log.Println("ES SERVER: Client connected.")
+					es.clients[s.clientID] = s.channel
+					log.Println("ES Main: Client connected.")
+					es.sendWelcome(s.channel)
 				}
 			case s := <-es.closingClient:
 				{
-					delete(es.clients, s)
-					close(s)
-					log.Println("ES SERVER: Client disconnected.")
+					delete(es.clients, s.clientID)
+					close(s.channel)
+					log.Println("ES Main: Client disconnected.")
 				}
-			case msg, open := <-es.message:
+			case pack, open := <-es.message:
 				{
 					if open {
-						for s := range es.clients {
-							s <- msg
+						var cnt = 0
+						msg, err := json.Marshal(pack.data)
+						if err == nil {
+							for clientID, channel := range es.clients {
+								// TODO: check the client id one by one
+								if pack.clientID != clientID {
+									channel <- msg
+									cnt++
+								}
+							}
 						}
-						log.Printf("ES SERVER: Broadcast %d clients\n", len(es.clients))
+						log.Printf("ES Main: Broadcast %d/%d clients\n", cnt, len(es.clients))
 					} else {
-						log.Println("ES SERVER: Server is closing, notify clients...")
-						for s := range es.clients {
-							close(s)
+						log.Println("ES Main: Server is closing, notify clients...")
+						for clientID, channel := range es.clients {
+							close(channel)
+							delete(es.clients, clientID)
 						}
+						es.message = nil
 						es.done <- true
 						// out of loop
 						alive = false
@@ -139,40 +227,30 @@ func (es *eventServer) Start(r *mux.Router) {
 				}
 			}
 		}
-		log.Println("ES SERVER: End")
+		log.Println("ES Main: End")
 	}()
 }
 
-func (es *eventServer) Notify(action string, params map[string]string) {
-	Pack := eventServerPack{
-		Action: action,
-		Params: params,
-		TS:     time.Now().Unix(),
+func (es *eventServer) Notify(clientID string, params *map[string]string) {
+	ret := es.sendEvent(clientID, actionNotify, params)
+	if ret != false {
+		log.Println("ES Notify: Sent")
 	}
-	msg, err := json.Marshal(Pack)
-	if err != nil {
-		return
-	}
-	log.Println("ES NOTIFY: Sent")
-	es.message <- msg
 }
 
 func (es *eventServer) End() {
-	log.Printf("ES END: Start")
-	Pack := eventServerPack{
-		Action: "closed",
-		Params: make(map[string]string),
-		TS:     time.Now().Unix(),
-	}
-	msg, err := json.Marshal(Pack)
-	if err != nil {
-		return
-	}
-	log.Printf("ES END: Sent")
-	es.message <- msg
-	log.Println("ES END: Close")
+	log.Printf("Shutting down event server...")
+
+	// stop keepalive
+	es.kldone <- true
+
+	// send all client to close
+	es.sendEvent(clientNobody, actionClose, nil)
+
+	// close message
 	close(es.message)
 
+	// wait until dispatcher is done
 	<-es.done
-	log.Println("ES END: End")
+	log.Println("Shutting down event server is done")
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:storyboard/net/config.dart';
-import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/setting.dart';
 import 'package:storyboard/views/common/app_icons.dart';
@@ -249,14 +248,7 @@ class _ClientWidgetState extends State<ClientWidget> {
           serverKey: store.state.setting.serverKey,
           serverReachable: store.state.setting.serverReachable,
           changeServerKey: (String serverKey) {
-            if (serverKey != store.state.setting.serverKey) {
-              store.onChange
-                  .firstWhere((store) => store.setting.serverKey == serverKey)
-                  .then((_) => getViewResource().netAuth.netPing(store));
-              store.dispatch(
-                SettingServerKeyAction(serverKey: serverKey),
-              );
-            }
+            getViewResource().actServer.actChangeServerKey(store, serverKey);
           },
         );
       },

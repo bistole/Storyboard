@@ -1,19 +1,42 @@
 NOW
 ===
 
-- Notify Frontend when change happens in backend
+- Notify Frontend when change happens in backend [DONE]
   - Server side events [https://github.com/kljensen/golang-html5-sse-example/blob/master/server.go]
-    - Backend [IN_PROGRESS]
+    - Backend [DONE]
       - Implement [DONE]
-      - Notify via SSE
-    - Frontend [IN_PROGRESS]
+      - Notify via SSE [DONE]
+        - Connect with clientID. [DONE]
+        - Only send notify to client with different clientID. [DONE]
+        - Tell client which resource is updated. [DONE]
+    - Frontend [DONE]
       - Implement [DONE]
-      - Trigger to fetch photo/task list
-
-- Authenticate
+      - Integrate with frontend [DONE]
+        - ServerKey to SSE Client [DONE]
+          - Only check when ServerKey changed or launch the app [DONE]
+          - Launch SSE Client if ServerKey is valid [DONE]
+            - Otherwise, show unknown [DONE]
+          - If ServerKey is changed [DONE]
+            - Stop current SSE Client if is connected [DONE]
+            - Otherwise do nothing since it will try to reconnect [DONE]
+        - SSE Client is running [DONE]
+          - If not connected or connected wrong one [DONE]
+            - Show unknown or wrong server [DONE]
+            - Retry loop [DONE]
+          - If connected [DONE]
+            - Show available [DONE]
+            - Trigger to fetch photo/task right way [DONE]
+          - If disconnected [DONE]
+            - Show not available [DONE]
+            - Enter retry loop [DONE]
+        - SSE Client receive updates info [DONE]
+          - Trigger to fetch photo/task [DONE]
+      - Add Client ID [DONE]
+  - Test on mobile devices together
 
 TODO
 ====
+- Authenticate
 
 - Change icon for app.
 - Set minsize of desktop application.

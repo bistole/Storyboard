@@ -2,12 +2,18 @@ package server
 
 import (
 	"fmt"
+	"log"
 	"net"
 	"net/http"
 	"regexp"
 	"strconv"
 	"time"
 )
+
+const headerNameClientID = "client-id"
+
+const notifyTypePhoto = "photo"
+const notifyTypeTask = "task"
 
 // GetOutboundIP get most possible ip address to bind
 func GetOutboundIP() string {
@@ -18,7 +24,7 @@ func GetOutboundIP() string {
 	defer conn.Close()
 
 	localIP := conn.LocalAddr().(*net.UDPAddr).IP.String()
-	fmt.Println("Outbound IP: " + localIP)
+	log.Println("Outbound IP: " + localIP)
 	return localIP
 }
 
@@ -53,7 +59,7 @@ func GetServerIPs() map[string]string {
 			var v4 = ip.To4()
 			if v4 != nil {
 				results[i.Name] = v4.String()
-				fmt.Println("Found IP: " + i.Name + " -> " + v4.String())
+				log.Println("Found IP: " + i.Name + " -> " + v4.String())
 			}
 		}
 	}

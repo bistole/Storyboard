@@ -1,13 +1,12 @@
 import 'package:storyboard/actions/photos.dart';
+import 'package:storyboard/actions/server.dart';
 import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/configs/device_manager.dart';
-import 'package:storyboard/net/auth.dart';
 import 'package:storyboard/storage/storage.dart';
 
 class ViewsResource {
-  NetAuth netAuth;
-
+  ActServer actServer;
   ActPhotos actPhotos;
   ActTasks actTasks;
 

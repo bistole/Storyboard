@@ -54,8 +54,10 @@ class NetTasks {
       if (prefix == null) return false;
 
       int ts = (store.state.photoRepo.lastTS + 1);
-      final response =
-          await _httpClient.get(prefix + "/tasks?ts=$ts&c=$countPerFetch");
+      final response = await _httpClient.get(
+        prefix + "/tasks?ts=$ts&c=$countPerFetch",
+        headers: {headerNameClientID: getClientID(store)},
+      );
 
       if (response.statusCode == 200) {
         Map<String, dynamic> object = jsonDecode(response.body);
@@ -86,7 +88,10 @@ class NetTasks {
       if (task == null) return true;
 
       final response = await _httpClient.post(prefix + "/tasks",
-          headers: {'Content-Type': 'application/json'},
+          headers: {
+            'Content-Type': 'application/json',
+            headerNameClientID: getClientID(store)
+          },
           body: jsonEncode(task.toJson()),
           encoding: Encoding.getByName("utf-8"));
 
@@ -116,7 +121,10 @@ class NetTasks {
 
       final body = jsonEncode(task.toJson());
       final response = await _httpClient.post(prefix + "/tasks/" + task.uuid,
-          headers: {'Content-Type': 'application/json'},
+          headers: {
+            'Content-Type': 'application/json',
+            headerNameClientID: getClientID(store)
+          },
           body: body,
           encoding: Encoding.getByName("utf-8"));
 
@@ -146,6 +154,7 @@ class NetTasks {
 
       final responseStream = await _httpClient.send(
         http.Request("DELETE", Uri.parse(prefix + "/tasks/" + task.uuid))
+          ..headers[headerNameClientID] = getClientID(store)
           ..body = jsonEncode({"updatedAt": task.updatedAt}),
       );
 

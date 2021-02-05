@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:redux/redux.dart';
+import 'package:storyboard/actions/server.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
@@ -17,6 +18,11 @@ class CommandChannel {
   Store<AppState> _store;
   setStore(Store<AppState> store) {
     _store = store;
+  }
+
+  ActServer _actServer;
+  setActServer(ActServer actServer) {
+    _actServer = actServer;
   }
 
   // required
@@ -81,7 +87,7 @@ class CommandChannel {
       if (decodeServerKey(code) == null) {
         throw new Exception("invalid");
       }
-      _store.dispatch(SettingServerKeyAction(serverKey: code));
+      _actServer.actChangeServerKey(_store, code);
       return true;
     }
     return false;
