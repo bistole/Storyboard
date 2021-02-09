@@ -1,39 +1,6 @@
 NOW
 ===
 
-- Notify Frontend when change happens in backend [DONE]
-  - Server side events [https://github.com/kljensen/golang-html5-sse-example/blob/master/server.go]
-    - Backend [DONE]
-      - Implement [DONE]
-      - Notify via SSE [DONE]
-        - Connect with clientID. [DONE]
-        - Only send notify to client with different clientID. [DONE]
-        - Tell client which resource is updated. [DONE]
-    - Frontend [DONE]
-      - Implement [DONE]
-      - Integrate with frontend [DONE]
-        - ServerKey to SSE Client [DONE]
-          - Only check when ServerKey changed or launch the app [DONE]
-          - Launch SSE Client if ServerKey is valid [DONE]
-            - Otherwise, show unknown [DONE]
-          - If ServerKey is changed [DONE]
-            - Stop current SSE Client if is connected [DONE]
-            - Otherwise do nothing since it will try to reconnect [DONE]
-        - SSE Client is running [DONE]
-          - If not connected or connected wrong one [DONE]
-            - Show unknown or wrong server [DONE]
-            - Retry loop [DONE]
-          - If connected [DONE]
-            - Show available [DONE]
-            - Trigger to fetch photo/task right way [DONE]
-          - If disconnected [DONE]
-            - Show not available [DONE]
-            - Enter retry loop [DONE]
-        - SSE Client receive updates info [DONE]
-          - Trigger to fetch photo/task [DONE]
-      - Add Client ID [DONE]
-  - Test on mobile devices together
-
 TODO
 ====
 - Authenticate
@@ -48,9 +15,9 @@ TODO
   - Automatic build
 
 - Redesign display photo interface.
+  - When create - allow rotate photo
+  - When update - allow rotate photo
 
-
-- QR Code for real device
 
 ISSUE
 =====
@@ -58,6 +25,7 @@ ISSUE
 - Allow change PORT of backend service
 - Take photo need not confirm again.
 - Zoom in/out for detail photo in mobile. [?]
+- Space does not function well when create/update task
 
 DONE
 ====
@@ -201,3 +169,46 @@ Compile as windows services [DONE]
 - Compile backend.lib with app [DONE]
 - Start backend from windows code [DONE]
 - Use methodChannel to communicate with backend from flutter [DONE]
+
+- Notify Frontend when change happens in backend [DONE]
+  - Server side events [https://github.com/kljensen/golang-html5-sse-example/blob/master/server.go]
+    - Backend [DONE]
+      - Implement [DONE]
+      - Notify via SSE [DONE]
+        - Connect with clientID. [DONE]
+        - Only send notify to client with different clientID. [DONE]
+        - Tell client which resource is updated. [DONE]
+    - Frontend [DONE]
+      - Implement [DONE]
+      - Integrate with frontend [DONE]
+        - ServerKey to SSE Client [DONE]
+          - Only check when ServerKey changed or launch the app [DONE]
+          - Launch SSE Client if ServerKey is valid [DONE]
+            - Otherwise, show unknown [DONE]
+          - If ServerKey is changed [DONE]
+            - Stop current SSE Client if is connected [DONE]
+            - Otherwise do nothing since it will try to reconnect [DONE]
+        - SSE Client is running [DONE]
+          - If not connected or connected wrong one [DONE]
+            - Show unknown or wrong server [DONE]
+            - Retry loop [DONE]
+          - If connected [DONE]
+            - Show available [DONE]
+            - Trigger to fetch photo/task right way [DONE]
+          - If disconnected [DONE]
+            - Show not available [DONE]
+            - Enter retry loop [DONE]
+        - SSE Client receive updates info [DONE]
+          - Trigger to fetch photo/task [DONE]
+      - Add Client ID [DONE]
+  - Test on mobile devices together
+
+
+- QR Code for real device
+  - Fix bug for upload failed in iphone device [DONE]
+  - Add switch when take photo with iphone device. [DONE]
+  - Make confirm/cancel button smaller [DONE]
+  - Make QR code work [DONE]
+  - Fix orientation of photo when take with iphone device. [DONE]
+  - Fix mirrow issue [DONE]
+  - Failed to scan QR in android [DONE]

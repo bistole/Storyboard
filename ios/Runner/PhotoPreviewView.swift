@@ -55,14 +55,14 @@ class PhotoPreviewView : UIView {
         
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
         cancelButton.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -15).isActive = true;
-        cancelButton.widthAnchor.constraint(equalToConstant: 80).isActive = true;
-        cancelButton.heightAnchor.constraint(equalToConstant: 80).isActive = true;
+        cancelButton.widthAnchor.constraint(equalToConstant: 50).isActive = true;
+        cancelButton.heightAnchor.constraint(equalToConstant: 50).isActive = true;
         cancelButton.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor, constant: 90).isActive = true
 
         savePhotoButton.translatesAutoresizingMaskIntoConstraints = false
         savePhotoButton.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -15).isActive = true;
-        savePhotoButton.widthAnchor.constraint(equalToConstant: 80).isActive = true;
-        savePhotoButton.heightAnchor.constraint(equalToConstant: 80).isActive = true;
+        savePhotoButton.widthAnchor.constraint(equalToConstant: 50).isActive = true;
+        savePhotoButton.heightAnchor.constraint(equalToConstant: 50).isActive = true;
         savePhotoButton.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor, constant: -90).isActive = true
     }
     

@@ -22,6 +22,8 @@ class RealCameraController : NSObject, CameraController {
     
     private var qrOutput : AVCaptureMetadataOutput?
     private var qrCaptureCompletionBlock: ((String?, Error?) -> Void)?
+    
+    private var imageOrientation : UIImage.Orientation?
 
     func prepare(for type: CameraControllerTarget, completionHandler: @escaping (Error?) -> Void) {
         func createCaptureSession() {
@@ -83,9 +85,11 @@ class RealCameraController : NSObject, CameraController {
             
             self.photoOutput = AVCapturePhotoOutput()
             self.photoOutput!.setPreparedPhotoSettingsArray(
-                [AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.jpeg])],
+                [AVCapturePhotoSettings(
+                    format: [AVVideoCodecKey: AVVideoCodecType.jpeg])],
                 completionHandler: nil)
-            
+            self.photoOutput!.maxPhotoQualityPrioritization = .quality;
+            self.photoOutput!.isHighResolutionCaptureEnabled = true;
             if captureSession.canAddOutput(self.photoOutput!) {
                 captureSession.addOutput(self.photoOutput!)
             }
@@ -145,13 +149,21 @@ class RealCameraController : NSObject, CameraController {
             print("cameraLayer: \(photoOutputLayer)")
             photoOutputLayer.frame = view.frame
             photoOutputLayer.videoGravity = .resizeAspectFill
-            view.layer.addSublayer(photoOutputLayer)
+            if let conn = photoOutputLayer.connection, conn.isVideoOrientationSupported {
+                let ori = UIApplication.shared.windows.first(where: { $0.isKeyWindow })?.windowScene?.interfaceOrientation
+                conn.videoOrientation = self.interfaceOrientationToVideoOrientation(orientation: ori)
+            }
+            view.layer.insertSublayer(photoOutputLayer, at: 0)
         }
     }
     
     func layoutPreview(on view: UIView) {
         if let photoOutputLayer = self.photoOutputLayer {
             photoOutputLayer.frame = view.frame
+            if let conn = photoOutputLayer.connection, conn.isVideoOrientationSupported {
+                let ori = UIApplication.shared.windows.first(where: { $0.isKeyWindow })?.windowScene?.interfaceOrientation
+                conn.videoOrientation = self.interfaceOrientationToVideoOrientation(orientation: ori)
+            }
         }
     }
     
@@ -234,14 +246,12 @@ class RealCameraController : NSObject, CameraController {
         
         captureSession.beginConfiguration()
         
-        switch cameraPosition {
+        switch currentPosition {
         case .front:
             try switchToRearCamera()
             break;
         case .rear:
             try switchToFrontCamera()
-            break;
-        default:
             break;
         }
         
@@ -257,10 +267,24 @@ extension RealCameraController : AVCapturePhotoCaptureDelegate {
         }
         
         if let data = photo.fileDataRepresentation(), let image = UIImage(data: data) {
-            self.photoCaptureCompletionBlock?(image, nil)
-        } else {
-            self.photoCaptureCompletionBlock?(nil, CameraControllerError.unknown)
+            if let cgImage = image.cgImage, let imageOrientation = self.imageOrientation {
+                let alignedImage = UIImage(cgImage: cgImage, scale: 1.0, orientation: imageOrientation)
+                
+                // hard copy
+                UIGraphicsBeginImageContext(alignedImage.size)
+                alignedImage.draw(in: CGRect(origin: .zero, size: alignedImage.size))
+                let copiedImage = UIGraphicsGetImageFromCurrentImageContext()
+                UIGraphicsEndImageContext()
+                
+                self.photoCaptureCompletionBlock?(copiedImage, nil)
+                return
+            }
         }
+        self.photoCaptureCompletionBlock?(nil, CameraControllerError.unknown)
+    }
+    
+    func photoOutput(_ output: AVCapturePhotoOutput, willBeginCaptureFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+        imageOrientation = UIDevice.current.orientation.UIImageOrientation(camera: self.cameraPosition ?? .rear)
     }
 }
 
@@ -279,6 +303,23 @@ extension RealCameraController :AVCaptureMetadataOutputObjectsDelegate {
             } else {
                 self.qrCaptureCompletionBlock?(nil, CameraControllerError.unknown)
             }
+        }
+    }
+}
+
+extension RealCameraController {
+    func interfaceOrientationToVideoOrientation(orientation: UIInterfaceOrientation?) -> AVCaptureVideoOrientation {
+        switch orientation {
+        case .portrait:
+            return .portrait
+        case .portraitUpsideDown:
+            return .portraitUpsideDown
+        case .landscapeLeft:
+            return .landscapeLeft
+        case .landscapeRight:
+            return .landscapeRight
+        default:
+            return .portrait
         }
     }
 }

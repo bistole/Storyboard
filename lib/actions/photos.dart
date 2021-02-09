@@ -56,7 +56,7 @@ class ActPhotos {
 
   var validMimeTypes = ["image/jpeg", "image/png", "image/gif"];
 
-  void actUploadPhoto(Store<AppState> store, String path) {
+  void actUploadPhoto(Store<AppState> store, String path) async {
     var mimeType = lookupMimeType(path);
     if (!validMimeTypes.contains(mimeType)) {
       // TODO: show error in UI
@@ -80,7 +80,7 @@ class ActPhotos {
       createdAt: ts,
       ts: 0,
     );
-    _storage.copyPhotoByUUID(uuid, File(path));
+    await _storage.copyPhotoByUUID(uuid, File(path));
     store.dispatch(CreatePhotoAction(photo: photo));
     _netQueue.addQueueItem(
       QueueItemType.Photo,
