@@ -3,10 +3,7 @@ package config
 import "testing"
 
 func TestConfig(t *testing.T) {
-	config := NewConfigService()
-	if config.GetVendorName() != "Laterhorse" {
-		t.Error("Mismatch vendor name")
-	}
+	config := NewConfigService("Storyboard")
 	if config.GetAppName() != "Storyboard" {
 		t.Error("Mismatch app name")
 	}

@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:redux/redux.dart';
 
 import 'package:storyboard/actions/photos.dart';
+import 'package:storyboard/actions/server.dart';
 import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/channel/menu.dart';
@@ -12,6 +13,7 @@ import 'package:storyboard/net/auth.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/photos.dart';
 import 'package:storyboard/net/queue.dart';
+import 'package:storyboard/net/sse.dart';
 import 'package:storyboard/net/tasks.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
@@ -25,12 +27,14 @@ const CHANNEL_COMMANDS = '/COMMANDS';
 class Factory {
   DeviceManager deviceManager;
 
+  ActServer actServer;
   ActPhotos actPhotos;
   ActTasks actTasks;
 
   NetAuth netAuth;
   NetPhotos netPhotos;
   NetTasks netTasks;
+  NetSSE netSSE;
   NetQueue netQueue;
 
   ChannelManager channelManager;
@@ -42,16 +46,20 @@ class Factory {
 
   Factory() {
     deviceManager = DeviceManager();
+    actServer = ActServer();
     actPhotos = ActPhotos();
     actTasks = ActTasks();
 
     netAuth = NetAuth();
     netPhotos = NetPhotos();
     netTasks = NetTasks();
+    netSSE = NetSSE();
     netQueue = NetQueue(60);
 
     channelManager = ChannelManager();
     storage = Storage();
+
+    actServer.setNetSSE(netSSE);
 
     actPhotos.setNetQueue(netQueue);
     actPhotos.setStorage(storage);
@@ -69,14 +77,16 @@ class Factory {
     netTasks.setActTasks(actTasks);
     netTasks.registerToQueue(netQueue);
 
-    netQueue.registerPeriodicTrigger(actTasks.actFetchTasks);
-    netQueue.registerPeriodicTrigger(actPhotos.actFetchPhotos);
+    netSSE.setGetHttpClient(() => http.Client());
+
+    netSSE.registerUpdateFunc(notifyTypeTask, actTasks.actFetchTasks);
+    netSSE.registerUpdateFunc(notifyTypePhoto, actPhotos.actFetchPhotos);
 
     getViewResource().deviceManager = deviceManager;
     getViewResource().storage = storage;
     getViewResource().actPhotos = actPhotos;
     getViewResource().actTasks = actTasks;
-    getViewResource().netAuth = netAuth;
+    getViewResource().actServer = actServer;
   }
 
   Future<MethodChannel> createChannelByName(String name) =>
@@ -89,20 +99,20 @@ class Factory {
         // only first time when serverKey is updated
         store.onChange
             .any((state) => state.setting.serverKey == newServeKey)
-            .then((_) => netAuth.netPing(store));
+            .then((_) => netSSE.connect(store));
 
         // backend ip is changed, lets change frontend ip too
         store.dispatch(SettingServerKeyAction(serverKey: newServeKey));
       } else {
         // local ip does not changed, check reachable only
-        netAuth.netPing(store);
+        netSSE.connect(store);
       }
     });
   }
 
   void checkServerKeyOnMobile() {
     if (store.state.setting.serverKey != null) {
-      netAuth.netPing(store);
+      netSSE.connect(store);
     }
   }
 
@@ -117,6 +127,7 @@ class Factory {
     MethodChannel mcCommand = await createChannelByName(CHANNEL_COMMANDS);
     command = CommandChannel(mcCommand);
     command.setStore(store);
+    command.setActServer(actServer);
 
     MethodChannel mcMenu = await createChannelByName(CHANNEL_MENU_EVENTS);
     menu = MenuChannel(mcMenu);

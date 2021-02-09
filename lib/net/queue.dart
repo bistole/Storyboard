@@ -23,8 +23,6 @@ class NetQueue {
   int _stamp;
   Timer _checker;
   Map<QueueItemType, Map<QueueItemAction, NetQueueActionFunc>> _actions = Map();
-  List<NetQueuePeriodicTriggerFunc> _triggers = [];
-
   // init queue to listen redux changed
   NetQueue(this.sleepInterval);
 
@@ -60,15 +58,8 @@ class NetQueue {
   }
 
   void _periodicPushEvents() {
-    Queue queue = _store.state.queue;
     if (_status == NetQueueStatus.IDLE) {
-      if (queue.list.length == 0 && queue.now == null) {
-        _triggers.forEach((element) {
-          element();
-        });
-      } else {
-        _queueLoop();
-      }
+      _queueLoop();
     }
   }
 
@@ -96,10 +87,6 @@ class NetQueue {
       action: action,
       uuid: uuid,
     ));
-  }
-
-  void registerPeriodicTrigger(NetQueuePeriodicTriggerFunc func) {
-    _triggers.add(func);
   }
 
   void registerQueueItemAction(

@@ -60,23 +60,23 @@ main() {
     expect(order, ['uuid-before', 'uuid-no1', 'uuid-no2']);
   });
 
-  test('registerPeriodicTrigger', () async {
-    buildStore(Queue(list: [], tick: 1));
+  // test('registerPeriodicTrigger', () async {
+  //   buildStore(Queue(list: [], tick: 1));
 
-    bool callbackWorks = false;
-    void callback() {
-      callbackWorks = true;
-    }
+  //   bool callbackWorks = false;
+  //   void callback() {
+  //     callbackWorks = true;
+  //   }
 
-    NetQueue netQueue = NetQueue(1);
-    netQueue.setStore(store);
-    netQueue.start();
+  //   NetQueue netQueue = NetQueue(1);
+  //   netQueue.setStore(store);
+  //   netQueue.start();
 
-    netQueue.registerPeriodicTrigger(callback);
+  //   netQueue.registerPeriodicTrigger(callback);
 
-    await Future.delayed(Duration(milliseconds: 100));
-    expect(callbackWorks, false);
-    await Future.delayed(Duration(seconds: 1));
-    expect(callbackWorks, true);
-  });
+  //   await Future.delayed(Duration(milliseconds: 100));
+  //   expect(callbackWorks, false);
+  //   await Future.delayed(Duration(seconds: 1));
+  //   expect(callbackWorks, true);
+  // });
 }

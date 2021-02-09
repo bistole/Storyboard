@@ -1,34 +1,49 @@
 NOW
 ===
+- Split storage by environment
+  - Merge backend storage and frontend storage together [IN_PROGRESS]
+    - Backend [DONE]
+    - Macos [DONE]
+    - Windows
 
-Compile as windows services
-- Install under windows [DONE]
-- Add methodChannel in windows' code [DONE]
-- Add open file
-- Change script to build backend in windows [DONE]
-- Compile backend.lib with app [DONE]
-- Start backend from windows code [DONE]
-- Use methodChannel to communicate with backend from flutter [DONE]
+- Deployment
+  - MacOS
+  - Windows
+  - Android
+  - iOS
 
 TODO
 ====
 - Authenticate
-- Notify Frontend when change happens in backend
-- Force to retry connection
+  - Create server-id for each server.
+    - Persistent server-id.
+    - Share on QRCode.
+  - Create client-id on mobile side
+    - Persistent client-id.
+  - Authentication:
+    - Call with server-id and client-id
+    - If server-id does not match, reject
+    - If succ return client-token respondent to client-id
+  - Other calls
+    - Use client-token instead of client-id
+  - Store information under /<server-id>/
+  - Mobile: allow multiple server-id
+    - allow switch between different server
+    - add nickname for each server
+  - Desktop: add server nickname which can is recognized
+
+- Share backend/frontend media data on desktop
 
 - Change icon for app.
 - Set minsize of desktop application.
-- Deployment
-  - Android
-  - MacOS
-  - Windows
+
 - Create a website to publish service.
   - Automatic build
 
 - Redesign display photo interface.
+  - When create - allow rotate photo
+  - When update - allow rotate photo
 
-
-- QR Code for real device
 
 ISSUE
 =====
@@ -36,6 +51,7 @@ ISSUE
 - Allow change PORT of backend service
 - Take photo need not confirm again.
 - Zoom in/out for detail photo in mobile. [?]
+- Space does not function well when create/update task
 
 DONE
 ====
@@ -170,3 +186,55 @@ Server Send Event [DONE]
     - Connect to server [DONE]
       - Happy path [DONE]
       - If failed, ask for update the connection [DONE]
+
+Compile as windows services [DONE]
+- Install under windows [DONE]
+- Add methodChannel in windows' code [DONE]
+- Add open file [DONE]
+- Change script to build backend in windows [DONE]
+- Compile backend.lib with app [DONE]
+- Start backend from windows code [DONE]
+- Use methodChannel to communicate with backend from flutter [DONE]
+
+- Notify Frontend when change happens in backend [DONE]
+  - Server side events [https://github.com/kljensen/golang-html5-sse-example/blob/master/server.go]
+    - Backend [DONE]
+      - Implement [DONE]
+      - Notify via SSE [DONE]
+        - Connect with clientID. [DONE]
+        - Only send notify to client with different clientID. [DONE]
+        - Tell client which resource is updated. [DONE]
+    - Frontend [DONE]
+      - Implement [DONE]
+      - Integrate with frontend [DONE]
+        - ServerKey to SSE Client [DONE]
+          - Only check when ServerKey changed or launch the app [DONE]
+          - Launch SSE Client if ServerKey is valid [DONE]
+            - Otherwise, show unknown [DONE]
+          - If ServerKey is changed [DONE]
+            - Stop current SSE Client if is connected [DONE]
+            - Otherwise do nothing since it will try to reconnect [DONE]
+        - SSE Client is running [DONE]
+          - If not connected or connected wrong one [DONE]
+            - Show unknown or wrong server [DONE]
+            - Retry loop [DONE]
+          - If connected [DONE]
+            - Show available [DONE]
+            - Trigger to fetch photo/task right way [DONE]
+          - If disconnected [DONE]
+            - Show not available [DONE]
+            - Enter retry loop [DONE]
+        - SSE Client receive updates info [DONE]
+          - Trigger to fetch photo/task [DONE]
+      - Add Client ID [DONE]
+  - Test on mobile devices together
+
+
+- QR Code for real device
+  - Fix bug for upload failed in iphone device [DONE]
+  - Add switch when take photo with iphone device. [DONE]
+  - Make confirm/cancel button smaller [DONE]
+  - Make QR code work [DONE]
+  - Fix orientation of photo when take with iphone device. [DONE]
+  - Fix mirrow issue [DONE]
+  - Failed to scan QR in android [DONE]

@@ -48,6 +48,8 @@ String decodeServerKey(String code) {
   return result;
 }
 
+const headerNameClientID = "client-id";
+
 String getURLPrefix(Store<AppState> store) {
   // eg: C0A803AB0BB8 which means 192.168.3.172:3000
   String serverKey = store.state.setting.serverKey;
@@ -55,6 +57,10 @@ String getURLPrefix(Store<AppState> store) {
     return null;
   }
   return "http://" + decodeServerKey(serverKey);
+}
+
+String getClientID(Store<AppState> store) {
+  return store.state.setting.clientID;
 }
 
 bool handleNetworkSucc(Store<AppState> store) {

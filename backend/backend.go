@@ -6,6 +6,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"storyboard/backend/config"
 	"storyboard/backend/database"
@@ -23,16 +24,20 @@ var photoRepo interfaces.PhotoRepo
 var ss interfaces.RESTService
 
 //export Backend_Start
-func Backend_Start() {
+func Backend_Start(app *C.char) {
 	if inited {
-		fmt.Printf("Already Started")
+		log.Printf("Already Started")
 		return
 	}
 	inited = true
-	fmt.Println("Hello, Backend Server")
+	log.Println("Hello, Backend Server")
 
 	// config service
-	c = config.NewConfigService()
+	appStr := ""
+	if app != nil {
+		appStr = C.GoString(app)
+	}
+	c = config.NewConfigService(appStr)
 
 	// database service
 	db = database.NewDatabaseService(c)
@@ -49,8 +54,7 @@ func Backend_Start() {
 
 //export Backend_Stop
 func Backend_Stop() {
-	fmt.Println("Goodbye, Backend Server")
-
+	log.Println("Closing Backend Service")
 	// server
 	if ss != nil {
 		ss.Stop()
@@ -68,6 +72,7 @@ func Backend_Stop() {
 
 	c = nil
 	inited = false
+	log.Println("Goodbye, Backend Server")
 }
 
 //export Backend_GetCurrentIP
@@ -104,7 +109,7 @@ func console() {
 }
 
 func main() {
-	Backend_Start()
+	Backend_Start(nil)
 	console()
 	Backend_Stop()
 }

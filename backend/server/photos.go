@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"storyboard/backend/interfaces"
 	"strconv"
@@ -95,6 +96,12 @@ func (rs RESTServer) getCreatedAtFromParameter(r *http.Request) (int64, error) {
 func (rs RESTServer) UploadPhoto(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(10 << 20)
 
+	clientID := r.Header.Get(headerNameClientID)
+	if clientID == "" {
+		rs.buildErrorResponse(w, fmt.Errorf("Missing request header: %s", headerNameClientID))
+		return
+	}
+
 	file, handler, err := r.FormFile("photo")
 	if err != nil {
 		rs.buildErrorResponse(w, err)
@@ -115,9 +122,9 @@ func (rs RESTServer) UploadPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("File Name: %+v\n", filename)
-	fmt.Printf("File Size: %+v\n", size)
-	fmt.Printf("MIME Header: %+v\n", mimeType)
+	log.Printf("File Name: %+v\n", filename)
+	log.Printf("File Size: %+v\n", size)
+	log.Printf("MIME Header: %+v\n", mimeType)
 	mimeTypeArr := strings.Split(mimeType, ";")
 
 	photo, err := rs.PhotoRepo.AddPhoto(uuid, filename, mimeTypeArr[0], size, file, createdAt)
@@ -125,6 +132,8 @@ func (rs RESTServer) UploadPhoto(w http.ResponseWriter, r *http.Request) {
 		rs.buildErrorResponse(w, err)
 		return
 	}
+	param := map[string]string{"type": notifyTypePhoto}
+	rs.EventServer.Notify(clientID, &param)
 	rs.buildSuccPhotoResponse(w, *photo)
 }
 
@@ -169,6 +178,12 @@ func (rs RESTServer) DeletePhoto(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
+	clientID := r.Header.Get(headerNameClientID)
+	if clientID == "" {
+		rs.buildErrorResponse(w, fmt.Errorf("Missing request header: %s", headerNameClientID))
+		return
+	}
+
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	var deletedPhoto Photo
 	json.Unmarshal(reqBody, &deletedPhoto)
@@ -183,5 +198,8 @@ func (rs RESTServer) DeletePhoto(w http.ResponseWriter, r *http.Request) {
 		rs.buildErrorResponse(w, err)
 		return
 	}
+
+	param := map[string]string{"type": notifyTypePhoto}
+	rs.EventServer.Notify(clientID, &param)
 	rs.buildSuccPhotoResponse(w, *photo)
 }

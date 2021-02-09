@@ -3,7 +3,6 @@ package database
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"log"
 	"os"
 	"path"
@@ -50,12 +49,12 @@ func (d Database) GetTS() int64 {
 
 // GetDataFolder get data folder
 func (d Database) GetDataFolder() string {
-	return path.Join(xdg.DataHome, d.config.GetVendorName(), d.config.GetAppName())
+	return path.Join(xdg.DataHome, d.config.GetAppName())
 }
 
 func (d Database) createDBInstance(dirPath string, dbName string) (fullPath string, existed bool) {
 	fullPath = path.Join(dirPath, dbName)
-	fmt.Printf("Create Database: %s\n", fullPath)
+	log.Printf("Create Database: %s\n", fullPath)
 	_, err := os.Stat(fullPath)
 	if os.IsNotExist(err) {
 		os.MkdirAll(dirPath, 0755)

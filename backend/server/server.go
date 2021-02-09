@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"storyboard/backend/interfaces"
@@ -14,12 +13,13 @@ import (
 
 // RESTServer is wrapper for http server and wait group
 type RESTServer struct {
-	Config    interfaces.ConfigService
-	ServerIP  string
-	Server    *http.Server
-	Wg        *sync.WaitGroup
-	TaskRepo  interfaces.TaskRepo
-	PhotoRepo interfaces.PhotoRepo
+	Config      interfaces.ConfigService
+	ServerIP    string
+	Server      *http.Server
+	Wg          *sync.WaitGroup
+	TaskRepo    interfaces.TaskRepo
+	PhotoRepo   interfaces.PhotoRepo
+	EventServer eventServer
 }
 
 // NewRESTServer create REST server
@@ -55,10 +55,19 @@ func (rs RESTServer) route() *mux.Router {
 // Start to build RESTful API Server
 func (rs *RESTServer) Start() {
 	rs.Wg.Add(1)
+
+	rs.EventServer = *createEventServer()
+
+	var route = rs.route()
+	// add event server to standard route
+	rs.EventServer.route(route)
+	go rs.EventServer.MainLoop()
+	go rs.EventServer.KeepAlive()
+
 	ip := rs.GetCurrentIP()
 	rs.Server = &http.Server{
 		Addr:    ip + ":3000",
-		Handler: rs.route(),
+		Handler: route,
 	}
 
 	go func() {
@@ -67,7 +76,7 @@ func (rs *RESTServer) Start() {
 			rs.Wg.Done()
 		}()
 
-		fmt.Println("Started: ", ip)
+		log.Println("Started: ", ip)
 		if err := rs.Server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("ListenAndServe(): %v", err)
 		}
@@ -82,6 +91,9 @@ func (rs *RESTServer) Stop() {
 	)
 	defer cancelFunc()
 
+	// stop event server
+	rs.EventServer.End()
+
 	err := rs.Server.Shutdown(ctx)
 	if err != nil {
 		log.Fatalf("Shutdown(): %v", err)
@@ -89,7 +101,7 @@ func (rs *RESTServer) Stop() {
 
 	rs.Wg.Wait()
 
-	fmt.Println("Stopped")
+	log.Println("Stopped")
 }
 
 // GetCurrentIP set current ip

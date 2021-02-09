@@ -67,8 +67,10 @@ class NetPhotos {
       if (prefix == null) return false;
 
       int ts = (store.state.photoRepo.lastTS + 1);
-      final response =
-          await _httpClient.get(prefix + "/photos?ts=$ts&c=$countPerFetch");
+      final response = await _httpClient.get(
+        prefix + "/photos?ts=$ts&c=$countPerFetch",
+        headers: {headerNameClientID: getClientID(store)},
+      );
       if (response.statusCode == 200) {
         Map<String, dynamic> object = jsonDecode(response.body);
         if (object['succ'] == true && object['photos'] != null) {
@@ -103,6 +105,7 @@ class NetPhotos {
 
       final response = await _httpClient.send(
         http.MultipartRequest("POST", Uri.parse(prefix + "/photos"))
+          ..headers[headerNameClientID] = getClientID(store)
           ..fields['uuid'] = photo.uuid
           ..fields['createdAt'] = photo.createdAt.toString()
           ..files.add(
@@ -144,6 +147,7 @@ class NetPhotos {
 
       final response = await _httpClient.get(
         prefix + "/photos/" + uuid,
+        headers: {headerNameClientID: getClientID(store)},
       );
 
       if (response.statusCode == 200) {
@@ -174,6 +178,7 @@ class NetPhotos {
 
       final response = await _httpClient.get(
         prefix + "/photos/" + uuid + '/thumbnail',
+        headers: {headerNameClientID: getClientID(store)},
       );
 
       if (response.statusCode == 200) {
@@ -202,6 +207,7 @@ class NetPhotos {
 
       final responseStream = await _httpClient.send(
         http.Request("DELETE", Uri.parse(prefix + "/photos/" + photo.uuid))
+          ..headers[headerNameClientID] = getClientID(store)
           ..body = jsonEncode({"updatedAt": photo.updatedAt}),
       );
 

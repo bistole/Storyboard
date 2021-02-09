@@ -30,7 +30,6 @@ type Photo struct {
 
 // ConfigService is interface of config package
 type ConfigService interface {
-	GetVendorName() string
 	GetAppName() string
 	GetDatabaseName() string
 	GetIP() string

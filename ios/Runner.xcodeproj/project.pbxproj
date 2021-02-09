@@ -15,6 +15,7 @@
 		87732FD425AEA85300D65BF3 /* Commands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87732FD325AEA85300D65BF3 /* Commands.swift */; };
 		87732FD625AEA9FC00D65BF3 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 87732FD525AEA9FC00D65BF3 /* AVFoundation.framework */; };
 		87732FD825AEAA2200D65BF3 /* PhotoCaptureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87732FD725AEAA2200D65BF3 /* PhotoCaptureViewController.swift */; };
+		8778ADEC25D1BA0C00E8F828 /* UIDeviceOrientation+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8778ADEB25D1BA0C00E8F828 /* UIDeviceOrientation+Extension.swift */; };
 		87CC52BB25AF49F5001CF962 /* PhotoPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87CC52BA25AF49F5001CF962 /* PhotoPreviewView.swift */; };
 		87CC52BD25AF8E75001CF962 /* CameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87CC52BC25AF8E75001CF962 /* CameraController.swift */; };
 		87CC52BF25AF8F14001CF962 /* RealCameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87CC52BE25AF8F14001CF962 /* RealCameraController.swift */; };
@@ -49,6 +50,7 @@
 		87732FD325AEA85300D65BF3 /* Commands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Commands.swift; sourceTree = "<group>"; };
 		87732FD525AEA9FC00D65BF3 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		87732FD725AEAA2200D65BF3 /* PhotoCaptureViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCaptureViewController.swift; sourceTree = "<group>"; };
+		8778ADEB25D1BA0C00E8F828 /* UIDeviceOrientation+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIDeviceOrientation+Extension.swift"; sourceTree = "<group>"; };
 		87CC52BA25AF49F5001CF962 /* PhotoPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPreviewView.swift; sourceTree = "<group>"; };
 		87CC52BC25AF8E75001CF962 /* CameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraController.swift; sourceTree = "<group>"; };
 		87CC52BE25AF8F14001CF962 /* RealCameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealCameraController.swift; sourceTree = "<group>"; };
@@ -117,6 +119,7 @@
 				97C147021CF9000F007C117D /* Info.plist */,
 				1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */,
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
+				8778ADEB25D1BA0C00E8F828 /* UIDeviceOrientation+Extension.swift */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				87732FD325AEA85300D65BF3 /* Commands.swift */,
 				87CC52BA25AF49F5001CF962 /* PhotoPreviewView.swift */,
@@ -296,6 +299,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8778ADEC25D1BA0C00E8F828 /* UIDeviceOrientation+Extension.swift in Sources */,
 				87CC52BD25AF8E75001CF962 /* CameraController.swift in Sources */,
 				87CC52C125AF97BF001CF962 /* FakeCameraController.swift in Sources */,
 				87732FD825AEAA2200D65BF3 /* PhotoCaptureViewController.swift in Sources */,

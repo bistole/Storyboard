@@ -29,6 +29,15 @@ class PhotoCaptureViewController : UIViewController, AVCapturePhotoCaptureDelega
         cameraController.layoutPreview(on: self.view)
     }
     
+    // fix: AVCapture rotate animation
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        coordinator.animate(alongsideTransition: nil) { (_) in
+            UIView.setAnimationsEnabled(true)
+        }
+        UIView.setAnimationsEnabled(false)
+        super.viewWillTransition(to: size, with: coordinator)
+    }
+    
     func setDelegate(delegate: PhotoCaptureDelegate?) {
         self.delegate = delegate
     }

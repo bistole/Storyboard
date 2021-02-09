@@ -19,9 +19,6 @@ func TestDatabase(t *testing.T) {
 	os.Remove(dbPath)
 
 	var cftMock = &mocks.ConfigMock{
-		GetVendorNameFn: func() string {
-			return testVendor
-		},
 		GetAppNameFn: func() string {
 			return testFolder
 		},

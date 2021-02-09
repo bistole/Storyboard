@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"storyboard/backend/interfaces"
@@ -64,6 +65,12 @@ func (rs RESTServer) GetTasks(w http.ResponseWriter, r *http.Request) {
 func (rs RESTServer) CreateTask(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := ioutil.ReadAll(r.Body)
 
+	clientID := r.Header.Get(headerNameClientID)
+	if clientID == "" {
+		rs.buildErrorResponse(w, fmt.Errorf("Missing request header: %s", headerNameClientID))
+		return
+	}
+
 	// decode json
 	var inTask Task
 	json.Unmarshal(reqBody, &inTask)
@@ -88,6 +95,8 @@ func (rs RESTServer) CreateTask(w http.ResponseWriter, r *http.Request) {
 		rs.buildErrorResponse(w, err)
 		return
 	}
+	param := map[string]string{"type": notifyTypeTask}
+	rs.EventServer.Notify(clientID, &param)
 	rs.buildSuccTaskResponse(w, *outTask)
 }
 
@@ -109,6 +118,12 @@ func (rs RESTServer) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
+	clientID := r.Header.Get(headerNameClientID)
+	if clientID == "" {
+		rs.buildErrorResponse(w, fmt.Errorf("Missing request header: %s", headerNameClientID))
+		return
+	}
+
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	var updatedTask Task
 	json.Unmarshal(reqBody, &updatedTask)
@@ -127,6 +142,8 @@ func (rs RESTServer) UpdateTask(w http.ResponseWriter, r *http.Request) {
 		rs.buildErrorResponse(w, err)
 		return
 	}
+	param := map[string]string{"type": notifyTypeTask}
+	rs.EventServer.Notify(clientID, &param)
 	rs.buildSuccTaskResponse(w, *task)
 }
 
@@ -134,6 +151,12 @@ func (rs RESTServer) UpdateTask(w http.ResponseWriter, r *http.Request) {
 func (rs RESTServer) DeleteTask(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
+
+	clientID := r.Header.Get(headerNameClientID)
+	if clientID == "" {
+		rs.buildErrorResponse(w, fmt.Errorf("Missing request header: %s", headerNameClientID))
+		return
+	}
 
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	var deletedTask Task
@@ -149,5 +172,7 @@ func (rs RESTServer) DeleteTask(w http.ResponseWriter, r *http.Request) {
 		rs.buildErrorResponse(w, err)
 		return
 	}
+	param := map[string]string{"type": notifyTypeTask}
+	rs.EventServer.Notify(clientID, &param)
 	rs.buildSuccTaskResponse(w, *task)
 }

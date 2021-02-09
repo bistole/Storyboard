@@ -1,6 +1,7 @@
 package taskrepo
 
 import (
+	"log"
 	"storyboard/backend/interfaces"
 
 	"database/sql"
@@ -136,7 +137,7 @@ func (t TaskRepo) _updateTask(task Task) error {
 		return err
 	}
 
-	fmt.Printf("Updated: %t\n", affectRow > 0)
+	log.Printf("Updated: %t\n", affectRow > 0)
 	if affectRow > 0 {
 		return nil
 	}
@@ -171,7 +172,7 @@ func (t TaskRepo) _deleteTask(UUID string, updatedAt int64) error {
 		return err
 	}
 
-	fmt.Printf("Deleted: %t\n", affectRow > 0)
+	log.Printf("Deleted: %t\n", affectRow > 0)
 	if affectRow > 0 {
 		return nil
 	}
