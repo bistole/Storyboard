@@ -49,7 +49,7 @@ func (d Database) GetTS() int64 {
 
 // GetDataFolder get data folder
 func (d Database) GetDataFolder() string {
-	return path.Join(xdg.DataHome, d.config.GetVendorName(), d.config.GetAppName())
+	return path.Join(xdg.DataHome, d.config.GetAppName())
 }
 
 func (d Database) createDBInstance(dirPath string, dbName string) (fullPath string, existed bool) {

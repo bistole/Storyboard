@@ -10,9 +10,9 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const vendorName = "Laterhorse"
-const appName = "Storyboard"
-const databaseName = "foo.db"
+const defaultAppName = "Storyboard"
+const databaseName = "backend.db"
+const configName = "backend.yaml"
 
 // Properties save config file properties
 type Properties struct {
@@ -22,25 +22,24 @@ type Properties struct {
 
 // Config is implemented interface ConfigService
 type Config struct {
-	conn  *sql.DB
-	props Properties
+	conn    *sql.DB
+	appName string
+	props   Properties
 }
 
 // NewConfigService create a config service instance
-func NewConfigService() Config {
-	c := Config{}
+func NewConfigService(app string) Config {
+	if app == "" {
+		app = defaultAppName
+	}
+	c := Config{appName: app}
 	c.LoadFromConfigFile()
 	return c
 }
 
 // GetAppName get app name
 func (c Config) GetAppName() string {
-	return appName
-}
-
-// GetVendorName get vendor name
-func (c Config) GetVendorName() string {
-	return vendorName
+	return c.appName
 }
 
 // GetDatabaseName get database name
@@ -48,9 +47,9 @@ func (c Config) GetDatabaseName() string {
 	return databaseName
 }
 
-// LoadFromConfigFile load config from config.yaml file
+// LoadFromConfigFile load config from configName yaml file
 func (c Config) LoadFromConfigFile() {
-	filename := path.Join(xdg.DataHome, vendorName, appName, "config.yaml")
+	filename := path.Join(xdg.DataHome, c.appName, configName)
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		c.props.IP = ""
@@ -62,9 +61,9 @@ func (c Config) LoadFromConfigFile() {
 	yaml.Unmarshal(data, &c.props)
 }
 
-// SaveToConfigFile save config to config.yaml file
+// SaveToConfigFile save config to configName yaml file
 func (c Config) SaveToConfigFile() {
-	filename := path.Join(xdg.DataHome, vendorName, appName, "config.yaml")
+	filename := path.Join(xdg.DataHome, c.appName, configName)
 	log.Println("config file: " + filename)
 	data, err := yaml.Marshal(c.props)
 	if err != nil {

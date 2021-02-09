@@ -24,7 +24,7 @@ var photoRepo interfaces.PhotoRepo
 var ss interfaces.RESTService
 
 //export Backend_Start
-func Backend_Start() {
+func Backend_Start(app *C.char) {
 	if inited {
 		log.Printf("Already Started")
 		return
@@ -33,7 +33,11 @@ func Backend_Start() {
 	log.Println("Hello, Backend Server")
 
 	// config service
-	c = config.NewConfigService()
+	appStr := ""
+	if app != nil {
+		appStr = C.GoString(app)
+	}
+	c = config.NewConfigService(appStr)
 
 	// database service
 	db = database.NewDatabaseService(c)
@@ -105,7 +109,7 @@ func console() {
 }
 
 func main() {
-	Backend_Start()
+	Backend_Start(nil)
 	console()
 	Backend_Stop()
 }

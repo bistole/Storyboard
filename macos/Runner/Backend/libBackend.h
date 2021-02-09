@@ -68,7 +68,7 @@ typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
 extern "C" {
 #endif
 
-extern void Backend_Start();
+extern void Backend_Start(char* vendor, char* app);
 extern void Backend_Stop();
 extern char* Backend_GetCurrentIP();
 extern void Backend_SetCurrentIP(char* ip);

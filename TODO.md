@@ -1,16 +1,42 @@
 NOW
 ===
+- Split storage by environment
+  - Merge backend storage and frontend storage together [IN_PROGRESS]
+    - Backend [DONE]
+    - Macos [DONE]
+    - Windows
+
+- Deployment
+  - MacOS
+  - Windows
+  - Android
+  - iOS
 
 TODO
 ====
 - Authenticate
+  - Create server-id for each server.
+    - Persistent server-id.
+    - Share on QRCode.
+  - Create client-id on mobile side
+    - Persistent client-id.
+  - Authentication:
+    - Call with server-id and client-id
+    - If server-id does not match, reject
+    - If succ return client-token respondent to client-id
+  - Other calls
+    - Use client-token instead of client-id
+  - Store information under /<server-id>/
+  - Mobile: allow multiple server-id
+    - allow switch between different server
+    - add nickname for each server
+  - Desktop: add server nickname which can is recognized
+
+- Share backend/frontend media data on desktop
 
 - Change icon for app.
 - Set minsize of desktop application.
-- Deployment
-  - Android
-  - MacOS
-  - Windows
+
 - Create a website to publish service.
   - Automatic build
 
