@@ -9,7 +9,6 @@ import (
 	"storyboard/backend/interfaces"
 	"time"
 
-	"github.com/adrg/xdg"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -49,7 +48,7 @@ func (d Database) GetTS() int64 {
 
 // GetDataFolder get data folder
 func (d Database) GetDataFolder() string {
-	return path.Join(xdg.DataHome, d.config.GetAppName())
+	return d.config.GetHomeDir()
 }
 
 func (d Database) createDBInstance(dirPath string, dbName string) (fullPath string, existed bool) {

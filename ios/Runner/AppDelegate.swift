@@ -8,6 +8,11 @@ import Flutter
         return commands;
     }()
     
+    lazy var backendEvents: BackendEvents = {
+        let backendEvents: BackendEvents = BackendEvents()
+        return backendEvents
+    }()
+    
     override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         GeneratedPluginRegistrant.register(with: self)
         
@@ -20,7 +25,7 @@ import Flutter
 
         // regist method channel
         commands.register(delegate: self, withBinaryMessager: flutterViewController.binaryMessenger)
-        
+        backendEvents.register(withBinaryMessager: flutterViewController.binaryMessenger)
     
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }

@@ -14,7 +14,7 @@ type Photo = interfaces.Photo
 
 // ConfigMock to mock config
 type ConfigMock struct {
-	GetAppNameFn      func() string
+	GetHomeDirFn      func() string
 	GetDatabaseNameFn func() string
 	GetIPFn           func() string
 	GetPortFn         func() int
@@ -22,9 +22,9 @@ type ConfigMock struct {
 	SetPortFn         func(int)
 }
 
-// GetAppName mock config GetAppName
-func (c *ConfigMock) GetAppName() string {
-	return c.GetAppNameFn()
+// GetHomeDir mock config GetHomeDir
+func (c *ConfigMock) GetHomeDir() string {
+	return c.GetHomeDirFn()
 }
 
 // GetDatabaseName mock config GetDatabaseName
