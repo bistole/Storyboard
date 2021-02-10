@@ -20,8 +20,8 @@ const testDBName = "foo_task_"
 
 func initDB(suffix string) interfaces.DatabaseService {
 	conf := &mocks.ConfigMock{
-		GetAppNameFn: func() string {
-			return testAppName + suffix
+		GetHomeDirFn: func() string {
+			return "C:\\" + testAppName + suffix
 		},
 		GetDatabaseNameFn: func() string {
 			return testDBName + suffix + ".db"

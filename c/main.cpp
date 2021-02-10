@@ -2,8 +2,8 @@
 #include "libBackend.h"
 
 int main(int argc, char **argv) {
-    char *app = (char *)"Storyboard_backend_only";
-    Backend_Start(app);
+    char *path = (char *)"./Storyboard_backend_only";
+    Backend_Start(path);
 
     while (true) {
         char c = getchar();

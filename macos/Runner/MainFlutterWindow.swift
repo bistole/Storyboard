@@ -2,6 +2,7 @@ import Cocoa
 import FlutterMacOS
 
 class MainFlutterWindow: NSWindow {
+    @IBOutlet weak var backendEvents: BackendEvents!
     @IBOutlet weak var menuEvent: MenuEvents!
     @IBOutlet weak var commands: Commands!
 
@@ -13,6 +14,7 @@ class MainFlutterWindow: NSWindow {
 
         RegisterGeneratedPlugins(registry: flutterViewController)
 
+        backendEvents.register(withBinaryMessager: flutterViewController.engine.binaryMessenger);
         menuEvent.register(withBinaryMessager: flutterViewController.engine.binaryMessenger);
         commands.register(withBinaryMessager: flutterViewController.engine.binaryMessenger);
 
