@@ -5,6 +5,7 @@ import 'package:redux/redux.dart';
 import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/actions/server.dart';
 import 'package:storyboard/actions/tasks.dart';
+import 'package:storyboard/channel/backend.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/channel/menu.dart';
 import 'package:storyboard/configs/channel_manager.dart';
@@ -21,6 +22,7 @@ import 'package:storyboard/redux/store.dart';
 import 'package:storyboard/storage/storage.dart';
 import 'package:storyboard/views/config/config.dart';
 
+const CHANNEL_BACKENDS = "/BACKENDS";
 const CHANNEL_MENU_EVENTS = "/MENU_EVENTS";
 const CHANNEL_COMMANDS = '/COMMANDS';
 
@@ -38,6 +40,7 @@ class Factory {
   NetQueue netQueue;
 
   ChannelManager channelManager;
+  BackendChannel backend;
   MenuChannel menu;
   CommandChannel command;
 
@@ -93,7 +96,7 @@ class Factory {
       channelManager.createChannel(name);
 
   void checkServerKeyOnDesktop() {
-    command.getCurrentIp().then((localIp) {
+    backend.getCurrentIp().then((localIp) {
       var newServeKey = encodeServerKey(localIp, 3000);
       if (store.state.setting.serverKey != newServeKey) {
         // only first time when serverKey is updated
@@ -117,23 +120,32 @@ class Factory {
   }
 
   Future<void> initAfterAppCreated() async {
-    await storage.initDataHome();
+    // init backend
+    MethodChannel mcBackend = await createChannelByName(CHANNEL_BACKENDS);
+    backend = BackendChannel(mcBackend);
+
+    // init storage
+    storage.setDataHome(await backend.getDataHome());
     await storage.initPhotoStorage();
 
+    // init store & start queue
     store = await initStore(storage);
     netQueue.setStore(store);
     netQueue.start();
 
+    // init command
     MethodChannel mcCommand = await createChannelByName(CHANNEL_COMMANDS);
     command = CommandChannel(mcCommand);
     command.setStore(store);
     command.setActServer(actServer);
 
+    // init menu
     MethodChannel mcMenu = await createChannelByName(CHANNEL_MENU_EVENTS);
     menu = MenuChannel(mcMenu);
     menu.setCommandChannel(command);
 
     getViewResource().command = command;
+    getViewResource().backend = backend;
 
     if (deviceManager.isDesktop()) {
       checkServerKeyOnDesktop();

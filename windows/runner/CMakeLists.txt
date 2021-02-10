@@ -10,6 +10,7 @@ add_executable(${BINARY_NAME} WIN32
   "run_loop.cpp"
   "utils.cpp"
   "commands.cpp"
+  "backends.cpp"
   "menu_events.cpp"
   "package_info.cpp"
   "win32_window.cpp"

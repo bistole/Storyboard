@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"io/ioutil"
 	"log"
+	"os"
 	"path"
 
-	"github.com/adrg/xdg"
 	"gopkg.in/yaml.v2"
 )
 
@@ -23,23 +23,27 @@ type Properties struct {
 // Config is implemented interface ConfigService
 type Config struct {
 	conn    *sql.DB
-	appName string
+	homedir string
 	props   Properties
 }
 
 // NewConfigService create a config service instance
-func NewConfigService(app string) Config {
-	if app == "" {
-		app = defaultAppName
+func NewConfigService(homedir string) Config {
+	if homedir == "" {
+		dir, err := os.Getwd()
+		if err != nil {
+			panic(err)
+		}
+		homedir = path.Join(dir, defaultAppName)
 	}
-	c := Config{appName: app}
+	c := Config{homedir: homedir}
 	c.LoadFromConfigFile()
 	return c
 }
 
-// GetAppName get app name
-func (c Config) GetAppName() string {
-	return c.appName
+// GetHomeDir get home dir
+func (c Config) GetHomeDir() string {
+	return c.homedir
 }
 
 // GetDatabaseName get database name
@@ -49,7 +53,7 @@ func (c Config) GetDatabaseName() string {
 
 // LoadFromConfigFile load config from configName yaml file
 func (c Config) LoadFromConfigFile() {
-	filename := path.Join(xdg.DataHome, c.appName, configName)
+	filename := path.Join(c.homedir, configName)
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		c.props.IP = ""
@@ -63,7 +67,7 @@ func (c Config) LoadFromConfigFile() {
 
 // SaveToConfigFile save config to configName yaml file
 func (c Config) SaveToConfigFile() {
-	filename := path.Join(xdg.DataHome, c.appName, configName)
+	filename := path.Join(c.homedir, configName)
 	log.Println("config file: " + filename)
 	data, err := yaml.Marshal(c.props)
 	if err != nil {

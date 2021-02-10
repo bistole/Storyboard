@@ -2,14 +2,12 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
 
 class Storage {
   String dataHome;
 
-  Future<void> initDataHome() async {
-    Directory dict = await getApplicationSupportDirectory();
-    dataHome = dict.path;
+  void setDataHome(String _dataHome) {
+    dataHome = _dataHome;
   }
 
   String getPersistDataPath() {

@@ -29,6 +29,8 @@
 		33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CC11122044BFA00003C045 /* MainFlutterWindow.swift */; };
 		876D00EA2582A14D009787B7 /* MenuEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 876D00E92582A14D009787B7 /* MenuEvents.swift */; };
 		876D00EC2582CD92009787B7 /* Commands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 876D00EB2582CD92009787B7 /* Commands.swift */; };
+		8778ADFD25D39E5500E8F828 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8778ADFC25D39E5500E8F828 /* Utils.swift */; };
+		8778AE0325D4358B00E8F828 /* BackendEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8778AE0225D4358B00E8F828 /* BackendEvents.swift */; };
 		87A8554C25803DCA001D38B2 /* libBackend.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 87A8554B25803DCA001D38B2 /* libBackend.h */; };
 		87A8554E25804128001D38B2 /* libBackend.a in CopyFiles */ = {isa = PBXBuildFile; fileRef = 87A8554D25803DFE001D38B2 /* libBackend.a */; };
 		87A8554F25804151001D38B2 /* libBackend.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 87A8554D25803DFE001D38B2 /* libBackend.a */; };
@@ -87,6 +89,8 @@
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		876D00E92582A14D009787B7 /* MenuEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuEvents.swift; sourceTree = "<group>"; };
 		876D00EB2582CD92009787B7 /* Commands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Commands.swift; sourceTree = "<group>"; };
+		8778ADFC25D39E5500E8F828 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		8778AE0225D4358B00E8F828 /* BackendEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendEvents.swift; sourceTree = "<group>"; };
 		87A8554B25803DCA001D38B2 /* libBackend.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = libBackend.h; path = Backend/libBackend.h; sourceTree = "<group>"; };
 		87A8554D25803DFE001D38B2 /* libBackend.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libBackend.a; path = Runner/Backend/libBackend.a; sourceTree = "<group>"; };
 		87A855502580418D001D38B2 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -168,6 +172,8 @@
 				33CC11122044BFA00003C045 /* MainFlutterWindow.swift */,
 				876D00E92582A14D009787B7 /* MenuEvents.swift */,
 				876D00EB2582CD92009787B7 /* Commands.swift */,
+				8778AE0225D4358B00E8F828 /* BackendEvents.swift */,
+				8778ADFC25D39E5500E8F828 /* Utils.swift */,
 				87A8554B25803DCA001D38B2 /* libBackend.h */,
 				87A855502580418D001D38B2 /* Runner-Bridging-Header.h */,
 				33E51913231747F40026EE4D /* DebugProfile.entitlements */,
@@ -368,10 +374,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */,
+				8778AE0325D4358B00E8F828 /* BackendEvents.swift in Sources */,
 				876D00EA2582A14D009787B7 /* MenuEvents.swift in Sources */,
 				33CC10F12044A3C60003C045 /* AppDelegate.swift in Sources */,
 				876D00EC2582CD92009787B7 /* Commands.swift in Sources */,
 				335BBD1B22A9A15E00E9071D /* GeneratedPluginRegistrant.swift in Sources */,
+				8778ADFD25D39E5500E8F828 /* Utils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

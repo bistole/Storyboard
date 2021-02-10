@@ -35,8 +35,8 @@ class _ServerPickerState extends State<ServerPicker> {
       currentIP = ip;
     });
 
-    getViewResource().command.setCurrentIp(ip).then(
-          (_) => getViewResource().command.getCurrentIp().then(
+    getViewResource().backend.setCurrentIp(ip).then(
+          (_) => getViewResource().backend.getCurrentIp().then(
                 (value) => changeServerKey(encodeServerKey(currentIP, 3000)),
               ),
         );
@@ -44,14 +44,14 @@ class _ServerPickerState extends State<ServerPicker> {
 
   void getBackendInfo() {
     if (currentIP == "") {
-      getViewResource().command.getCurrentIp().then(
+      getViewResource().backend.getCurrentIp().then(
             (value) => this.setState(() {
               currentIP = value;
             }),
           );
     }
     if (availableIPs.length == 0) {
-      getViewResource().command.getAvailableIps().then(
+      getViewResource().backend.getAvailableIps().then(
             (value) => this.setState(() {
               availableIPs = value;
             }),
