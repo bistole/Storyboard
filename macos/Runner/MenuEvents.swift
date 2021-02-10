@@ -14,7 +14,7 @@ class MenuEvents : NSObject {
   let MENU_EVENTS = "/MENU_EVENTS";
   
   let MENU_IMPORT_PHOTO = "MENU_EVENTS:IMPORT_PHOTO"
-  let MENU_TIMER = "TIMER"
+  // let MENU_TIMER = "TIMER"
 
   weak var binaryMessager : FlutterBinaryMessenger?
   var methodChannel : FlutterMethodChannel?
@@ -28,17 +28,17 @@ class MenuEvents : NSObject {
     methodChannel = FlutterMethodChannel.init(name: channelName, binaryMessenger: binaryMessager!)
     
     // create schedule
-    Timer.scheduledTimer(
-      timeInterval: 5,
-      target: self,
-      selector: #selector(MenuEvents.timer),
-      userInfo: nil,
-      repeats: true);
+    // Timer.scheduledTimer(
+    //   timeInterval: 5,
+    //   target: self,
+    //   selector: #selector(MenuEvents.timer),
+    //   userInfo: nil,
+    //   repeats: true);
   }
   
-  @objc func timer() {
-    methodChannel?.invokeMethod(MENU_TIMER, arguments: Date().description);
-  }
+  // @objc func timer() {
+  //   methodChannel?.invokeMethod(MENU_TIMER, arguments: Date().description);
+  // }
     
   // deliever menu event to flutter
   @IBAction func importPhoto(sender: AnyObject) {

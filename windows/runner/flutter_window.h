@@ -8,6 +8,10 @@
 
 #include "run_loop.h"
 #include "win32_window.h"
+#include "package_info.h"
+#include "backends.h"
+#include "menu_events.h"
+#include "commands.h"
 
 // A window that does nothing but host a Flutter view.
 class FlutterWindow : public Win32Window {
@@ -28,6 +32,10 @@ class FlutterWindow : public Win32Window {
  private:
   // The run loop driving events for this window.
   RunLoop* run_loop_;
+  PackageInfo* package_info_;
+  Backends* backends_;
+  MenuEvents* menu_events_;
+  Commands* commands_;
 
   // The project to run.
   flutter::DartProject project_;

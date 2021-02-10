@@ -1,12 +1,11 @@
-import 'package:storyboard/actions/actions.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import '../../net/tasks.dart';
-import '../../models/app.dart';
-import '../../models/status.dart';
-import '../../models/task.dart';
+import 'package:storyboard/redux/actions/actions.dart';
+import 'package:storyboard/redux/models/app.dart';
+import 'package:storyboard/redux/models/status.dart';
+import 'package:storyboard/redux/models/task.dart';
+import 'package:storyboard/views/config/config.dart';
 
 class ReduxActions {
   final void Function(String) update;
@@ -26,12 +25,10 @@ class UpdateTaskWidget extends StatelessWidget {
       converter: (store) {
         return ReduxActions(
           update: (String value) {
-            var updatedTask = task.copyWith(
-              title: value,
-              updatedAt: DateTime.now().millisecondsSinceEpoch ~/ 1000,
-            );
-            updateTask(store, updatedTask);
             store.dispatch(new ChangeStatusAction(status: StatusKey.ListTask));
+            if (value.length > 0 && value != task.title) {
+              getViewResource().actTasks.actUpdateTask(store, task.uuid, value);
+            }
           },
           cancel: () {
             store.dispatch(new ChangeStatusAction(status: StatusKey.ListTask));
@@ -42,10 +39,11 @@ class UpdateTaskWidget extends StatelessWidget {
         return new ListTile(
           title: RawKeyboardListener(
             child: TextField(
+              style: Theme.of(context).textTheme.headline2,
               onSubmitted: (String value) {
                 redux.update(value);
               },
-              controller: new TextEditingController(text: task.title),
+              controller: TextEditingController(text: task.title),
               autofocus: true,
               decoration: InputDecoration(hintText: 'Put task name here'),
             ),

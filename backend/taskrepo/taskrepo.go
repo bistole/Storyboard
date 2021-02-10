@@ -1,13 +1,11 @@
 package taskrepo
 
 import (
+	"log"
 	"storyboard/backend/interfaces"
 
 	"database/sql"
 	"fmt"
-	"time"
-
-	"github.com/google/uuid"
 )
 
 // Task is defined in interfaces
@@ -25,12 +23,6 @@ func NewTaskRepo(db interfaces.DatabaseService) TaskRepo {
 
 // CreateTask in DB
 func (t TaskRepo) CreateTask(inTask Task) (outTask *Task, err error) {
-	// create uuid
-	UUID, _ := uuid.NewRandom()
-	inTask.UUID = UUID.String()
-	inTask.CreatedAt = time.Now().Unix()
-	inTask.UpdatedAt = time.Now().Unix()
-
 	// create task
 	if err := t._createTask(inTask); err != nil {
 		return nil, err
@@ -50,7 +42,6 @@ func (t TaskRepo) UpdateTask(UUID string, inTask Task) (outTask *Task, err error
 	}
 
 	inTask.UUID = UUID
-	inTask.UpdatedAt = time.Now().Unix()
 	inTask.CreatedAt = task.CreatedAt
 
 	if err := t._updateTask(inTask); err != nil {
@@ -64,9 +55,7 @@ func (t TaskRepo) UpdateTask(UUID string, inTask Task) (outTask *Task, err error
 }
 
 // DeleteTask in DB
-func (t TaskRepo) DeleteTask(UUID string) (outTask *Task, err error) {
-
-	updatedAt := time.Now().Unix()
+func (t TaskRepo) DeleteTask(UUID string, updatedAt int64) (outTask *Task, err error) {
 	if err := t._deleteTask(UUID, updatedAt); err != nil {
 		return nil, err
 	}
@@ -148,7 +137,7 @@ func (t TaskRepo) _updateTask(task Task) error {
 		return err
 	}
 
-	fmt.Printf("Updated: %t\n", affectRow > 0)
+	log.Printf("Updated: %t\n", affectRow > 0)
 	if affectRow > 0 {
 		return nil
 	}
@@ -183,7 +172,7 @@ func (t TaskRepo) _deleteTask(UUID string, updatedAt int64) error {
 		return err
 	}
 
-	fmt.Printf("Deleted: %t\n", affectRow > 0)
+	log.Printf("Deleted: %t\n", affectRow > 0)
 	if affectRow > 0 {
 		return nil
 	}

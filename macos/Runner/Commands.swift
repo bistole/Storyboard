@@ -50,8 +50,8 @@ class Commands : NSObject {
             dialog.openFileDialog(
                 title: dict["title"] ?? "Import Files",
                 fileTypes: dict["types"] ?? "*",
-                result: result);
-            break;
+                result: result)
+            break
         default:
             result(FlutterMethodNotImplemented);
         }

@@ -1,30 +1,31 @@
-import 'dart:convert';
-
-import 'package:storyboard/models/app.dart';
-import 'package:storyboard/models/status.dart';
-import 'package:storyboard/models/task.dart';
-import 'package:storyboard/net/config.dart';
-import 'package:storyboard/reducers/app_reducer.dart';
+import 'package:storyboard/actions/tasks.dart';
+import 'package:storyboard/channel/command.dart';
+import 'package:storyboard/configs/factory.dart';
+import 'package:storyboard/net/queue.dart';
+import 'package:storyboard/redux/models/app.dart';
+import 'package:storyboard/redux/models/photo_repo.dart';
+import 'package:storyboard/redux/models/status.dart';
+import 'package:storyboard/redux/models/task.dart';
+import 'package:storyboard/redux/models/task_repo.dart';
+import 'package:storyboard/redux/reducers/app_reducer.dart';
+import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/page.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
 
-class MockClient extends Mock implements http.Client {
-  @override
-  String toString() {
-    return "I am the mock";
-  }
-}
+class MockNetQueue extends Mock implements NetQueue {}
+
+class MockCommandChannel extends Mock implements CommandChannel {}
 
 Type typeof<T>() => T;
 
 void main() {
   Store<AppState> store;
+  MockNetQueue netQueue;
 
   final uuid = '04deb797-7ca0-4cd3-b4ef-c1e01aeea130';
   final taskJson = {
@@ -36,13 +37,6 @@ void main() {
     '_ts': 1606406017000,
   };
   Widget buildTestableWidget(Widget widget) {
-    store = Store<AppState>(
-      appReducer,
-      initialState: AppState(
-        status: Status.noParam(StatusKey.ListTask),
-        tasks: <String, Task>{uuid: Task.fromJson(taskJson)},
-      ),
-    );
     return new StoreProvider(
       store: store,
       child: new MaterialApp(
@@ -54,31 +48,26 @@ void main() {
   group(
     "update item",
     () {
+      setUp(() {
+        getFactory().store = store = Store<AppState>(
+          appReducer,
+          initialState: AppState(
+            status: Status.noParam(StatusKey.ListTask),
+            taskRepo: TaskRepo(
+              tasks: <String, Task>{uuid: Task.fromJson(taskJson)},
+              lastTS: 0,
+            ),
+            photoRepo: PhotoRepo(photos: {}, lastTS: 0),
+          ),
+        );
+
+        netQueue = MockNetQueue();
+        getViewResource().actTasks = ActTasks();
+        getViewResource().actTasks.setNetQueue(netQueue);
+        getViewResource().command = MockCommandChannel();
+      });
+
       testWidgets("update item succ", (WidgetTester tester) async {
-        // Setup HTTP Response
-        final client = MockClient();
-        setHTTPClient(client);
-
-        final responseBody = jsonEncode({
-          'succ': true,
-          'task': {
-            'uuid': uuid,
-            'title': 'updated Title',
-            'deleted': 0,
-            'updatedAt': 1606506017,
-            'createdAt': 1606406017,
-            '_ts': 1606506017000,
-          },
-        });
-        when(client.post(
-          startsWith(URLPrefix),
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-          encoding: anyNamed('encoding'),
-        )).thenAnswer((_) async {
-          return http.Response(responseBody, 200);
-        });
-
         // home page
         var widget = buildTestableWidget(HomePage(title: 'title'));
         await tester.pumpWidget(widget);
@@ -115,31 +104,14 @@ void main() {
         await tester.testTextInput.receiveAction(TextInputAction.done);
         await tester.pump();
 
-        // Verify http request is correct
-        var captured = verify(client.post(
-          captureAny,
-          headers: anyNamed("headers"),
-          body: captureAnyNamed("body"),
-          encoding: anyNamed("encoding"),
-        )).captured;
-
-        expect(captured[0], "http://localhost:3000/tasks/" + uuid);
-
-        var bodyJson = jsonDecode(captured[1]);
-        expect(bodyJson['uuid'], uuid);
-        expect(bodyJson['title'], "Add updated list");
-        var ts = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-        expect(bodyJson['updatedAt'], greaterThan(ts - 5));
-        expect(bodyJson['updatedAt'], lessThan(ts + 5));
-
         // Verify the redux state is correct
         expect(store.state.status.status, StatusKey.ListTask);
-        expect(store.state.tasks.length, 1);
-        expect(store.state.tasks[uuid].title, "updated Title");
+        expect(store.state.taskRepo.tasks.length, 1);
+        expect(store.state.taskRepo.tasks[uuid].title, "Add updated list");
 
         // verify the UI is correct
         expect(find.byType(TextField), findsNothing);
-        expect(find.text('updated Title'), findsOneWidget);
+        expect(find.text('Add updated list'), findsOneWidget);
       });
     },
   );

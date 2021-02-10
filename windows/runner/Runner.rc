@@ -97,6 +97,7 @@ BEGIN
             VALUE "OriginalFilename", "storyboard.exe" "\0"
             VALUE "ProductName", "storyboard" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
+            VALUE "PackageName", "com.laterhorse.storyboard" "\0"
         END
     END
     BLOCK "VarFileInfo"

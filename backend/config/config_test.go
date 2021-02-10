@@ -3,11 +3,8 @@ package config
 import "testing"
 
 func TestConfig(t *testing.T) {
-	config := NewConfigService()
-	if config.GetVendorName() != "Laterhorse" {
-		t.Error("Mismatch vendor name")
-	}
-	if config.GetAppName() != "Storyboard" {
+	config := NewConfigService("c:\\Storyboard")
+	if config.GetHomeDir() != "c:\\Storyboard" {
 		t.Error("Mismatch app name")
 	}
 	if config.GetDatabaseName() != "foo.db" {

@@ -1,12 +1,12 @@
 #include "flutter_window.h"
-
 #include <optional>
 
 #include "flutter/generated_plugin_registrant.h"
 
 FlutterWindow::FlutterWindow(RunLoop* run_loop,
                              const flutter::DartProject& project)
-    : run_loop_(run_loop), project_(project) {}
+    : run_loop_(run_loop), project_(project), package_info_(nullptr),
+      backends_(nullptr), commands_(nullptr), menu_events_(nullptr) {}
 
 FlutterWindow::~FlutterWindow() {}
 
@@ -14,7 +14,7 @@ bool FlutterWindow::OnCreate() {
   if (!Win32Window::OnCreate()) {
     return false;
   }
-
+  
   RECT frame = GetClientArea();
 
   // The size here must match the window dimensions to avoid unnecessary surface
@@ -26,6 +26,19 @@ bool FlutterWindow::OnCreate() {
     return false;
   }
   RegisterPlugins(flutter_controller_->engine());
+
+  package_info_ = new PackageInfo();
+  package_info_->registerMessenger(flutter_controller_->engine()->messenger());
+
+  backends_ = new Backends();
+  backends_->registerMessenger(flutter_controller_->engine()->messenger());
+
+  commands_ = new Commands();
+  commands_->registerMessenger(flutter_controller_->engine()->messenger());
+
+  menu_events_ = new MenuEvents();
+  menu_events_->registerMessenger(flutter_controller_->engine()->messenger());
+
   run_loop_->RegisterFlutterInstance(flutter_controller_->engine());
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
   return true;
@@ -35,6 +48,23 @@ void FlutterWindow::OnDestroy() {
   if (flutter_controller_) {
     run_loop_->UnregisterFlutterInstance(flutter_controller_->engine());
     flutter_controller_ = nullptr;
+  }
+
+  if (package_info_) {
+    delete package_info_;
+    package_info_ = nullptr;
+  }
+  if (backends_) {
+    delete backends_;
+    backends_ = nullptr;
+  }
+  if (menu_events_) {
+    delete menu_events_;
+    menu_events_ = nullptr;
+  }
+  if (commands_) {
+    delete commands_;
+    commands_ = nullptr;
   }
 
   Win32Window::OnDestroy();

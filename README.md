@@ -23,7 +23,7 @@ Run backend service
 
 ```
 cd $PROJECT_HOME/backend
-go run
+go run .
 ```
 
 You can also compile and run as executable file.
@@ -33,13 +33,67 @@ go build -buildmode=exe
 ./backend 
 ```
 
-Run frontend
+Run frontend - macOS
 ---
 
 ```
 cd $PROJECT_HOME
 flutter run -d macos
 ```
+
+Run frontend - Windows
+---
+
+Should follow the [Instruction](https://flutter.dev/docs/get-started/install/windows`)
+
+In order to build backend, also need to install [TDM64-GCC](https://jmeubank.github.io/tdm-gcc/download/)
+
+
+```
+cd $PROJECT_HOME
+flutter run -d windows
+```
+
+Run frontend - emulator - android
+---
+
+Solve android licenses:
+```
+flutter doctor --android-licenses
+```
+
+First need to fix android command line issue for java9 and above:
+
+```
+export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jre/jdk/Contents/Home
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export ANDROID_SDK_ROOT=$HOME/Library/Android/sdk
+export ANDROID_AVD_HOME=$HOME/.android/avd
+export PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$PATH
+````
+
+Display the available avd and start it
+```
+emulator -list-avds
+emulator @devicename
+
+```
+
+Check the devices is connected and run app on this device.
+```
+flutter devices
+flutter run -d "devicename"
+```
+
+Run frontend - emulator - ios
+---
+
+```
+open -a Simulator
+flutter devices
+flutter run -d "device name"
+```
+
 
 Test
 ===
@@ -95,6 +149,15 @@ cd $PROJECT_HOME/c
 gcc -I. main.c ../backend/backend.a -v
 ```
 
+Programming windows version on mac
+----
+
+Install vcpkg - 
+https://docs.microsoft.com/en-us/cpp/build/install-vcpkg
+
+Integrate with vc - 
+./vcpkg integrate install
+
 References
 ===
 
@@ -103,4 +166,3 @@ Go package layout: https://medium.com/@benbjohnson/standard-package-layout-7cdbc
 Testing HTTP Server in Go: https://blog.questionable.services/article/testing-http-handlers-go/
 
 Flutter MethodChannel: https://stablekernel.com/article/flutter-platform-channels-quick-start/
-
