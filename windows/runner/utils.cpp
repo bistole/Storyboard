@@ -1,9 +1,11 @@
+#include "config.h"
 #include "utils.h"
 
 #include <flutter_windows.h>
 #include <io.h>
 #include <stdio.h>
-#include <windows.h>
+#include "windows.h"
+#include "ShlObj.h"
 
 #include <sstream>
 #include <iostream>
@@ -40,6 +42,19 @@ std::vector<std::string> GetCommandLineArguments() {
   ::LocalFree(argv);
 
   return command_line_arguments;
+}
+
+std::string GetHomeDir() {
+  TCHAR szPath[MAX_PATH];
+  HRESULT hr = SHGetFolderPath( NULL, CSIDL_COMMON_APPDATA, NULL, 0, szPath );
+  if (SUCCEEDED(hr)) {
+    std::string* strPath = ConvertLPWSTR2String(szPath);
+    if (strPath != NULL) {
+        std::string fullpath = *strPath + "\\" + PACKAGE_NAME;
+        return fullpath;
+    }
+  }
+  return NULL;
 }
 
 std::string Utf8FromUtf16(const wchar_t* utf16_string) {

@@ -9,7 +9,6 @@
 #include <map>
 #include <sstream>
 #include <string>
-#include <shlobj.h>
 
 #include <flutter/standard_method_codec.h>
 
@@ -42,16 +41,6 @@ void Backends::registerMessenger(BinaryMessenger* binary_messenger)
         std::unique_ptr<MethodResult<EncodableValue>> result) {
         this->methodChannelHandler(call, result);
     });
-}
-
-std::string Backends::getHomeDir() {
-    TCHAR szPath[MAX_PATH];
-
-    HRESULT hr = SHGetFolderPath( NULL, CSIDL_COMMON_APPDATA, NULL, 0, szPath ) 
-    if (SUCCEEDED(hr)) {
-        return szPath + PACKAGE_NAME;
-    }
-    return NULL
 }
 
 std::string Backends::getCurrentIP() {
@@ -99,7 +88,7 @@ void Backends::methodChannelHandler(
     const std::string& method_name = call.method_name();
     if (method_name.compare(BK_GET_DATAHOME) == 0) {
         printf("BK_GET_DATAHOME\n");
-        std::string path = this->getHomeDir();
+        std::string path = GetHomeDir();
         result->Success(path);
     } else if (method_name.compare(BK_GET_CURRENT_IP) == 0) {
         printf("BK_GET_CURRENT_IP\n");

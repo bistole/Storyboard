@@ -9,7 +9,8 @@
 #include <map>
 #include <sstream>
 #include <string>
-#include <ShObjIdl.h>
+#include "windows.h"
+#include "ShObjIdl.h"
 
 #include <flutter/standard_method_codec.h>
 

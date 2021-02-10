@@ -17,7 +17,6 @@ private:
     BinaryMessenger* binary_messenger_;
     MethodChannel<EncodableValue>* method_channel_;
 
-    std::string getHomeDir();
 	void setCurrentIP(std::string& ip);
 	std::string getCurrentIP();
 	std::map<EncodableValue, EncodableValue> getServerIPs();

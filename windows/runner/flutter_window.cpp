@@ -5,7 +5,8 @@
 
 FlutterWindow::FlutterWindow(RunLoop* run_loop,
                              const flutter::DartProject& project)
-    : run_loop_(run_loop), project_(project), commands_(nullptr), menu_events_(nullptr), package_info_(nullptr) {}
+    : run_loop_(run_loop), project_(project), package_info_(nullptr),
+      backends_(nullptr), commands_(nullptr), menu_events_(nullptr) {}
 
 FlutterWindow::~FlutterWindow() {}
 
@@ -29,6 +30,9 @@ bool FlutterWindow::OnCreate() {
   package_info_ = new PackageInfo();
   package_info_->registerMessenger(flutter_controller_->engine()->messenger());
 
+  backends_ = new Backends();
+  backends_->registerMessenger(flutter_controller_->engine()->messenger());
+
   commands_ = new Commands();
   commands_->registerMessenger(flutter_controller_->engine()->messenger());
 
@@ -47,12 +51,19 @@ void FlutterWindow::OnDestroy() {
   }
 
   if (package_info_) {
+    delete package_info_;
     package_info_ = nullptr;
   }
+  if (backends_) {
+    delete backends_;
+    backends_ = nullptr;
+  }
   if (menu_events_) {
-      menu_events_ = nullptr;
+    delete menu_events_;
+    menu_events_ = nullptr;
   }
   if (commands_) {
+    delete commands_;
     commands_ = nullptr;
   }
 
