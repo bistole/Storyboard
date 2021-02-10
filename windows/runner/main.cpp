@@ -36,7 +36,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   }
   window.SetQuitOnClose(true);
 
-  Backend_Start();
+  // set homedir when backend start
+  std::string homedir = GetHomeDir();
+  const char* dirchar = homedir.c_str();
+	char* dircharDump = _strdup(dirchar);
+	printf("HOME_DIR: %s\n", dircharDump);
+	Backend_Start(dircharDump);
+	free(dircharDump);
+
   run_loop.Run();
 
   Backend_Stop();

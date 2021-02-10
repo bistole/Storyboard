@@ -37,9 +37,6 @@ class OpenDialog : NSObject {
 class Commands : NSObject {
     let COMMANDS = "/COMMANDS";
     let CMD_OPEN_DIALOG = "CMD:OPEN_DIALOG";
-    let CMD_GET_CURRENT_IP = "CMD:GET_CURRENT_IP"
-    let CMD_SET_CURRENT_IP = "CMD:SET_CURRENT_IP"
-    let CMD_GET_SERVER_IPS = "CMD:GET_SERVER_IPS"
     
     weak var binaryMessager : FlutterBinaryMessenger?
     var methodChannel : FlutterMethodChannel?
@@ -55,33 +52,6 @@ class Commands : NSObject {
                 fileTypes: dict["types"] ?? "*",
                 result: result)
             break
-        case self.CMD_GET_CURRENT_IP:
-            if let ipRaw = Backend_GetCurrentIP() {
-                let ip = String(cString: ipRaw, encoding: String.Encoding.ascii);
-                result(ip)
-                free(ipRaw)
-            }
-            break
-        case self.CMD_SET_CURRENT_IP:
-            let ip : String = call.arguments as! String
-            if let ipdata = (ip as NSString).utf8String {
-                let ippchar = UnsafeMutablePointer<Int8>.init(mutating: ipdata)
-                Backend_SetCurrentIP(ippchar)
-            }
-            result(true)
-            break;
-        case self.CMD_GET_SERVER_IPS:
-            do {
-                if let ipsRaw = Backend_GetAvailableIPs() {
-                    let ipsStr = String(cString: ipsRaw, encoding: String.Encoding.ascii)
-                    if let ipsData = ipsStr?.data(using: .utf8) {
-                        let ipsJson = try JSONSerialization.jsonObject(with: ipsData, options: [])
-                        result(ipsJson)
-                    }
-                }
-            } catch {
-                result({})
-            }
         default:
             result(FlutterMethodNotImplemented);
         }

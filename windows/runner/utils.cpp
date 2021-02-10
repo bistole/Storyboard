@@ -1,10 +1,13 @@
+#include "config.h"
 #include "utils.h"
 
 #include <flutter_windows.h>
 #include <io.h>
 #include <stdio.h>
-#include <windows.h>
+#include "windows.h"
+#include "ShlObj.h"
 
+#include <sstream>
 #include <iostream>
 
 void CreateAndAttachConsole() {
@@ -41,6 +44,19 @@ std::vector<std::string> GetCommandLineArguments() {
   return command_line_arguments;
 }
 
+std::string GetHomeDir() {
+  TCHAR szPath[MAX_PATH];
+  HRESULT hr = SHGetFolderPath( NULL, CSIDL_COMMON_APPDATA, NULL, 0, szPath );
+  if (SUCCEEDED(hr)) {
+    std::string* strPath = ConvertLPWSTR2String(szPath);
+    if (strPath != NULL) {
+        std::string fullpath = *strPath + "\\" + PACKAGE_NAME;
+        return fullpath;
+    }
+  }
+  return NULL;
+}
+
 std::string Utf8FromUtf16(const wchar_t* utf16_string) {
   if (utf16_string == nullptr) {
     return std::string();
@@ -61,4 +77,39 @@ std::string Utf8FromUtf16(const wchar_t* utf16_string) {
     return std::string();
   }
   return utf8_string;
+}
+
+void SplitStringIntoVector(std::string str, char delimiter, std::vector<std::string>& out) {
+    std::istringstream stream(str);
+    std::string s;
+    out.clear();
+    while (std::getline(stream, s, ';')) {
+        if (s.length() > 0) {
+            out.push_back(s);
+        }
+    }
+}
+
+std::string *ConvertLPWSTR2String(wchar_t* pwszStr) {
+    int size = WideCharToMultiByte(CP_UTF8, 0, pwszStr, -1,
+        NULL, 0, NULL, NULL);
+    if (size > 0) {
+        char* pszStr = (CHAR*)malloc((size + 1) * sizeof(CHAR));
+        pszStr[size] = '\0';
+        WideCharToMultiByte(CP_UTF8, 0, pwszStr, -1, pszStr, size, NULL, NULL);
+        std::string* str = new std::string(pszStr);
+        free(pszStr);
+        return str;
+    }
+    return NULL;
+}
+
+wchar_t* ConvertString2LPWSTR(std::string& str) {
+    int size = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, NULL, 0);
+    if (size > 0) {
+        wchar_t* pwszStr = (wchar_t*)malloc((size + 1) * sizeof(wchar_t));
+        MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, pwszStr, size);
+        return pwszStr;
+    }
+    return NULL;
 }
