@@ -1,5 +1,9 @@
 package database
 
+// TODO: test getTS
+// TODO: test createDBInstance when db file exists
+// TODO: test error cases
+
 import (
 	"database/sql"
 	"errors"

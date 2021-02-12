@@ -1,5 +1,7 @@
 package taskrepo
 
+// TODO: error cases
+
 import (
 	"log"
 	"storyboard/backend/interfaces"

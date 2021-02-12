@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"log"
+	"net"
 	"net/http"
 	"storyboard/backend/interfaces"
 	"sync"
@@ -14,6 +15,8 @@ import (
 // RESTServer is wrapper for http server and wait group
 type RESTServer struct {
 	Config      interfaces.ConfigService
+	Net         interfaces.NetProxy
+	HTTP        interfaces.HTTPProxy
 	ServerIP    string
 	Server      *http.Server
 	Wg          *sync.WaitGroup
@@ -23,10 +26,18 @@ type RESTServer struct {
 }
 
 // NewRESTServer create REST server
-func NewRESTServer(config interfaces.ConfigService, taskRepo interfaces.TaskRepo, photoRepo interfaces.PhotoRepo) *RESTServer {
+func NewRESTServer(
+	net interfaces.NetProxy,
+	http interfaces.HTTPProxy,
+	config interfaces.ConfigService,
+	taskRepo interfaces.TaskRepo,
+	photoRepo interfaces.PhotoRepo,
+) *RESTServer {
 	var wg = &sync.WaitGroup{}
 	return &RESTServer{
 		Config:    config,
+		Net:       net,
+		HTTP:      http,
 		ServerIP:  "",
 		Server:    nil,
 		Wg:        wg,
@@ -77,7 +88,7 @@ func (rs *RESTServer) Start() {
 		}()
 
 		log.Println("Started: ", ip)
-		if err := rs.Server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := rs.HTTP.ListenAndServe(rs.Server); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("ListenAndServe(): %v", err)
 		}
 	}()
@@ -94,7 +105,7 @@ func (rs *RESTServer) Stop() {
 	// stop event server
 	rs.EventServer.End()
 
-	err := rs.Server.Shutdown(ctx)
+	err := rs.HTTP.Shutdown(ctx, rs.Server)
 	if err != nil {
 		log.Fatalf("Shutdown(): %v", err)
 	}
@@ -111,11 +122,11 @@ func (rs *RESTServer) GetCurrentIP() string {
 	}
 	var configIP = rs.Config.GetIP()
 	if configIP == "" {
-		configIP = GetOutboundIP()
+		configIP = rs.getOutboundIP()
 		rs.Config.SetIP(configIP)
 	} else {
 		var valid = false
-		candidates := GetServerIPs()
+		candidates := rs.GetServerIPs()
 		for _, val := range candidates {
 			if val == configIP {
 				valid = true
@@ -124,7 +135,7 @@ func (rs *RESTServer) GetCurrentIP() string {
 		}
 		if valid != true {
 			// config ip is not valid, use outbound one
-			configIP := GetOutboundIP()
+			configIP := rs.getOutboundIP()
 			rs.Config.SetIP(configIP)
 		}
 	}
@@ -144,7 +155,53 @@ func (rs *RESTServer) SetCurrentIP(ip string) {
 	}
 }
 
+// GetOutboundIP get most possible ip address to bind
+func (rs *RESTServer) getOutboundIP() string {
+	conn, err := rs.Net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		panic(err)
+	}
+	defer rs.Net.ConnClose(conn)
+
+	localIP := rs.Net.ConnLocalAddr(conn).(*net.UDPAddr).IP.String()
+	log.Println("Outbound IP: " + localIP)
+	return localIP
+}
+
 // GetServerIPs get available server ips
 func (rs *RESTServer) GetServerIPs() map[string]string {
-	return GetServerIPs()
+	ifaces, err := rs.Net.Interfaces()
+	if err != nil {
+		panic(err)
+	}
+
+	var results map[string]string = make(map[string]string)
+	for _, i := range ifaces {
+		addrs, err := rs.Net.InterfaceAddrs(i)
+		if err != nil {
+			panic(err)
+		}
+		if len(addrs) == 0 {
+			continue
+		}
+		for _, addr := range addrs {
+			var ip net.IP
+			switch v := addr.(type) {
+			case *net.IPNet:
+				ip = v.IP
+			case *net.IPAddr:
+				ip = v.IP
+
+			}
+			if ip.IsLoopback() {
+				continue
+			}
+			var v4 = ip.To4()
+			if v4 != nil {
+				results[i.Name] = v4.String()
+				log.Println("Found IP: " + i.Name + " -> " + v4.String())
+			}
+		}
+	}
+	return results
 }

@@ -1,10 +1,5 @@
 NOW
 ===
-- Split storage by environment
-  - Merge backend storage and frontend storage together [IN_PROGRESS]
-    - Backend [DONE]
-    - Macos [DONE]
-    - Windows
 
 - Deployment
   - MacOS
@@ -32,8 +27,6 @@ TODO
     - add nickname for each server
   - Desktop: add server nickname which can is recognized
 
-- Share backend/frontend media data on desktop
-
 - Change icon for app.
 - Set minsize of desktop application.
 
@@ -44,6 +37,10 @@ TODO
   - When create - allow rotate photo
   - When update - allow rotate photo
 
+- Split storage by environment
+- Share backend/frontend media data on desktop
+- Change Windows Folder from /ProgramData/com.laterhorse.storyboard
+  to /ProgramData/Laterhorse/Storyboard
 
 ISSUE
 =====
@@ -238,3 +235,8 @@ Compile as windows services [DONE]
   - Fix orientation of photo when take with iphone device. [DONE]
   - Fix mirrow issue [DONE]
   - Failed to scan QR in android [DONE]
+
+- Merge backend storage and frontend storage together [DONE]
+  - Backend [DONE]
+  - Macos [DONE]
+  - Windows [DONE]

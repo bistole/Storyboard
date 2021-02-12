@@ -1,8 +1,11 @@
 package mocks
 
 import (
+	"context"
 	"database/sql"
 	"io"
+	"net"
+	"net/http"
 	"storyboard/backend/interfaces"
 )
 
@@ -11,6 +14,56 @@ type Task = interfaces.Task
 
 // Photo is defined in interfaces
 type Photo = interfaces.Photo
+
+// NetMock to mock package net
+type NetMock struct {
+	DialFn           func(string, string) (net.Conn, error)
+	ConnCloseFn      func(net.Conn)
+	ConnLocalAddrFn  func(net.Conn) net.Addr
+	InterfacesFn     func() ([]net.Interface, error)
+	InterfaceAddrsFn func(net.Interface) ([]net.Addr, error)
+}
+
+// Dial mock net Dial()
+func (net NetMock) Dial(t string, ip string) (net.Conn, error) {
+	return net.DialFn(t, ip)
+}
+
+// ConnClose mock net.Conn.Close()
+func (net NetMock) ConnClose(conn net.Conn) {
+	net.ConnCloseFn(conn)
+}
+
+// ConnLocalAddr mock net.Conn.Close()
+func (net NetMock) ConnLocalAddr(conn net.Conn) net.Addr {
+	return net.ConnLocalAddrFn(conn)
+}
+
+// Interfaces mock net Interfaces()
+func (net NetMock) Interfaces() ([]net.Interface, error) {
+	return net.InterfacesFn()
+}
+
+// InterfaceAddrs mock net.Interface.Addrs()
+func (net NetMock) InterfaceAddrs(i net.Interface) ([]net.Addr, error) {
+	return net.InterfaceAddrsFn(i)
+}
+
+// HTTPMock to mock package net/http
+type HTTPMock struct {
+	ListenAndServeFn func(*http.Server) error
+	ShutdownFn       func(context.Context, *http.Server) error
+}
+
+// ListenAndServe mock net.http.Server.ListenAndServe()
+func (http HTTPMock) ListenAndServe(server *http.Server) error {
+	return http.ListenAndServeFn(server)
+}
+
+// Shutdown mock net.http.Server.Shutdown()
+func (http HTTPMock) Shutdown(ctx context.Context, server *http.Server) error {
+	return http.ShutdownFn(ctx, server)
+}
 
 // ConfigMock to mock config
 type ConfigMock struct {
