@@ -11,10 +11,12 @@ import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo_repo.dart';
+import 'package:storyboard/redux/models/setting.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
 import 'package:storyboard/redux/models/task_repo.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
+import 'package:storyboard/views/common/toolbar_button.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/page.dart';
 
@@ -51,6 +53,11 @@ void main() {
             status: Status.noParam(StatusKey.ListTask),
             taskRepo: TaskRepo(tasks: <String, Task>{}, lastTS: 0),
             photoRepo: PhotoRepo(photos: {}, lastTS: 0),
+            setting: Setting(
+              clientID: 'client-id',
+              serverKey: 'server-key',
+              serverReachable: Reachable.Unknown,
+            ),
           ),
         );
 
@@ -66,7 +73,7 @@ void main() {
         await tester.pumpWidget(widget);
 
         // Add Button here
-        expect(find.byType(TextButton), findsNWidgets(2));
+        expect(find.byType(SBToolbarButton), findsNWidgets(2));
         expect(find.text('ADD TASK'), findsOneWidget);
 
         // Tap 'ADD' button

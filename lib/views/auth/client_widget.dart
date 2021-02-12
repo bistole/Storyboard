@@ -66,7 +66,7 @@ class _ClientWidgetState extends State<ClientWidget> {
           title: Text('Error'),
           content: Text(ErrorInvalidScanner),
           actions: [
-            FlatButton(
+            TextButton(
               onPressed: () => {Navigator.of(context).pop()},
               child: Text('OK'),
             )

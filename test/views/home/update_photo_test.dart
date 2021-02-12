@@ -14,6 +14,7 @@ import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/photo_repo.dart';
+import 'package:storyboard/redux/models/setting.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task_repo.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
@@ -72,6 +73,11 @@ void main() {
           photoRepo: PhotoRepo(
             photos: <String, Photo>{uuid: Photo.fromJson(photoJson)},
             lastTS: 0,
+          ),
+          setting: Setting(
+            clientID: 'client-id',
+            serverKey: 'server-key',
+            serverReachable: Reachable.Unknown,
           ),
         ),
       );

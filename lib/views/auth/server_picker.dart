@@ -37,7 +37,7 @@ class _ServerPickerState extends State<ServerPicker> {
 
     getViewResource().backend.setCurrentIp(ip).then(
           (_) => getViewResource().backend.getCurrentIp().then(
-                (value) => changeServerKey(encodeServerKey(currentIP, 3000)),
+                (retIP) => changeServerKey(encodeServerKey(retIP, 3000)),
               ),
         );
   }

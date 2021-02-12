@@ -51,7 +51,7 @@ class Storage {
 
   Future<void> copyPhotoByUUID(String uuid, File src) async {
     String photoPath = getPhotoPathByUUID(uuid);
-    await src.copy(photoPath);
+    src.copySync(photoPath);
   }
 
   Future<void> savePhotoByUUID(String uuid, Uint8List bytes) async {

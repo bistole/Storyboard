@@ -98,6 +98,7 @@ class Factory {
   void checkServerKeyOnDesktop() {
     backend.getCurrentIp().then((localIp) {
       var newServeKey = encodeServerKey(localIp, 3000);
+      if (newServeKey == null) return;
       if (store.state.setting.serverKey != newServeKey) {
         // only first time when serverKey is updated
         store.onChange
@@ -119,24 +120,14 @@ class Factory {
     }
   }
 
-  Future<void> initAfterAppCreated() async {
+  Future<void> initMethodChannels() async {
     // init backend
     MethodChannel mcBackend = await createChannelByName(CHANNEL_BACKENDS);
     backend = BackendChannel(mcBackend);
 
-    // init storage
-    storage.setDataHome(await backend.getDataHome());
-    await storage.initPhotoStorage();
-
-    // init store & start queue
-    store = await initStore(storage);
-    netQueue.setStore(store);
-    netQueue.start();
-
     // init command
     MethodChannel mcCommand = await createChannelByName(CHANNEL_COMMANDS);
     command = CommandChannel(mcCommand);
-    command.setStore(store);
     command.setActServer(actServer);
 
     // init menu
@@ -144,9 +135,26 @@ class Factory {
     menu = MenuChannel(mcMenu);
     menu.setCommandChannel(command);
 
+    // set to view resource
     getViewResource().command = command;
     getViewResource().backend = backend;
+  }
 
+  Future<void> initStoreAndStorage() async {
+    // init storage
+    storage.setDataHome(await backend.getDataHome());
+    await storage.initPhotoStorage();
+
+    // init store & start queue
+    store = await initStore(storage);
+
+    netQueue.setStore(store);
+    netQueue.start();
+
+    command.setStore(store);
+  }
+
+  Future<void> checkServerStatus() async {
     if (deviceManager.isDesktop()) {
       checkServerKeyOnDesktop();
     } else {

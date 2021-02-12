@@ -7,6 +7,8 @@ import 'package:storyboard/redux/models/app.dart';
 var countPerFetch = 100;
 
 String encodeServerKey(String ip, int port) {
+  if (ip == null) return null;
+
   const c2hex = '0123456789abcdef';
   var result = '';
   var iparr = ip.split('.');
