@@ -76,10 +76,8 @@ bool handleNetworkError(Store<AppState> store, Exception e) {
         e.osError.errorCode == 60 /* Operation timed out */ ||
         e.osError.errorCode == 111 /* Connection refused */) {
       store.dispatch(SettingServerReachableAction(reachable: false));
-      print(e.toString());
       return true;
     } else if (e.osError.errorCode == 50 /* Network is down */) {
-      print(e.toString());
       return true;
     }
   }

@@ -174,20 +174,26 @@ class _ClientWidgetState extends State<ClientWidget> {
             ? Icon(AppIcons.ok, color: color)
             : Icon(AppIcons.cancel, color: color));
 
-    return Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-      Container(
-        child: Text(
-          'Access Point Status:',
-          style: Theme.of(context)
-              .textTheme
-              .headline3
-              .copyWith(color: Colors.black),
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            'Access Point Status:',
+            style: Theme.of(context)
+                .textTheme
+                .headline3
+                .copyWith(color: Colors.black),
+          ),
         ),
-      ),
-      icon,
-      Text(desc,
-          style: Theme.of(context).textTheme.headline3.copyWith(color: color)),
-    ]);
+        icon,
+        Expanded(
+          child: Text(
+            desc,
+            style: Theme.of(context).textTheme.headline3.copyWith(color: color),
+          ),
+        ),
+      ],
+    );
   }
 
   List<Widget> buildScanButtons(BuildContext context) {

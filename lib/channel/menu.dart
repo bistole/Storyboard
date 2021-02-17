@@ -22,11 +22,9 @@ class MenuChannel {
   Future<void> notifyMenuEvent(MethodCall call) async {
     switch (call.method) {
       case MENU_IMPORT_PHOTO:
-        print('receive menu event: ' + call.method);
         _command.importPhoto();
         break;
       case MENU_TIMER:
-        print('receive timer: ' + (call.arguments as String));
         break;
     }
   }

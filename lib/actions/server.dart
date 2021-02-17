@@ -14,7 +14,7 @@ class ActServer {
     if (serverKey != store.state.setting.serverKey) {
       store.onChange
           .any((state) => state.setting.serverKey == serverKey)
-          .then((_) => {_netSSE.connect(store)});
+          .then((_) => {_netSSE.reconnect(store)});
       store.dispatch(
         SettingServerKeyAction(serverKey: serverKey),
       );

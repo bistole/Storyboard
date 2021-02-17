@@ -19,86 +19,80 @@ const LabelWidth = 80.0;
 
 class ServerQRCode extends StatelessWidget {
   Widget buildTitle(BuildContext context) {
-    return Container(
-      alignment: Alignment.centerLeft,
-      margin: EdgeInsets.only(bottom: 4),
-      child: Text(
-        "Access Point Info",
-        style: Theme.of(context).textTheme.headline2.copyWith(
-              color: Colors.black,
-            ),
-      ),
-    );
-  }
-
-  Widget buildQRCode(ReduxActions redux) {
-    return Row(
+    return Wrap(
       children: [
         Container(
-          width: LabelWidth,
-          child: Text('QR Code:'),
+          margin: EdgeInsets.only(bottom: 5),
+          child: Text(
+            "Access Point Info",
+            style: Theme.of(context)
+                .textTheme
+                .headline2
+                .copyWith(color: Colors.black),
+          ),
         ),
-        QrImage(
-          data: redux.serverKey,
-          version: QrVersions.auto,
-          size: 200,
-          padding: EdgeInsets.all(5),
-        )
       ],
     );
   }
 
-  Widget buildServerKey(BuildContext context, ReduxActions redux) {
-    return Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-      Container(
-        width: LabelWidth,
-        child: Text(
-          'Server Key:',
-          style: Theme.of(context)
-              .textTheme
-              .headline3
-              .copyWith(color: Colors.black),
-        ),
-      ),
-      Expanded(
-        child: Container(
-          margin: EdgeInsets.all(4),
-          padding: EdgeInsets.all(4),
-          child: Text(
+  Widget buildStatus(BuildContext context, ReduxActions redux) {
+    var icon = redux.serverReachable == Reachable.Unknown
+        ? Icon(AppIcons.help, color: Colors.grey)
+        : (redux.serverReachable == Reachable.Yes
+            ? Icon(AppIcons.ok, color: Colors.green)
+            : Icon(AppIcons.cancel, color: Colors.red));
+    return Table(
+      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+      columnWidths: {
+        0: FlexColumnWidth(1),
+        1: FlexColumnWidth(3),
+      },
+      children: <TableRow>[
+        TableRow(children: [
+          TableCell(
+            verticalAlignment: TableCellVerticalAlignment.top,
+            child: Text(
+              'QR Code:',
+              style: Theme.of(context)
+                  .textTheme
+                  .headline2
+                  .copyWith(color: Colors.black),
+            ),
+          ),
+          QrImage(
+            data: redux.serverKey,
+            version: QrVersions.auto,
+            padding: EdgeInsets.all(5),
+          )
+        ]),
+        TableRow(children: [
+          Text(
+            'Server Key:',
+            style: Theme.of(context)
+                .textTheme
+                .headline2
+                .copyWith(color: Colors.black),
+          ),
+          Text(
             redux.serverKey,
             style: Theme.of(context).textTheme.headline2.copyWith(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                 ),
           ),
-        ),
-      )
-    ]);
-  }
-
-  Widget buildLaunched(BuildContext context, ReduxActions redux) {
-    var icon = redux.serverReachable == Reachable.Unknown
-        ? Icon(AppIcons.help, color: Colors.grey)
-        : (redux.serverReachable == Reachable.Yes
-            ? Icon(AppIcons.ok, color: Colors.green)
-            : Icon(AppIcons.cancel, color: Colors.red));
-
-    return Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-      Container(
-        width: LabelWidth,
-        child: Text(
-          'Status:',
-          style: Theme.of(context)
-              .textTheme
-              .headline3
-              .copyWith(color: Colors.black),
-        ),
-      ),
-      Container(
-        margin: EdgeInsets.fromLTRB(5, 5, 0, 0),
-        child: icon,
-      ),
-    ]);
+        ]),
+        TableRow(children: [
+          Text(
+            'Status:',
+            style: Theme.of(context)
+                .textTheme
+                .headline2
+                .copyWith(color: Colors.black),
+          ),
+          Align(alignment: Alignment.centerLeft, child: icon),
+        ]),
+      ],
+    );
   }
 
   Widget buildDescription(BuildContext context) {
@@ -154,16 +148,14 @@ class ServerQRCode extends StatelessWidget {
       },
       builder: (context, ReduxActions redux) {
         if (redux.serverKey == "") {
-          return Column(children: [
+          return ListView(shrinkWrap: true, children: [
             buildTitle(context),
             buildNotAvailable(),
           ]);
         }
-        return Column(children: [
+        return ListView(shrinkWrap: true, children: [
           buildTitle(context),
-          buildQRCode(redux),
-          buildServerKey(context, redux),
-          buildLaunched(context, redux),
+          buildStatus(context, redux),
           buildDescription(context),
         ]);
       },

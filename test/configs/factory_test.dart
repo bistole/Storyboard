@@ -146,7 +146,7 @@ void main() {
 
       when(f.deviceManager.isDesktop()).thenReturn(true);
       when(f.backend.getCurrentIp()).thenAnswer((_) async => newIP);
-      when(f.netSSE.connect(any)).thenAnswer((_) {
+      when(f.netSSE.reconnect(any)).thenAnswer((_) {
         connectCalled = true;
         return null;
       });
@@ -157,7 +157,7 @@ void main() {
         await Future.delayed(Duration(milliseconds: 100));
       }
 
-      var capture = verify(f.netSSE.connect(captureAny)).captured;
+      var capture = verify(f.netSSE.reconnect(captureAny)).captured;
       expect(capture[0], f.store);
 
       expect(f.store.state.setting.serverKey, newServerKey);

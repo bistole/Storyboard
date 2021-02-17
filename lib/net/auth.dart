@@ -28,11 +28,11 @@ class NetAuth {
         }
       }
     } on TimeoutException catch (_) {
-      print("netPing timeout");
       store.dispatch(SettingServerReachableAction(reachable: false));
     } catch (e) {
-      handleNetworkError(store, e);
-      print("netPing failed: $e");
+      if (!handleNetworkError(store, e)) {
+        print("netPing failed: $e");
+      }
     }
     return false;
   }

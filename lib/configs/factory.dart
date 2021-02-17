@@ -103,7 +103,7 @@ class Factory {
         // only first time when serverKey is updated
         store.onChange
             .any((state) => state.setting.serverKey == newServeKey)
-            .then((_) => netSSE.connect(store));
+            .then((_) => netSSE.reconnect(store));
 
         // backend ip is changed, lets change frontend ip too
         store.dispatch(SettingServerKeyAction(serverKey: newServeKey));

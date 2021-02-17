@@ -7,11 +7,15 @@ class ServerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(children: [
-        ServerQRCode(),
-        ServerPicker(),
-        Spacer(),
-      ]),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            ServerQRCode(),
+            Divider(color: Colors.grey),
+            ServerPicker(),
+          ],
+        ),
+      ),
     );
   }
 }
