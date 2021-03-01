@@ -1,11 +1,20 @@
 NOW
 ===
 
+- Change icon for app.
+- Set minsize of desktop application.
+
+- Create a website to publish service. [DONE]
+  - Create static home page [DONE]
+  - Create download page for all [DONE]
+
 - Deployment
-  - MacOS
+  - MacOS [DONE]
   - Windows
   - Android
+    - APK
   - iOS
+    - TestFlight
 
 TODO
 ====
@@ -26,12 +35,6 @@ TODO
     - allow switch between different server
     - add nickname for each server
   - Desktop: add server nickname which can is recognized
-
-- Change icon for app.
-- Set minsize of desktop application.
-
-- Create a website to publish service.
-  - Automatic build
 
 - Redesign display photo interface.
   - When create - allow rotate photo
