@@ -20,9 +20,14 @@ TODO
 ====
 
 - Deployment enhancement
-  - Track for kotlin crash
-  - Track for Flutter crash
-  - Use appbundle instead of apk
+  - MacOS
+    - Convert version from alpha-0.1.0 to 0.1.0-alpha
+  - Android
+    - Track for kotlin crash
+    - Track for Flutter crash
+    - Use appbundle instead of apk
+
+
 
 - Authenticate
   - Create server-id for each server.

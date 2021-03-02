@@ -152,6 +152,14 @@ Upload to internal
 Promote to alpha
 > SUPPLY_VERSION_CODE=5 fastlane android alpha
 
+iOS
+----
+
+Upload to testflight
+> cd $PROJECT_HOME/ios
+> flutter build ios --release --no-codesign
+> fastlane ios alpha
+
 Misc
 ===
 

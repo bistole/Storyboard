@@ -21,6 +21,9 @@
 .idea
 .vs
 */fastlane/report.xml
+ios/Runner.ipa
+ios/Runner.app.dSYM.zip
+
 coverage/
 build/
 docs/
