@@ -18,6 +18,12 @@ NOW
 
 TODO
 ====
+
+- Deployment enhancement
+  - Track for kotlin crash
+  - Track for Flutter crash
+  - Use appbundle instead of apk
+
 - Authenticate
   - Create server-id for each server.
     - Persistent server-id.

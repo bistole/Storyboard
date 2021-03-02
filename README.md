@@ -136,6 +136,22 @@ go test ./... -coverprofile=coverage.out
 go tool cover -html=coverage.out
 ```
 
+Deploy
+====
+
+Change the version in pubspec.yaml
+
+Android
+----
+
+Upload to internal
+> cd $PROJECT_HOME/android
+> flutter build apk
+> fastlane android internal
+
+Promote to alpha
+> SUPPLY_VERSION_CODE=5 fastlane android alpha
+
 Misc
 ===
 

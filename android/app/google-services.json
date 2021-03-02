@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "596199825636",
+    "project_id": "pc-api-7030696049390298626-874",
+    "storage_bucket": "pc-api-7030696049390298626-874.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:596199825636:android:8cd9e3527cc9b0344f4cf1",
+        "android_client_info": {
+          "package_name": "com.laterhorse.storyboard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "596199825636-f4ngjavv1ppen5dm4in58cbkerqmn312.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBq9s2wPJce1GyqCJsocSRlMSi1zPJKXqE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "596199825636-f4ngjavv1ppen5dm4in58cbkerqmn312.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
