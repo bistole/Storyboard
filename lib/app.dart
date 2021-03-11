@@ -6,6 +6,7 @@ import 'package:storyboard/views/auth/page.dart';
 
 import 'package:storyboard/views/home/page.dart';
 import 'package:storyboard/redux/models/app.dart';
+import 'package:storyboard/views/logger/page.dart';
 import 'package:storyboard/views/photo/page.dart';
 
 class StoryBoardApp extends StatelessWidget {
@@ -41,9 +42,14 @@ class StoryBoardApp extends StatelessWidget {
   }
 
   Future<Store<AppState>> getFutureStore() async {
-    await getFactory().initMethodChannels();
-    await getFactory().initStoreAndStorage();
-    await getFactory().checkServerStatus();
+    try {
+      await getFactory().initMethodChannels();
+      await getFactory().initStoreAndStorage();
+      await getFactory().checkServerStatus();
+    } catch (e, trace) {
+      print(e);
+      print(trace);
+    }
     return getFactory().store;
   }
 
@@ -63,6 +69,7 @@ class StoryBoardApp extends StatelessWidget {
             routes: {
               PhotoPage.routeName: (_) => PhotoPage(),
               AuthPage.routeName: (_) => AuthPage(),
+              LoggerPage.routeName: (_) => LoggerPage(),
             },
             theme: ThemeData(
               primarySwatch: Colors.green,

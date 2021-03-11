@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:redux/redux.dart';
+import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
@@ -25,6 +26,12 @@ const String notifyTypeTask = "task";
 const String notifyTypePhoto = "photo";
 
 class NetSSE {
+  String _LOG_TAG = (NetSSE).toString();
+  Logger _logger;
+  void setLogger(Logger logger) {
+    _logger = logger;
+  }
+
   http.Client Function() _getHttpClient;
   void setGetHttpClient(http.Client Function() getHttpClient) {
     _getHttpClient = getHttpClient;
@@ -68,6 +75,7 @@ class NetSSE {
   }
 
   Future<void> connect(Store<AppState> store) async {
+    _logger.info(_LOG_TAG, "connect");
     if (!_running) {
       _running = true;
       _runLoop(store);
@@ -75,6 +83,7 @@ class NetSSE {
   }
 
   void disconnect() {
+    _logger.info(_LOG_TAG, "disconnect");
     if (_running) {
       _closeHTTP();
       _running = false;
@@ -82,11 +91,13 @@ class NetSSE {
   }
 
   Future<void> reconnect(Store<AppState> store) async {
+    _logger.info(_LOG_TAG, "reconnect");
     disconnect();
     await connect(store);
   }
 
   void _closeHTTP() {
+    _logger.info(_LOG_TAG, "_closeHTTP");
     if (_currentHttpClient != null) {
       _currentHttpClient.close();
       _currentHttpClient = null;
@@ -97,27 +108,33 @@ class NetSSE {
     Map<String, dynamic> object = jsonDecode(body);
     switch (object['action'] as String) {
       case actionNotify:
+        _logger.debug(_LOG_TAG, "SSE Recv actionNotify");
         if (object['params'] is Map && object['params']['type'] is String) {
           _callUpdateFuncByType(object['params']['type']);
         }
         break;
       case actionWelcome:
+        _logger.debug(_LOG_TAG, "SSE Recv actionWelcome");
         break;
       case actionKeepalive:
+        _logger.debug(_LOG_TAG, "SSE Recv actionKeepalive");
         break;
       case actionClose:
+        _logger.debug(_LOG_TAG, "SSE Recv actionClose");
         return false;
       default:
-        print("SSE Recv unknown: $body");
+        _logger.warn(_LOG_TAG, "SSE Recv unknown: $body");
     }
     return true;
   }
 
   Future<bool> _recvEvent(Store<AppState> store) async {
+    _logger.info(_LOG_TAG, "_recvEvent");
     try {
       String prefix = getURLPrefix(store);
       if (prefix == null) {
         _changeStatus(store, NetSSEStatus.NotLaunched);
+        _logger.info(_LOG_TAG, "_recvEvent no server url");
         return false;
       }
 
@@ -137,6 +154,7 @@ class NetSSE {
       _callUpdateAllFuncs();
 
       store.dispatch(SettingServerReachableAction(reachable: true));
+      _logger.info(_LOG_TAG, "_recvEvent connect to server");
 
       Completer<bool> completer = Completer<bool>();
       response.stream.listen((value) {
@@ -144,6 +162,7 @@ class NetSSE {
         if (_parseEvent(str)) {
           _changeStatus(store, NetSSEStatus.Connected);
         } else {
+          _logger.info(_LOG_TAG, "_recvEvent server ask for close");
           _closeHTTP();
           _changeStatus(store, NetSSEStatus.Disconnected);
           completer.complete(false);
@@ -151,12 +170,13 @@ class NetSSE {
       }, onError: (Object err) {
         // server is down or disconnected.
         // ClientException: Connection closed while receiving data
-        print("SSE http catch error: ${err.runtimeType} $err");
+        _logger.error(
+            _LOG_TAG, "SSE http catch error: ${err.runtimeType} $err");
         _closeHTTP();
         _changeStatus(store, NetSSEStatus.Disconnected);
         completer.complete(false);
       }, onDone: () {
-        print("SSE Connection is terminated");
+        _logger.warn(_LOG_TAG, "SSE Connection is terminated");
         _changeStatus(store, NetSSEStatus.Disconnected);
         if (!completer.isCompleted) {
           completer.complete(false);
@@ -167,17 +187,20 @@ class NetSSE {
     } catch (e) {
       // exception: SocketException: OS Error: Connection refused, errno = 61, address = 192.168.3.135, port = 55223
       // exception: TimeoutException after 0:00:05.000000: Future not completed
-      print("SSE catch unexpected exception: $e");
+      _logger.error(_LOG_TAG, "SSE catch unexpected exception: $e");
       _changeStatus(store, NetSSEStatus.WrongServer);
     }
     _closeHTTP();
+    _logger.info(_LOG_TAG, "_recvEvent exit");
     return false;
   }
 
   Future<void> _runLoop(Store<AppState> store) async {
+    _logger.info(_LOG_TAG, "_runLoop");
     while (_running) {
       await _recvEvent(store);
       await Future.delayed(Duration(seconds: 2));
     }
+    _logger.info(_LOG_TAG, "_runLoop exit");
   }
 }

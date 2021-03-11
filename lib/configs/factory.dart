@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
 
 import 'package:storyboard/actions/photos.dart';
@@ -10,6 +13,8 @@ import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/channel/menu.dart';
 import 'package:storyboard/configs/channel_manager.dart';
 import 'package:storyboard/configs/device_manager.dart';
+import 'package:storyboard/logger/log_level.dart';
+import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/net/auth.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/photos.dart';
@@ -28,6 +33,7 @@ const CHANNEL_COMMANDS = '/COMMANDS';
 
 class Factory {
   DeviceManager deviceManager;
+  Logger logger;
 
   ActServer actServer;
   ActPhotos actPhotos;
@@ -49,6 +55,9 @@ class Factory {
 
   Factory() {
     deviceManager = DeviceManager();
+    logger = Logger();
+    logger.setLevel(LogLevel.debug());
+
     actServer = ActServer();
     actPhotos = ActPhotos();
     actTasks = ActTasks();
@@ -62,34 +71,46 @@ class Factory {
     channelManager = ChannelManager();
     storage = Storage();
 
+    actServer.setLogger(logger);
     actServer.setNetSSE(netSSE);
 
+    actPhotos.setLogger(logger);
     actPhotos.setNetQueue(netQueue);
     actPhotos.setStorage(storage);
 
+    actTasks.setLogger(logger);
     actTasks.setNetQueue(netQueue);
 
+    netQueue.setLogger(logger);
+
+    netAuth.setLogger(logger);
     netAuth.setHttpClient(http.Client());
 
+    netPhotos.setLogger(logger);
     netPhotos.setHttpClient(http.Client());
     netPhotos.setActPhotos(actPhotos);
     netPhotos.setStorage(storage);
     netPhotos.registerToQueue(netQueue);
 
+    netTasks.setLogger(logger);
     netTasks.setHttpClient(http.Client());
     netTasks.setActTasks(actTasks);
     netTasks.registerToQueue(netQueue);
 
+    netSSE.setLogger(logger);
     netSSE.setGetHttpClient(() => http.Client());
-
     netSSE.registerUpdateFunc(notifyTypeTask, actTasks.actFetchTasks);
     netSSE.registerUpdateFunc(notifyTypePhoto, actPhotos.actFetchPhotos);
+
+    channelManager.setLogger(logger);
+    storage.setLogger(logger);
 
     getViewResource().deviceManager = deviceManager;
     getViewResource().storage = storage;
     getViewResource().actPhotos = actPhotos;
     getViewResource().actTasks = actTasks;
     getViewResource().actServer = actServer;
+    getViewResource().logger = logger;
   }
 
   Future<MethodChannel> createChannelByName(String name) =>
@@ -121,18 +142,26 @@ class Factory {
   }
 
   Future<void> initMethodChannels() async {
+    // init logger
+    Directory logDir = await getApplicationDocumentsDirectory();
+    logger.setDir(logDir);
+    logger.setLevel(LogLevel.warn());
+
     // init backend
     MethodChannel mcBackend = await createChannelByName(CHANNEL_BACKENDS);
     backend = BackendChannel(mcBackend);
+    backend.setLogger(logger);
 
     // init command
     MethodChannel mcCommand = await createChannelByName(CHANNEL_COMMANDS);
     command = CommandChannel(mcCommand);
+    command.setLogger(logger);
     command.setActServer(actServer);
 
     // init menu
     MethodChannel mcMenu = await createChannelByName(CHANNEL_MENU_EVENTS);
     menu = MenuChannel(mcMenu);
+    menu.setLogger(logger);
     menu.setCommandChannel(command);
 
     // set to view resource
@@ -146,7 +175,7 @@ class Factory {
     await storage.initPhotoStorage();
 
     // init store & start queue
-    store = await initStore(storage);
+    store = await initStore(storage, logger);
 
     netQueue.setStore(store);
     netQueue.start();

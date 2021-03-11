@@ -59,11 +59,14 @@ class ServerQRCode extends StatelessWidget {
                   .copyWith(color: Colors.black),
             ),
           ),
-          QrImage(
-            data: redux.serverKey,
-            version: QrVersions.auto,
-            padding: EdgeInsets.all(5),
-          )
+          Container(
+            constraints: BoxConstraints(maxWidth: 320, maxHeight: 320),
+            child: QrImage(
+              data: redux.serverKey,
+              version: QrVersions.auto,
+              padding: EdgeInsets.all(5),
+            ),
+          ),
         ]),
         TableRow(children: [
           Text(

@@ -30,12 +30,12 @@ Submit to internal track
 ```
 fastlane android alpha
 ```
-Submit to alpha track
+Promote to alpha track
 ### android beta
 ```
 fastlane android beta
 ```
-Submit to beta track / open testing
+Promote to beta track / open testing
 ### android deploy
 ```
 fastlane android deploy

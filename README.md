@@ -145,11 +145,15 @@ Android
 ----
 
 Upload to internal
+
+### Remember change version in `pubspec.yaml` before build 
+
 > cd $PROJECT_HOME/android
 > flutter build apk
 > fastlane android internal
 
 Promote to alpha
+
 > SUPPLY_VERSION_CODE=5 fastlane android alpha
 
 iOS

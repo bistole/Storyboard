@@ -20,6 +20,8 @@
 .flutter-plugins-dependencies
 .idea
 .vs
+
+# deploy-related files
 */fastlane/report.xml
 ios/Runner.ipa
 ios/Runner.app.dSYM.zip
