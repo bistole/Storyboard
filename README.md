@@ -140,6 +140,8 @@ Deploy
 ====
 
 Change the version in pubspec.yaml
+Make sure all number should no less than previous version:
+    major.minor.bug+code
 
 Android
 ----
