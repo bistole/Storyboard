@@ -22,6 +22,8 @@ platform :ios do
       scheme: 'Runner',
       workspace: 'Runner.xcworkspace'
     )
+
+    upload_to_testflight
   end
 
   lane :crash do
