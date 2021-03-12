@@ -28,6 +28,7 @@ ios/Runner.app.dSYM.zip
 
 # secret files
 macos/Runner/GoogleService-Info.plist
+ios/Runner/GoogleService-Info.plist
 
 coverage/
 build/
