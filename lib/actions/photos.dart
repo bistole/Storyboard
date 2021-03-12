@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:mime/mime.dart';
 import 'package:redux/redux.dart';
+import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
@@ -10,6 +11,12 @@ import 'package:storyboard/storage/storage.dart';
 import 'package:uuid/uuid.dart';
 
 class ActPhotos {
+  String _LOG_TAG = (ActPhotos).toString();
+  Logger _logger;
+  void setLogger(Logger logger) {
+    _logger = logger;
+  }
+
   // required
   NetQueue _netQueue;
   void setNetQueue(NetQueue netQueue) {
@@ -23,6 +30,7 @@ class ActPhotos {
   }
 
   void actFetchPhotos() {
+    _logger.info(_LOG_TAG, "actFetchPhotos");
     _netQueue.addQueueItem(
       QueueItemType.Photo,
       QueueItemAction.List,
@@ -31,6 +39,7 @@ class ActPhotos {
   }
 
   void actDownloadPhoto(Store<AppState> store, String uuid) {
+    _logger.info(_LOG_TAG, "actDownloadPhoto");
     store.dispatch(DownloadPhotoAction(
       uuid: uuid,
       status: PhotoStatus.Loading,
@@ -43,6 +52,7 @@ class ActPhotos {
   }
 
   void actDownloadThumbnail(Store<AppState> store, String uuid) {
+    _logger.info(_LOG_TAG, "actDownloadThumbnail");
     store.dispatch(ThumbnailPhotoAction(
       uuid: uuid,
       status: PhotoStatus.Loading,
@@ -57,9 +67,11 @@ class ActPhotos {
   var validMimeTypes = ["image/jpeg", "image/png", "image/gif"];
 
   void actUploadPhoto(Store<AppState> store, String path) async {
+    _logger.info(_LOG_TAG, "actUploadPhoto");
     var mimeType = lookupMimeType(path);
     if (!validMimeTypes.contains(mimeType)) {
       // TODO: show error in UI
+      _logger.error(_LOG_TAG, "Invalid mimeType: $mimeType");
       return;
     }
 
@@ -90,6 +102,7 @@ class ActPhotos {
   }
 
   void actDeletePhoto(Store<AppState> store, String uuid) {
+    _logger.info(_LOG_TAG, "actDeletePhoto");
     Photo photo = store.state.photoRepo.photos[uuid];
     int ts = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     Photo newPhoto = photo.copyWith(

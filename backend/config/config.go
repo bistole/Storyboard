@@ -2,9 +2,9 @@ package config
 
 import (
 	"database/sql"
+	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
 	"path"
 
 	"gopkg.in/yaml.v2"
@@ -20,6 +20,10 @@ type Properties struct {
 	PORT int    `yaml:"PORT"`
 }
 
+func (p Properties) toString() string {
+	return fmt.Sprintf("IP: %s, PORT: %d", p.IP, p.PORT)
+}
+
 // Config is implemented interface ConfigService
 type Config struct {
 	conn    *sql.DB
@@ -28,17 +32,13 @@ type Config struct {
 }
 
 // NewConfigService create a config service instance
-func NewConfigService(homedir string) Config {
+func NewConfigService(homedir string) *Config {
 	if homedir == "" {
-		dir, err := os.Getwd()
-		if err != nil {
-			panic(err)
-		}
-		homedir = path.Join(dir, defaultAppName)
+		panic("Home dir is required for launch storyboard backend")
 	}
 	c := Config{homedir: homedir}
 	c.LoadFromConfigFile()
-	return c
+	return &c
 }
 
 // GetHomeDir get home dir
@@ -52,7 +52,7 @@ func (c Config) GetDatabaseName() string {
 }
 
 // LoadFromConfigFile load config from configName yaml file
-func (c Config) LoadFromConfigFile() {
+func (c *Config) LoadFromConfigFile() {
 	filename := path.Join(c.homedir, configName)
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -71,8 +71,8 @@ func (c Config) SaveToConfigFile() {
 	log.Println("config file: " + filename)
 	data, err := yaml.Marshal(c.props)
 	if err != nil {
-		log.Println(err)
-		return
+		log.Fatalln("Failed to save config file")
+		panic(err)
 	}
 	ioutil.WriteFile(filename, data, 0777)
 }
@@ -83,7 +83,7 @@ func (c Config) GetIP() string {
 }
 
 // SetIP set ip address
-func (c Config) SetIP(ip string) {
+func (c *Config) SetIP(ip string) {
 	if ip != c.props.IP {
 		c.props.IP = ip
 		c.SaveToConfigFile()
@@ -96,7 +96,7 @@ func (c Config) GetPort() int {
 }
 
 // SetPort set port
-func (c Config) SetPort(port int) {
+func (c *Config) SetPort(port int) {
 	if port != c.props.PORT {
 		c.props.PORT = port
 		c.SaveToConfigFile()

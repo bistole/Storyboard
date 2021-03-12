@@ -4,6 +4,7 @@ import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo_repo.dart';
+import 'package:storyboard/redux/models/setting.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
 import 'package:storyboard/redux/models/task_repo.dart';
@@ -58,6 +59,11 @@ void main() {
               lastTS: 0,
             ),
             photoRepo: PhotoRepo(photos: {}, lastTS: 0),
+            setting: Setting(
+              clientID: 'client-id',
+              serverKey: 'server-key',
+              serverReachable: Reachable.Unknown,
+            ),
           ),
         );
 

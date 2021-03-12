@@ -1,0 +1,8 @@
+app_identifier("com.laterhorse.storyboard.ios") # The bundle identifier of your app
+apple_id("shizheng.ding.ca@gmail.com") # Your Apple email address
+
+itc_team_id("122728485") # App Store Connect Team ID
+team_id("FP6PNQ347Z") # Developer Portal Team ID
+
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile

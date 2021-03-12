@@ -14,6 +14,7 @@ import (
 	"storyboard/backend/photorepo"
 	"storyboard/backend/server"
 	"storyboard/backend/taskrepo"
+	"storyboard/backend/wrapper"
 )
 
 var inited bool = false
@@ -43,12 +44,14 @@ func Backend_Start(app *C.char) {
 	db = database.NewDatabaseService(c)
 	db.Init()
 
-	// task repo
+	// task & photo repo
 	taskRepo = taskrepo.NewTaskRepo(db)
 	photoRepo = photorepo.NewPhotoRepo(db)
 
 	// server
-	ss = server.NewRESTServer(c, taskRepo, photoRepo)
+	httpProxy := *wrapper.NewHTTPWrapper()
+	netProxy := *wrapper.NewNetWrapper()
+	ss = server.NewRESTServer(netProxy, httpProxy, c, taskRepo, photoRepo)
 	go ss.Start()
 }
 
@@ -108,8 +111,18 @@ func console() {
 	}
 }
 
+func getCurrentPwd() *C.char {
+	dir, err := os.Getwd()
+	if err != nil {
+		panic("can not find current pwd")
+	}
+	var c = C.CString(dir)
+	return c
+}
+
 func main() {
-	Backend_Start(nil)
+	var c = getCurrentPwd()
+	Backend_Start(c)
 	console()
 	Backend_Stop()
 }

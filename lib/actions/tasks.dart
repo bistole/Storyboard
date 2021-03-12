@@ -1,4 +1,5 @@
 import 'package:redux/redux.dart';
+import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
@@ -7,6 +8,12 @@ import 'package:storyboard/redux/models/task.dart';
 import 'package:uuid/uuid.dart';
 
 class ActTasks {
+  String _LOG_TAG = (ActTasks).toString();
+  Logger _logger;
+  void setLogger(Logger logger) {
+    _logger = logger;
+  }
+
   // required
   NetQueue _netQueue;
   void setNetQueue(NetQueue netQueue) {
@@ -22,6 +29,7 @@ class ActTasks {
   }
 
   void actCreateTask(Store<AppState> store, String title) {
+    _logger.info(_LOG_TAG, "actCreateTask");
     String uuid = Uuid().v4();
     int ts = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     Task task = Task(
@@ -41,6 +49,7 @@ class ActTasks {
   }
 
   void actUpdateTask(Store<AppState> store, String uuid, String title) {
+    _logger.info(_LOG_TAG, "actUpdateTask");
     Task task = store.state.taskRepo.tasks[uuid];
     int ts = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     Task newTask = task.copyWith(
@@ -56,6 +65,7 @@ class ActTasks {
   }
 
   void actDeleteTask(Store<AppState> store, String uuid) {
+    _logger.info(_LOG_TAG, "actDeleteTask");
     Task task = store.state.taskRepo.tasks[uuid];
     int ts = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     Task newTask = task.copyWith(

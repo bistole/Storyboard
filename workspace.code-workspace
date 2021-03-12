@@ -5,6 +5,12 @@
 		},
 		{
 			"path": "backend"
+		},
+		{
+			"path": "../storyboard_deploy_mgmt"
+		},
+		{
+			"path": "../storyboard_website"
 		}
 	],
 	"settings": {

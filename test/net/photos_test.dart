@@ -28,8 +28,10 @@ class MockActPhotos extends Mock implements ActPhotos {}
 
 class MockStorage extends Mock implements Storage {}
 
-const mockServerKey = 'localhost:3000';
-const mockURLPrefix = 'http://' + mockServerKey;
+var mockHostname = "192.168.3.146";
+var mockPort = 3000;
+var mockServerKey = encodeServerKey(mockHostname, mockPort);
+var mockURLPrefix = 'http://' + mockHostname + ":" + mockPort.toString();
 
 void main() {
   NetPhotos netPhotos;
@@ -99,13 +101,18 @@ void main() {
         'succ': true,
         'photos': [getJsonPhotoObject()],
       });
-      when(httpClient.get(startsWith(mockURLPrefix))).thenAnswer((_) async {
+      when(httpClient.get(startsWith(mockURLPrefix),
+              headers: anyNamed('headers')))
+          .thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
       await netPhotos.netFetchPhotos(store);
 
-      var captured = verify(httpClient.get(captureAny)).captured.first;
+      var captured =
+          verify(httpClient.get(captureAny, headers: anyNamed('headers')))
+              .captured
+              .first;
       expect(captured, mockURLPrefix + '/photos?ts=1&c=100');
 
       expect(store.state.photoRepo.photos, {'uuid': getPhotoObject()});
@@ -127,13 +134,18 @@ void main() {
         'photos': [getJsonPhotoObject()],
       });
 
-      when(httpClient.get(startsWith(mockURLPrefix))).thenAnswer((_) async {
+      when(httpClient.get(startsWith(mockURLPrefix),
+              headers: anyNamed('headers')))
+          .thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
       await netPhotos.netFetchPhotos(store);
 
-      var captured = verify(httpClient.get(captureAny)).captured.first;
+      var captured =
+          verify(httpClient.get(captureAny, headers: anyNamed('headers')))
+              .captured
+              .first;
       expect(captured, mockURLPrefix + '/photos?ts=1&c=100');
 
       expect(store.state.photoRepo.photos, {
@@ -159,13 +171,18 @@ void main() {
         ],
       });
 
-      when(httpClient.get(startsWith(mockURLPrefix))).thenAnswer((_) async {
+      when(httpClient.get(startsWith(mockURLPrefix),
+              headers: anyNamed('headers')))
+          .thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
       await netPhotos.netFetchPhotos(store);
 
-      var captured = verify(httpClient.get(captureAny)).captured.first;
+      var captured =
+          verify(httpClient.get(captureAny, headers: anyNamed('headers')))
+              .captured
+              .first;
       expect(captured, mockURLPrefix + '/photos?ts=1&c=100');
 
       expect(
@@ -187,13 +204,18 @@ void main() {
           getJsonPhotoObject(),
         ],
       });
-      when(httpClient.get(startsWith(mockURLPrefix))).thenAnswer((_) async {
+      when(httpClient.get(startsWith(mockURLPrefix),
+              headers: anyNamed('headers')))
+          .thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
       await netPhotos.netFetchPhotos(store);
 
-      var captured = verify(httpClient.get(captureAny)).captured.first;
+      var captured =
+          verify(httpClient.get(captureAny, headers: anyNamed('headers')))
+              .captured
+              .first;
       expect(captured, mockURLPrefix + '/photos?ts=1&c=2');
 
       verifyNever(actPhotos.actFetchPhotos());
@@ -215,13 +237,18 @@ void main() {
           getJsonPhotoObject()..addAll({'uuid': 'uuid2'})
         ],
       });
-      when(httpClient.get(startsWith(mockURLPrefix))).thenAnswer((_) async {
+      when(httpClient.get(startsWith(mockURLPrefix),
+              headers: anyNamed('headers')))
+          .thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
       await netPhotos.netFetchPhotos(store);
 
-      var captured = verify(httpClient.get(captureAny)).captured.first;
+      var captured =
+          verify(httpClient.get(captureAny, headers: anyNamed('headers')))
+              .captured
+              .first;
       expect(captured, mockURLPrefix + '/photos?ts=1&c=2');
 
       verify(actPhotos.actFetchPhotos()).called(1);
@@ -298,13 +325,18 @@ void main() {
     test('download succ', () async {
       buildStore({'uuid': getPhotoObject()});
 
-      when(httpClient.get(startsWith(mockURLPrefix))).thenAnswer((_) async {
+      when(httpClient.get(startsWith(mockURLPrefix),
+              headers: anyNamed('headers')))
+          .thenAnswer((_) async {
         return http.Response("buffer", 200);
       });
 
       await netPhotos.netDownloadPhoto(store, uuid: 'uuid');
 
-      var capHttp = verify(httpClient.get(captureAny)).captured.first;
+      var capHttp =
+          verify(httpClient.get(captureAny, headers: anyNamed('headers')))
+              .captured
+              .first;
       expect(capHttp, mockURLPrefix + '/photos/uuid');
 
       var capStorage =
@@ -331,13 +363,18 @@ void main() {
     test('download succ', () async {
       buildStore({'uuid': getPhotoObject()});
 
-      when(httpClient.get(startsWith(mockURLPrefix))).thenAnswer((_) async {
+      when(httpClient.get(startsWith(mockURLPrefix),
+              headers: anyNamed('headers')))
+          .thenAnswer((_) async {
         return http.Response("buffer", 200);
       });
 
       await netPhotos.netDownloadThumbnail(store, uuid: 'uuid');
 
-      var capHttp = verify(httpClient.get(captureAny)).captured.first;
+      var capHttp =
+          verify(httpClient.get(captureAny, headers: anyNamed('headers')))
+              .captured
+              .first;
       expect(capHttp, mockURLPrefix + '/photos/uuid/thumbnail');
 
       var capStorage =
@@ -355,6 +392,7 @@ void main() {
       storage = MockStorage();
       actPhotos = MockActPhotos();
 
+      netPhotos = NetPhotos();
       netPhotos.setHttpClient(httpClient);
       netPhotos.setActPhotos(actPhotos);
       netPhotos.setStorage(storage);

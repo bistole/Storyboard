@@ -2,8 +2,15 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:path/path.dart' as path;
+import 'package:storyboard/logger/logger.dart';
 
 class Storage {
+  String _LOG_TAG = (Storage).toString();
+  Logger _logger;
+  void setLogger(Logger logger) {
+    _logger = logger;
+  }
+
   String dataHome;
 
   void setDataHome(String _dataHome) {
@@ -12,10 +19,12 @@ class Storage {
 
   String getPersistDataPath() {
     final statePath = path.join(dataHome, 'state.json');
+    _logger.debug(_LOG_TAG, "statePath: $statePath");
     return statePath;
   }
 
   Future<void> initPhotoStorage() async {
+    _logger.info(_LOG_TAG, "initPhotoStorage");
     final photoDirectory = Directory(path.join(dataHome, 'photos'));
     if (!await photoDirectory.exists()) {
       await photoDirectory.create(recursive: true);
@@ -38,6 +47,7 @@ class Storage {
   }
 
   Future<void> deletePhotoAndThumbByUUID(String uuid) async {
+    _logger.debug(_LOG_TAG, "deletePhotoAndThumbByUUID: $uuid");
     final photoPath = getPhotoPathByUUID(uuid);
     final thumbPath = getThumbnailPathByUUID(uuid);
 
@@ -50,16 +60,19 @@ class Storage {
   }
 
   Future<void> copyPhotoByUUID(String uuid, File src) async {
+    _logger.debug(_LOG_TAG, "copyPhotoByUUID: $uuid");
     String photoPath = getPhotoPathByUUID(uuid);
-    await src.copy(photoPath);
+    src.copySync(photoPath);
   }
 
   Future<void> savePhotoByUUID(String uuid, Uint8List bytes) async {
+    _logger.debug(_LOG_TAG, "savePhotoByUUID: $uuid");
     String photoPath = getPhotoPathByUUID(uuid);
     await File(photoPath).writeAsBytes(bytes);
   }
 
   Future<void> saveThumbailByUUID(String uuid, Uint8List bytes) async {
+    _logger.debug(_LOG_TAG, "saveThumbailByUUID: $uuid");
     var photoPath = getThumbnailPathByUUID(uuid);
     await File(photoPath).writeAsBytes(bytes);
   }

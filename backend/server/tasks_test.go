@@ -9,6 +9,7 @@ import (
 	"net/textproto"
 	"os"
 	"storyboard/backend/mocks"
+	"storyboard/backend/wrapper"
 	"strconv"
 	"strings"
 	"testing"
@@ -22,6 +23,7 @@ type httpFunc func(http.ResponseWriter, *http.Request)
 func GetRESTResponse(t *testing.T, ss *RESTServer, f httpFunc,
 	method string, url string, body io.Reader) *httptest.ResponseRecorder {
 	req, err := http.NewRequest(method, url, body)
+	req.Header.Add("Client-ID", "client-abc")
 
 	if err != nil {
 		t.Fatal("Can not make a request")
@@ -57,6 +59,7 @@ func GetRESTMultipartResponse(t *testing.T, ss *RESTServer, f httpFunc,
 
 	body, writer := io.Pipe()
 	req, err := http.NewRequest(method, url, body)
+	req.Header.Add("Client-ID", "client-abc")
 	if err != nil {
 		t.Fatalf("Can not make a request\n")
 	}
@@ -177,12 +180,14 @@ func TestGetTasksSuccRequest(t *testing.T) {
 	item := Task{UUID: "uuid", Title: "title", UpdatedAt: 1000, CreatedAt: 2000, Deleted: 0}
 
 	configMock := &mocks.ConfigMock{}
+	netMock := MockNetProxy()
+	httpMock := wrapper.NewHTTPWrapper()
 	taskRepoMock := MockAllTaskError()
 	taskRepoMock.GetTasksByTSFn = func(ts int64, limit, offset int) ([]mocks.Task, error) {
 		return []Task{item}, nil
 	}
 	photoRepoMock := MockAllPhotoError()
-	ss := NewRESTServer(configMock, taskRepoMock, photoRepoMock)
+	ss := NewRESTServer(netMock, httpMock, configMock, taskRepoMock, photoRepoMock)
 
 	// create http request
 	rr := GetRESTResponse(t, ss, ss.GetTasks, "GET", "http://localhost:3000/tasks", nil)
@@ -195,9 +200,11 @@ func TestGetTasksSuccRequest(t *testing.T) {
 
 func TestGetTasksFailureRequest(t *testing.T) {
 	configMock := &mocks.ConfigMock{}
+	netMock := MockNetProxy()
+	httpMock := wrapper.NewHTTPWrapper()
 	taskRepoMock := MockAllTaskError()
 	photoRepoMock := MockAllPhotoError()
-	ss := NewRESTServer(configMock, taskRepoMock, photoRepoMock)
+	ss := NewRESTServer(netMock, httpMock, configMock, taskRepoMock, photoRepoMock)
 
 	// create http request
 	rr := GetRESTResponse(t, ss, ss.GetTasks, "GET", "http://localhost:3000/tasks", nil)
@@ -212,12 +219,14 @@ func TestGetTaskSuccRequest(t *testing.T) {
 	item := Task{UUID: "uuid", Title: "title", UpdatedAt: 1000, CreatedAt: 2000, Deleted: 0}
 
 	configMock := &mocks.ConfigMock{}
+	netMock := MockNetProxy()
+	httpMock := wrapper.NewHTTPWrapper()
 	taskRepoMock := MockAllTaskError()
 	taskRepoMock.GetTaskByUUIDFn = func(s string) (*mocks.Task, error) {
 		return &item, nil
 	}
 	photoRepoMock := MockAllPhotoError()
-	ss := NewRESTServer(configMock, taskRepoMock, photoRepoMock)
+	ss := NewRESTServer(netMock, httpMock, configMock, taskRepoMock, photoRepoMock)
 
 	// create http request
 	rr := GetRESTResponse(t, ss, ss.GetTask, "GET", "http://localhost:3000/tasks/uuid", nil)
@@ -230,9 +239,11 @@ func TestGetTaskSuccRequest(t *testing.T) {
 
 func TestGetTaskFailureRequest(t *testing.T) {
 	configMock := &mocks.ConfigMock{}
+	netMock := MockNetProxy()
+	httpMock := wrapper.NewHTTPWrapper()
 	taskRepoMock := MockAllTaskError()
 	photoRepoMock := MockAllPhotoError()
-	ss := NewRESTServer(configMock, taskRepoMock, photoRepoMock)
+	ss := NewRESTServer(netMock, httpMock, configMock, taskRepoMock, photoRepoMock)
 
 	// create http request
 	rr := GetRESTResponse(t, ss, ss.GetTask, "GET", "http://localhost:3000/tasks/uuid", nil)
@@ -245,9 +256,11 @@ func TestGetTaskFailureRequest(t *testing.T) {
 
 func TestCreateTaskRequest(t *testing.T) {
 	configMock := &mocks.ConfigMock{}
+	netMock := MockNetProxy()
+	httpMock := wrapper.NewHTTPWrapper()
 	taskRepoMock := MockAllTaskError()
 	photoRepoMock := MockAllPhotoError()
-	ss := NewRESTServer(configMock, taskRepoMock, photoRepoMock)
+	ss := NewRESTServer(netMock, httpMock, configMock, taskRepoMock, photoRepoMock)
 
 	// create http request
 	UUID := uuid.New().String()
@@ -265,9 +278,11 @@ func TestCreateTaskRequest(t *testing.T) {
 
 func TestUpdateTaskRequest(t *testing.T) {
 	configMock := &mocks.ConfigMock{}
+	netMock := MockNetProxy()
+	httpMock := wrapper.NewHTTPWrapper()
 	taskRepoMock := MockAllTaskError()
 	photoRepoMock := MockAllPhotoError()
-	ss := NewRESTServer(configMock, taskRepoMock, photoRepoMock)
+	ss := NewRESTServer(netMock, httpMock, configMock, taskRepoMock, photoRepoMock)
 
 	UUID := uuid.New().String()
 	time := strconv.FormatInt(time.Now().Unix(), 10)
@@ -284,9 +299,11 @@ func TestUpdateTaskRequest(t *testing.T) {
 
 func TestDeleteTaskRequest(t *testing.T) {
 	configMock := &mocks.ConfigMock{}
+	netMock := MockNetProxy()
+	httpMock := wrapper.NewHTTPWrapper()
 	taskRepoMock := MockAllTaskError()
 	photoRepoMock := MockAllPhotoError()
-	ss := NewRESTServer(configMock, taskRepoMock, photoRepoMock)
+	ss := NewRESTServer(netMock, httpMock, configMock, taskRepoMock, photoRepoMock)
 
 	// delete http request
 	UUID := uuid.New().String()

@@ -136,6 +136,39 @@ go test ./... -coverprofile=coverage.out
 go tool cover -html=coverage.out
 ```
 
+Deploy
+====
+
+Change the version in pubspec.yaml
+Make sure all number should no less than previous version:
+    major.minor.bug+code
+
+Android
+----
+
+Upload to internal
+
+### Remember change version in `pubspec.yaml` before build 
+
+> cd $PROJECT_HOME/android
+> flutter build apk
+> fastlane android internal
+
+Promote to alpha
+
+> SUPPLY_VERSION_CODE=5 fastlane android alpha
+
+iOS
+----
+
+Upload to testflight
+> cd $PROJECT_HOME/ios
+> flutter build ios --release --no-codesign
+> fastlane ios alpha
+
+Upload dSYM to crashlytics
+> fastlane ios crash
+
 Misc
 ===
 

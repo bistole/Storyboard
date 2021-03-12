@@ -1,10 +1,13 @@
+import 'dart:io';
+
+import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
-import 'package:storyboard/actions/photos.dart';
 
+import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/net/queue.dart';
@@ -13,10 +16,12 @@ import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/photo_repo.dart';
 import 'package:storyboard/redux/models/queue_item.dart';
+import 'package:storyboard/redux/models/setting.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task_repo.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/storage/storage.dart';
+import 'package:storyboard/views/common/toolbar_button.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/page.dart';
 
@@ -49,17 +54,29 @@ void main() {
             status: Status.noParam(StatusKey.ListTask),
             photoRepo: PhotoRepo(photos: <String, Photo>{}, lastTS: 0),
             taskRepo: TaskRepo(tasks: {}, lastTS: 0),
+            setting: Setting(
+              clientID: 'client-id',
+              serverKey: 'server-key',
+              serverReachable: Reachable.Unknown,
+            ),
           ),
         );
 
         Storage s = Storage();
-        s.dataHome = "project_home";
+        String homePath = getHomePath("test_resources/home/");
+        s.setDataHome(homePath);
+        Directory(path.join(homePath, 'photos')).createSync(recursive: true);
 
         netQueue = MockNetQueue();
         getViewResource().storage = s;
         getViewResource().actPhotos = ActPhotos();
         getViewResource().actPhotos.setNetQueue(netQueue);
         getViewResource().actPhotos.setStorage(s);
+      });
+
+      tearDown(() {
+        String homePath = getHomePath("test_resources/home/");
+        Directory(path.join(homePath, 'photos')).deleteSync(recursive: true);
       });
 
       testWidgets('add item succ', (WidgetTester tester) async {
@@ -81,7 +98,7 @@ void main() {
         await tester.pumpWidget(widget);
 
         // Add Button here
-        expect(find.byType(TextButton), findsNWidgets(2));
+        expect(find.byType(SBToolbarButton), findsNWidgets(2));
         expect(find.text('ADD PHOTO'), findsOneWidget);
 
         // Tap 'ADD' button
@@ -94,8 +111,8 @@ void main() {
         expect(store.state.status.param1, resourcePath);
 
         // Show the selected image
-        expect(find.byType(TextButton), findsNWidgets(2));
-        expect(find.text("ADD"), findsOneWidget);
+        expect(find.byType(SBToolbarButton), findsNWidgets(2));
+        expect(find.text("OK"), findsOneWidget);
         expect(find.text("CANCEL"), findsOneWidget);
         expect(find.byType(Image), findsOneWidget);
 
@@ -105,8 +122,8 @@ void main() {
         FileImage imgProvider = img.image as FileImage;
         expect(imgProvider.file.path, resourcePath);
 
-        // click 'ADD'
-        await tester.tap(find.text("ADD"));
+        // click 'OK'
+        await tester.tap(find.text("OK"));
         await tester.pump();
 
         // Photo is in redux list

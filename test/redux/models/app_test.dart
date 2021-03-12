@@ -4,6 +4,7 @@ import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/photo_repo.dart';
 import 'package:storyboard/redux/models/queue.dart';
 import 'package:storyboard/redux/models/queue_item.dart';
+import 'package:storyboard/redux/models/setting.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
 import 'package:storyboard/redux/models/task_repo.dart';
@@ -94,13 +95,18 @@ void main() {
         ],
         'tick': 12
       },
+      'setting': {
+        'clientID': 'client-id',
+        'serverKey': 'server-key',
+      }
     });
     expect(
       appState.toString(),
       "AppState{status: Status{status: StatusKey.ListTask, param1: null, param2: null}, " +
           "taskRepo: TaskRepo{tasks: {uuid: Task{uuid: uuid, title: new title, deleted: 0, updatedAt: 14000, createdAt: 12000}}, lastTS: 0}, " +
           "photoRepo: PhotoRepo{photos: {uuid: Photo{uuid: uuid, filename: file.jpeg, mime: image/jpeg, size: 3000, hasOrigin: PhotoStatus.None, hasThumb: PhotoStatus.Loading, deleted: 0, updatedAt: 14000, createdAt: 12000}}, lastTS: 0}, " +
-          "queue: Queue{list: [QueueItem{type: null, action: null, uuid: uuid}], tick: 12, now: QueueItem{type: null, action: null, uuid: uuid}}}",
+          "queue: Queue{list: [QueueItem{type: null, action: null, uuid: uuid}], tick: 12, now: QueueItem{type: null, action: null, uuid: uuid}}, " +
+          "setting: Setting{clientID: client-id, serverKey: server-key, serverReachable: Reachable.Unknown}}",
     );
   });
 
@@ -113,6 +119,11 @@ void main() {
         tick: 12,
         now: getCreateQueue(),
         list: [getCreateQueue()],
+      ),
+      setting: Setting(
+        clientID: "client-id",
+        serverKey: "server-key",
+        serverReachable: Reachable.Unknown,
       ),
     );
 
@@ -161,7 +172,11 @@ void main() {
             'uuid': 'uuid'
           }
         ]
-      }
+      },
+      'setting': {
+        'clientID': 'client-id',
+        'serverKey': 'server-key',
+      },
     });
   });
 

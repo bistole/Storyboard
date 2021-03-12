@@ -21,8 +21,10 @@ class MockHttpClient extends Mock implements http.Client {}
 
 class MockActTasks extends Mock implements ActTasks {}
 
-const mockServerKey = 'localhost:3000';
-const mockURLPrefix = 'http://' + mockServerKey;
+var mockHostname = "192.168.3.146";
+var mockPort = 3000;
+var mockServerKey = encodeServerKey(mockHostname, mockPort);
+var mockURLPrefix = 'http://' + mockHostname + ":" + mockPort.toString();
 
 void main() {
   Store<AppState> store;
@@ -83,13 +85,18 @@ void main() {
         'succ': true,
         'tasks': [getJsonTaskObject()],
       });
-      when(httpClient.get(startsWith(mockURLPrefix))).thenAnswer((_) async {
+      when(httpClient.get(startsWith(mockURLPrefix),
+              headers: anyNamed("headers")))
+          .thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
       await netTasks.netFetchTasks(store);
 
-      var captured = verify(httpClient.get(captureAny)).captured.first;
+      var captured =
+          verify(httpClient.get(captureAny, headers: anyNamed("headers")))
+              .captured
+              .first;
       expect(captured, mockURLPrefix + '/tasks?ts=1&c=100');
 
       expect(store.state.taskRepo.tasks, {'uuid': getTaskObject()});
@@ -109,13 +116,18 @@ void main() {
         'tasks': [getJsonTaskObject()],
       });
 
-      when(httpClient.get(startsWith(mockURLPrefix))).thenAnswer((_) async {
+      when(httpClient.get(startsWith(mockURLPrefix),
+              headers: anyNamed("headers")))
+          .thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
       await netTasks.netFetchTasks(store);
 
-      var captured = verify(httpClient.get(captureAny)).captured.first;
+      var captured =
+          verify(httpClient.get(captureAny, headers: anyNamed("headers")))
+              .captured
+              .first;
       expect(captured, mockURLPrefix + '/tasks?ts=1&c=100');
 
       expect(store.state.taskRepo.tasks, {
@@ -133,13 +145,18 @@ void main() {
         ],
       });
 
-      when(httpClient.get(startsWith(mockURLPrefix))).thenAnswer((_) async {
+      when(httpClient.get(startsWith(mockURLPrefix),
+              headers: anyNamed("headers")))
+          .thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
       await netTasks.netFetchTasks(store);
 
-      var captured = verify(httpClient.get(captureAny)).captured.first;
+      var captured =
+          verify(httpClient.get(captureAny, headers: anyNamed("headers")))
+              .captured
+              .first;
       expect(captured, mockURLPrefix + '/tasks?ts=1&c=100');
 
       expect(store.state.taskRepo.tasks, {});
@@ -154,13 +171,18 @@ void main() {
         'succ': true,
         'tasks': [getJsonTaskObject()],
       });
-      when(httpClient.get(startsWith(mockURLPrefix))).thenAnswer((_) async {
+      when(httpClient.get(startsWith(mockURLPrefix),
+              headers: anyNamed("headers")))
+          .thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
       await netTasks.netFetchTasks(store);
 
-      var captured = verify(httpClient.get(captureAny)).captured.first;
+      var captured =
+          verify(httpClient.get(captureAny, headers: anyNamed("headers")))
+              .captured
+              .first;
       expect(captured, mockURLPrefix + '/tasks?ts=1&c=2');
 
       verifyNever(actTasks.actFetchTasks());
@@ -180,13 +202,18 @@ void main() {
           getJsonTaskObject()..addAll({'uuid': 'uuid2'}),
         ],
       });
-      when(httpClient.get(startsWith(mockURLPrefix))).thenAnswer((_) async {
+      when(httpClient.get(startsWith(mockURLPrefix),
+              headers: anyNamed("headers")))
+          .thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
       await netTasks.netFetchTasks(store);
 
-      var captured = verify(httpClient.get(captureAny)).captured.first;
+      var captured =
+          verify(httpClient.get(captureAny, headers: anyNamed("headers")))
+              .captured
+              .first;
       expect(captured, mockURLPrefix + '/tasks?ts=1&c=2');
 
       verify(actTasks.actFetchTasks()).called(1);
