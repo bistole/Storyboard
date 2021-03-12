@@ -1,19 +1,21 @@
 NOW
 ===
-- Split storage by environment
-  - Merge backend storage and frontend storage together [IN_PROGRESS]
-    - Backend [DONE]
-    - Macos [DONE]
-    - Windows
 
-- Deployment
-  - MacOS
-  - Windows
-  - Android
-  - iOS
+- Change icon for app.
+- Set minsize of desktop application.
 
 TODO
 ====
+- Write doc about how to deploy to TestFlight
+- Write doc about how to deploy to Google Play Console
+
+- Deployment enhancement
+  - Use appbundle instead of apk
+  - Need to test crash from kotlin
+  - Also can display logs from golang/backend
+  - Windows deployment 
+  - Windows crash report
+
 - Authenticate
   - Create server-id for each server.
     - Persistent server-id.
@@ -32,18 +34,14 @@ TODO
     - add nickname for each server
   - Desktop: add server nickname which can is recognized
 
-- Share backend/frontend media data on desktop
-
-- Change icon for app.
-- Set minsize of desktop application.
-
-- Create a website to publish service.
-  - Automatic build
-
 - Redesign display photo interface.
   - When create - allow rotate photo
   - When update - allow rotate photo
 
+- Split storage by environment
+- Share backend/frontend media data on desktop
+- Change Windows Folder from /ProgramData/com.laterhorse.storyboard
+  to /ProgramData/Laterhorse/Storyboard
 
 ISSUE
 =====
@@ -238,3 +236,49 @@ Compile as windows services [DONE]
   - Fix orientation of photo when take with iphone device. [DONE]
   - Fix mirrow issue [DONE]
   - Failed to scan QR in android [DONE]
+
+- Merge backend storage and frontend storage together [DONE]
+  - Backend [DONE]
+  - Macos [DONE]
+  - Windows [DONE]
+
+- Create a website to publish service. [DONE]
+  - Create static home page [DONE]
+  - Create download page for all [DONE]
+
+- Deployment
+  - MacOS [DONE]
+  - Windows
+  - Android [DONE]
+    - APK [DONE]
+  - iOS [DONE]
+    - TestFlight [DONE]
+
+- Add log files and show on UI
+  - Front-end Log [DONE]
+    - UI [DONE]
+      - Show logs [DONE]
+      - Change log level [DONE]
+    - Wrapper logs [DONE]
+    - Add lower level logs [DONE]
+  - Backend logs
+    - Switch backend/frontend
+
+- Crash logs
+  - macOS [DONE]
+    - Basic configuration [DONE]
+    - Track for swift crash [DONE]
+    - Track for Flutter crash [DONE]
+    - Upload dSYM [DONE]
+  - ios [DONE]
+    - Basic configuration [DONE]
+    - Track for swift crash [DONE]
+    - Track for Flutter crash [DONE]
+    - Upload dSYM [DONE]
+  - android
+    - Basic configuration [DONE]
+    - Track for kotlin crash
+    - Track for Flutter crash [DONE]
+
+- Deployment:
+  - Convert version from alpha-0.1.0 to 0.1.0-alpha [DONE]

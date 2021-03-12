@@ -10,6 +10,7 @@ import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/photo_repo.dart';
+import 'package:storyboard/redux/models/setting.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task_repo.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
@@ -51,7 +52,7 @@ void main() {
     );
   }
 
-  group("update item", () {
+  group("delete item", () {
     setUp(() {
       getFactory().store = store = Store<AppState>(
         appReducer,
@@ -62,6 +63,11 @@ void main() {
             lastTS: 0,
           ),
           taskRepo: TaskRepo(tasks: {}, lastTS: 0),
+          setting: Setting(
+            clientID: 'client-id',
+            serverKey: 'server-key',
+            serverReachable: Reachable.Unknown,
+          ),
         ),
       );
 

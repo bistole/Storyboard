@@ -10,5 +10,17 @@ String getResourcePath(String relativePath) {
       throw new Exception("can not find resource file: $relativePath");
     }
   }
-  return resourcePath;
+  return File(resourcePath).absolute.path;
+}
+
+String getHomePath(String relativePath) {
+  int cnt = 0;
+  String resourcePath = relativePath;
+  while (Directory(resourcePath).existsSync() != true) {
+    resourcePath = path.join("..", resourcePath);
+    if (++cnt > 20) {
+      throw new Exception("can not find resource file: $relativePath");
+    }
+  }
+  return Directory(resourcePath).absolute.path;
 }

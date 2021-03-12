@@ -53,6 +53,7 @@ class BackendEvents : NSObject {
             } catch {
                 result({})
             }
+            break;
         default:
             result(FlutterMethodNotImplemented);
         }

@@ -1,5 +1,8 @@
 package photorepo
 
+// TODO: test thumbnail big photo
+// TODO: test error cases
+
 import (
 	"log"
 	"storyboard/backend/interfaces"

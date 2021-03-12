@@ -37,7 +37,7 @@ class _ServerPickerState extends State<ServerPicker> {
 
     getViewResource().backend.setCurrentIp(ip).then(
           (_) => getViewResource().backend.getCurrentIp().then(
-                (value) => changeServerKey(encodeServerKey(currentIP, 3000)),
+                (retIP) => changeServerKey(encodeServerKey(retIP, 3000)),
               ),
         );
   }
@@ -60,15 +60,16 @@ class _ServerPickerState extends State<ServerPicker> {
   }
 
   Widget buildTitle(BuildContext context) {
-    return Container(
-      alignment: Alignment.centerLeft,
-      margin: EdgeInsets.only(bottom: 4),
-      child: Text(
-        "Alternatives:",
-        style: Theme.of(context).textTheme.headline2.copyWith(
-              color: Colors.black,
-            ),
-      ),
+    return Wrap(
+      children: [
+        Text(
+          "Alternatives:",
+          style: Theme.of(context)
+              .textTheme
+              .headline2
+              .copyWith(color: Colors.black),
+        ),
+      ],
     );
   }
 
@@ -97,19 +98,18 @@ class _ServerPickerState extends State<ServerPicker> {
           ),
         ));
       } else {
-        result.add(InkWell(
-          onTap: () {
-            print("Choose ${element.key} to change ip to ${element.value}");
-            this.changeIP(element.value, redux.changeServerKey);
-          },
-          child: Container(
-            margin: EdgeInsets.symmetric(vertical: 4),
-            padding: EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
-              borderRadius: BorderRadius.all(Radius.circular(4)),
-              border: Border.all(width: 1, color: Colors.grey),
-            ),
+        result.add(Container(
+          margin: EdgeInsets.symmetric(vertical: 4),
+          padding: EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: Theme.of(context).primaryColor,
+            borderRadius: BorderRadius.all(Radius.circular(4)),
+            border: Border.all(width: 1, color: Colors.grey),
+          ),
+          child: InkWell(
+            onTap: () {
+              this.changeIP(element.value, redux.changeServerKey);
+            },
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -128,28 +128,30 @@ class _ServerPickerState extends State<ServerPicker> {
   }
 
   Widget buildDescription(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(top: 8),
-      child: RichText(
-        text: TextSpan(
-          text: 'If',
-          style: Theme.of(context)
-              .textTheme
-              .headline3
-              .copyWith(color: Colors.grey),
-          children: <TextSpan>[
-            TextSpan(
-              text: ' Storyboard Mobile ',
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary),
-            ),
-            TextSpan(
-              text: 'failed to this app, try other access points listed above.',
-            )
-          ],
+    return Wrap(
+      children: [
+        RichText(
+          text: TextSpan(
+            text: 'If',
+            style: Theme.of(context)
+                .textTheme
+                .headline3
+                .copyWith(color: Colors.grey),
+            children: <TextSpan>[
+              TextSpan(
+                text: ' Storyboard Mobile ',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary),
+              ),
+              TextSpan(
+                text:
+                    'failed to this app, try other access points listed above.',
+              )
+            ],
+          ),
         ),
-      ),
+      ],
     );
   }
 
@@ -163,12 +165,14 @@ class _ServerPickerState extends State<ServerPicker> {
       );
     }, builder: (context, ReduxActions redux) {
       getBackendInfo();
-      return Column(children: [
-        Divider(color: Colors.grey),
-        buildTitle(context),
-        ...buildSelector(context, redux),
-        buildDescription(context),
-      ]);
+      return ListView(
+        shrinkWrap: true,
+        children: [
+          buildTitle(context),
+          ...buildSelector(context, redux),
+          buildDescription(context),
+        ],
+      );
     });
   }
 }

@@ -9,6 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TODO: test GetServerIPs
+
 func TestConvertQueryParamToIntDefault(t *testing.T) {
 	url, _ := url.Parse("http://localhost:3000/tasks")
 	req := http.Request{URL: url}

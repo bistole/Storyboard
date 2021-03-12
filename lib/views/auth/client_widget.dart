@@ -4,6 +4,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/setting.dart';
+import 'package:storyboard/views/auth/log_entrance.dart';
 import 'package:storyboard/views/common/app_icons.dart';
 import 'package:storyboard/views/common/button.dart';
 import 'package:storyboard/views/config/config.dart';
@@ -66,7 +67,7 @@ class _ClientWidgetState extends State<ClientWidget> {
           title: Text('Error'),
           content: Text(ErrorInvalidScanner),
           actions: [
-            FlatButton(
+            TextButton(
               onPressed: () => {Navigator.of(context).pop()},
               child: Text('OK'),
             )
@@ -174,20 +175,26 @@ class _ClientWidgetState extends State<ClientWidget> {
             ? Icon(AppIcons.ok, color: color)
             : Icon(AppIcons.cancel, color: color));
 
-    return Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-      Container(
-        child: Text(
-          'Access Point Status:',
-          style: Theme.of(context)
-              .textTheme
-              .headline3
-              .copyWith(color: Colors.black),
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            'Access Point Status:',
+            style: Theme.of(context)
+                .textTheme
+                .headline3
+                .copyWith(color: Colors.black),
+          ),
         ),
-      ),
-      icon,
-      Text(desc,
-          style: Theme.of(context).textTheme.headline3.copyWith(color: color)),
-    ]);
+        icon,
+        Expanded(
+          child: Text(
+            desc,
+            style: Theme.of(context).textTheme.headline3.copyWith(color: color),
+          ),
+        ),
+      ],
+    );
   }
 
   List<Widget> buildScanButtons(BuildContext context) {
@@ -262,12 +269,16 @@ class _ClientWidgetState extends State<ClientWidget> {
                     buildTitle(context),
                     ...buildEditLocation(context, redux),
                     ...buildEditButtons(context, redux),
+                    Divider(color: Colors.grey),
+                    LogEntrance(),
                   ]
                 : [
                     buildTitle(context),
                     ...buildDisplayLocation(context, redux),
                     buildLaunched(context, redux),
                     ...buildScanButtons(context),
+                    Divider(color: Colors.grey),
+                    LogEntrance(),
                   ],
           ),
         );

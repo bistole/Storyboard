@@ -1,5 +1,9 @@
 package server
 
+// TODO: test sse when missing client-id
+// TODO: test sse client close
+// TODO: test ping/pong
+
 import (
 	"encoding/json"
 	"fmt"

@@ -18,6 +18,8 @@ const testVendorName = "Laterhorse_"
 const testAppName = "Storyboard_"
 const testDBName = "foo_task_"
 
+// TODO: test error cases
+
 func initDB(suffix string) interfaces.DatabaseService {
 	conf := &mocks.ConfigMock{
 		GetHomeDirFn: func() string {

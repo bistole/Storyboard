@@ -7,6 +7,8 @@ import 'package:storyboard/redux/models/app.dart';
 var countPerFetch = 100;
 
 String encodeServerKey(String ip, int port) {
+  if (ip == null) return null;
+
   const c2hex = '0123456789abcdef';
   var result = '';
   var iparr = ip.split('.');
@@ -74,10 +76,8 @@ bool handleNetworkError(Store<AppState> store, Exception e) {
         e.osError.errorCode == 60 /* Operation timed out */ ||
         e.osError.errorCode == 111 /* Connection refused */) {
       store.dispatch(SettingServerReachableAction(reachable: false));
-      print(e.toString());
       return true;
     } else if (e.osError.errorCode == 50 /* Network is down */) {
-      print(e.toString());
       return true;
     }
   }

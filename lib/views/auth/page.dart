@@ -3,11 +3,6 @@ import 'package:storyboard/views/auth/client_widget.dart';
 import 'package:storyboard/views/auth/server_widget.dart';
 import 'package:storyboard/views/config/config.dart';
 
-class ReduxActions {
-  final String serverKey;
-  ReduxActions({this.serverKey});
-}
-
 class AuthPage extends StatelessWidget {
   static const routeName = '/auth';
 

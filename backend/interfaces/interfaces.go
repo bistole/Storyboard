@@ -1,8 +1,11 @@
 package interfaces
 
 import (
+	"context"
 	"database/sql"
 	"io"
+	"net"
+	"net/http"
 )
 
 // Task is data object of Task
@@ -26,6 +29,21 @@ type Photo struct {
 	CreatedAt int64  `json:"createdAt"`
 	UpdatedAt int64  `json:"updatedAt"`
 	TS        int64  `json:"_ts"`
+}
+
+// NetProxy is interface of package net
+type NetProxy interface {
+	Dial(string, string) (net.Conn, error)
+	ConnClose(net.Conn)
+	ConnLocalAddr(net.Conn) net.Addr
+	Interfaces() ([]net.Interface, error)
+	InterfaceAddrs(net.Interface) ([]net.Addr, error)
+}
+
+// HTTPProxy is interface of package net/http
+type HTTPProxy interface {
+	ListenAndServe(s *http.Server) error
+	Shutdown(ctx context.Context, s *http.Server) error
 }
 
 // ConfigService is interface of config package

@@ -5,6 +5,7 @@
 *.so
 *.dylib
 
+
 # Test binary, built with `go test -c`
 *.test
 
@@ -19,5 +20,18 @@
 .flutter-plugins-dependencies
 .idea
 .vs
+
+# deploy-related files
+*/fastlane/report.xml
+ios/Runner.ipa
+ios/Runner.app.dSYM.zip
+
+# secret files
+macos/Runner/GoogleService-Info.plist
+ios/Runner/GoogleService-Info.plist
+
 coverage/
 build/
+docs/
+
+libBackend.*

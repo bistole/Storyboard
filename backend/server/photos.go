@@ -1,5 +1,8 @@
 package server
 
+// TODO: test succ case when deleting photo
+// TODO: test error cases
+
 import (
 	"encoding/json"
 	"fmt"
