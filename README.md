@@ -164,6 +164,9 @@ Upload to testflight
 > flutter build ios --release --no-codesign
 > fastlane ios alpha
 
+Upload dSYM to crashlytics
+> fastlane ios crash
+
 Misc
 ===
 

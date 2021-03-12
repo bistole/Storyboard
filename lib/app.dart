@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -42,13 +43,14 @@ class StoryBoardApp extends StatelessWidget {
   }
 
   Future<Store<AppState>> getFutureStore() async {
+    await getFactory().initCrashlytics();
     try {
       await getFactory().initMethodChannels();
       await getFactory().initStoreAndStorage();
       await getFactory().checkServerStatus();
-    } catch (e, trace) {
-      print(e);
-      print(trace);
+    } catch (e, s) {
+      await FirebaseCrashlytics.instance
+          .recordError(e, s, reason: 'when create store');
     }
     return getFactory().store;
   }

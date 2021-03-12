@@ -21,6 +21,11 @@ or alternatively using `brew install fastlane`
 fastlane ios alpha
 ```
 Description of what the lane does
+### ios crash
+```
+fastlane ios crash
+```
+
 
 ----
 

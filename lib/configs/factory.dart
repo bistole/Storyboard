@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -111,6 +114,20 @@ class Factory {
     getViewResource().actTasks = actTasks;
     getViewResource().actServer = actServer;
     getViewResource().logger = logger;
+  }
+
+  Future<void> initCrashlytics() async {
+    await Firebase.initializeApp();
+
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+
+    // Pass all uncaught errors to Crashlytics.
+    Function originalOnError = FlutterError.onError;
+    FlutterError.onError = (FlutterErrorDetails errorDetails) async {
+      await FirebaseCrashlytics.instance.recordFlutterError(errorDetails);
+      // Forward to original handler.
+      originalOnError(errorDetails);
+    };
   }
 
   Future<MethodChannel> createChannelByName(String name) =>
