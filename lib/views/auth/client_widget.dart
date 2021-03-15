@@ -5,6 +5,7 @@ import 'package:storyboard/net/config.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/setting.dart';
 import 'package:storyboard/views/auth/log_entrance.dart';
+import 'package:storyboard/views/auth/version_widget.dart';
 import 'package:storyboard/views/common/app_icons.dart';
 import 'package:storyboard/views/common/button.dart';
 import 'package:storyboard/views/config/config.dart';
@@ -271,6 +272,7 @@ class _ClientWidgetState extends State<ClientWidget> {
                     ...buildEditButtons(context, redux),
                     Divider(color: Colors.grey),
                     LogEntrance(),
+                    VersionWidget(),
                   ]
                 : [
                     buildTitle(context),
@@ -279,6 +281,7 @@ class _ClientWidgetState extends State<ClientWidget> {
                     ...buildScanButtons(context),
                     Divider(color: Colors.grey),
                     LogEntrance(),
+                    VersionWidget(),
                   ],
           ),
         );

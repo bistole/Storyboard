@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:storyboard/views/auth/log_entrance.dart';
 import 'package:storyboard/views/auth/server_picker.dart';
 import 'package:storyboard/views/auth/server_qrcode.dart';
+import 'package:storyboard/views/auth/version_widget.dart';
 
 class ServerWidget extends StatelessWidget {
   @override
@@ -15,7 +16,8 @@ class ServerWidget extends StatelessWidget {
             Divider(color: Colors.grey),
             ServerPicker(),
             Divider(color: Colors.grey),
-            LogEntrance()
+            LogEntrance(),
+            VersionWidget(),
           ],
         ),
       ),
