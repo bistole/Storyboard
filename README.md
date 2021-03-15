@@ -5,197 +5,68 @@ Which can backup the data from multiple devices into one server which is desktop
 
 `'Storyboard` use `Go` build backend and use `Flutter` as front-end.
 
-Setup
-===
+# Setup:
 
 This project requires `go` and `flutter` to run. 
 
+Check [Install Flutter](https://flutter.dev/docs/get-started/install/macos) official document to setup `Flutter`.
 
-Setup the environment variables, make sure
+Check [Install GoLang](https://golang.org/doc/install) to install `Go`.
+
+Also need to remember to add `go` and `flutter` in PATH:
 
 ```
 export PATH=$HOME/Flutter/flutter/bin:/usr/local/go/bin:$HOME/go/bin:$PATH
 export CGO_ENABLED=1
 ```
 
-Run backend service
-----
+# Development
 
-```
-cd $PROJECT_HOME/backend
-go run .
-```
+Check [Backend](./BACKEND.md) for develop backend with GoLang.
 
-You can also compile and run as executable file.
-```
-cd $PROJECT_HOME/backend
-go build -buildmode=exe
-./backend 
-```
+Develop for MacOS or Windows, following the instruction from [Desktop Dev](./DESKTOP.md).
 
-Run frontend - macOS
----
+Develop for iOS or Android, following the instruction from [Mobile Dev](./MOBILE.md).
 
-```
-cd $PROJECT_HOME
-flutter run -d macos
-```
-
-Run frontend - Windows
----
-
-Should follow the [Instruction](https://flutter.dev/docs/get-started/install/windows`)
-
-In order to build backend, also need to install [TDM64-GCC](https://jmeubank.github.io/tdm-gcc/download/)
-
-
-```
-cd $PROJECT_HOME
-flutter run -d windows
-```
-
-Run frontend - emulator - android
----
-
-Solve android licenses:
-```
-flutter doctor --android-licenses
-```
-
-First need to fix android command line issue for java9 and above:
-
-```
-export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jre/jdk/Contents/Home
-export ANDROID_HOME=$HOME/Library/Android/sdk
-export ANDROID_SDK_ROOT=$HOME/Library/Android/sdk
-export ANDROID_AVD_HOME=$HOME/.android/avd
-export PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$PATH
-````
-
-Display the available avd and start it
-```
-emulator -list-avds
-emulator @devicename
-
-```
-
-Check the devices is connected and run app on this device.
-```
-flutter devices
-flutter run -d "devicename"
-```
-
-Run frontend - emulator - ios
----
-
-```
-open -a Simulator
-flutter devices
-flutter run -d "device name"
-```
-
-
-Test
-===
+# Test
 
 Since backend was writtend by `Go` and frontend is written by `Flutter/Dart`.  The whole project can only be tested separately for now. 
 
-Frontend
----
+Check the [Backend](./BACKEND.md) for testing backend server. 
 
-Test a single file:
+For testing front-end app which is written with `Flutter/Dart` use:
 
 ```
 flutter test [file]
 ```
 
+## Test coverage
+
 `lcov` is required for generate testing coverage report in Flutter. Check [Link](https://stackoverflow.com/questions/50789578/how-can-the-code-coverage-data-from-flutter-tests-be-displayed) for details.
+
+Briefly, just run following command to instlall it on mac:
+
+```
+brew install lcov
+```
+
+So we can run following commands to generate coverage report on cmmand line:
 
 ```
 flutter test --coverage
 /usr/local/bin/genhtml coverage/lcov.info -o coverage/html
 ```
 
-Backend
----
+# Deployment
 
-Test a single file:
+## iOS and Android
 
-```
-cd $PROJECT_HOME/backend
-go test [file]
-```
+Check `Deployment` section in [MOBILE](./MOBILE.md).
 
-The file should start with `./` such as `./database/database_test.go`.
+## MacOS
 
-In order to generate testing coverage report for frontend, run the following script:
+Done on anothe project: storyboard_deploy_mgmt
 
-```
-cd $PROJECT_HOME/backend
-go test ./... -coverprofile=coverage.out
-go tool cover -html=coverage.out
-```
+## Windows
 
-Deploy
-====
-
-Change the version in pubspec.yaml
-Make sure all number should no less than previous version:
-    major.minor.bug+code
-
-Android
-----
-
-Upload to internal
-
-### Remember change version in `pubspec.yaml` before build 
-
-> cd $PROJECT_HOME/android
-> flutter build apk
-> fastlane android internal
-
-Promote to alpha
-
-> SUPPLY_VERSION_CODE=5 fastlane android alpha
-
-iOS
-----
-
-Upload to testflight
-> cd $PROJECT_HOME/ios
-> flutter build ios --release --no-codesign
-> fastlane ios alpha
-
-Upload dSYM to crashlytics
-> fastlane ios crash
-
-Misc
-===
-
-Build backend as static library
----
-```
-cd $PROJECT_HOME/backend
-go build -buildmode=c-archive
-
-cd $PROJECT_HOME/c
-gcc -I. main.c ../backend/backend.a -v
-```
-
-Programming windows version on mac
-----
-
-Install vcpkg - 
-https://docs.microsoft.com/en-us/cpp/build/install-vcpkg
-
-Integrate with vc - 
-./vcpkg integrate install
-
-References
-===
-
-Go package layout: https://medium.com/@benbjohnson/standard-package-layout-7cdbc8391fc1#.ds38va3pp
-
-Testing HTTP Server in Go: https://blog.questionable.services/article/testing-http-handlers-go/
-
-Flutter MethodChannel: https://stablekernel.com/article/flutter-platform-channels-quick-start/
+Not implemented.
