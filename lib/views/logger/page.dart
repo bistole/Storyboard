@@ -9,6 +9,7 @@ class LoggerPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         title: Text('Logger'),
       ),
       body: Column(

@@ -3,7 +3,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
-import 'package:storyboard/views/common/bottombar.dart';
+import 'package:storyboard/views/common/footerbar.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/photo/view_photo_widget.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
@@ -44,7 +44,7 @@ class PhotoPage extends StatelessWidget {
   }
 
   Widget buildViewPhotoToolbar(ReduxActions redux) {
-    return SBBottombar([
+    return SBFooterbar([
       SBToolbarButton(
         () => {},
         text: "RESET",
@@ -70,6 +70,7 @@ class PhotoPage extends StatelessWidget {
         }
         return Scaffold(
           appBar: AppBar(
+            elevation: 0,
             title: Text(redux.photo.filename),
           ),
           body: Column(

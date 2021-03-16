@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/actions/server.dart';
 import 'package:storyboard/actions/tasks.dart';
@@ -18,6 +19,24 @@ class ViewsResource {
   Storage storage;
   BackendChannel backend;
   CommandChannel command;
+
+  Map<String, GlobalKey> keyPool = {};
+  GlobalKey getGlobalKeyByName(String name) {
+    if (keyPool[name] == null) {
+      keyPool[name] = GlobalKey();
+    }
+    return keyPool[name];
+  }
+
+  Size getSizeFromWidget(GlobalKey gKey) {
+    final keyContext = gKey.currentContext;
+    if (keyContext != null) {
+      final box = keyContext.findRenderObject() as RenderBox;
+      final size = box.hasSize ? box.size : Size.zero;
+      return size;
+    }
+    return Size.zero;
+  }
 }
 
 ViewsResource _vr;

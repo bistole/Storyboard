@@ -23,6 +23,8 @@ class ReduxActions {
   });
 }
 
+const String TOOLBAR_ADDING = "TOOLBAR_ADDING";
+
 class CreateBarWidget extends StatelessWidget {
   Widget buildAddingToolbar(ReduxActions redux) {
     SBToolbarButton photoActionButton;
@@ -39,14 +41,17 @@ class CreateBarWidget extends StatelessWidget {
         icon: Icon(AppIcons.picture),
       );
     }
-    return SBToolbar([
-      SBToolbarButton(
-        redux.startTask,
-        text: "ADD TASK",
-        icon: Icon(AppIcons.tasks),
-      ),
-      photoActionButton,
-    ]);
+    return SBToolbar(
+      [
+        SBToolbarButton(
+          redux.startTask,
+          text: "ADD TASK",
+          icon: Icon(AppIcons.tasks),
+        ),
+        photoActionButton,
+      ],
+      key: getViewResource().getGlobalKeyByName(TOOLBAR_ADDING),
+    );
   }
 
   Widget buildWhenAddingTask(ReduxActions redux) {

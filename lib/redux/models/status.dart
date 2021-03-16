@@ -4,7 +4,9 @@ enum StatusKey {
   AddingPhoto,
   AddingTask,
   EditingTask,
+  EditingPhoto,
   ListTask,
+  ListPhoto,
 }
 
 @immutable

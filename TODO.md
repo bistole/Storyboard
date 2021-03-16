@@ -1,15 +1,23 @@
 NOW
 ===
 
+- Change layout of home page
+  - Layout for different screen [DONE]
+    - Panel Menu [DONE]
+    - Switch Photo and Task detail view [DONE]
+    - Layout issue [DONE]
+      - Mobile [DONE]
+        - Popup Panel [DONE]
+        - Embed Panel [DONE]
+      - Desktop [DONE]
+        - Popup Panel [DONE]
+        - Embed Panel [DONE]
+  - Split toolbar into task and photo separately
+  - Split task list and photo list
+  - Change to Grid for photos
 
 TODO
 ====
-
-- Change layout of home page
-  - Left panel to separate photo and task
-  - Change to Grid for photos
-
-- 
 
 
 - Write doc:
@@ -44,6 +52,18 @@ TODO
 
 NOT READY
 ====
+
+- Create a new type called topic:
+  - Topic is a note with multiple lines.
+  - Display the clickable style when find link.
+    - Tap to open the URL in browser.
+
+- Stylish note
+  - Bold / Italic / Underline?
+  - Checkbox 
+  - List
+  - |->   <-|
+
 
 - Authenticate
   - Create server-id for each server.
