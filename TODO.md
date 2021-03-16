@@ -12,9 +12,9 @@ NOW
       - Desktop [DONE]
         - Popup Panel [DONE]
         - Embed Panel [DONE]
-  - Split toolbar into task and photo separately
-  - Split task list and photo list
+  - Split task list and photo list [DONE]
   - Change to Grid for photos
+  - Split toolbar into task and photo separately
 
 TODO
 ====

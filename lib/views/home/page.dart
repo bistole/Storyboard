@@ -48,14 +48,6 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  bool isWiderLayout(BuildContext context) {
-    if (getViewResource().deviceManager.isDesktop()) {
-      return MediaQuery.of(context).size.width > 400;
-    } else {
-      return MediaQuery.of(context).orientation == Orientation.landscape;
-    }
-  }
-
   Widget buildMenuButton(context, Function onTap) {
     return TextButton.icon(
       onPressed: onTap,
@@ -108,7 +100,7 @@ class HomePage extends StatelessWidget {
       titleSpacing: 0.0,
       title: Row(
         children: [
-          isWiderLayout(context)
+          getViewResource().isWiderLayout(context)
               ? Container()
               : buildMenuButton(context, onTap),
           buildTitle(),
@@ -118,7 +110,7 @@ class HomePage extends StatelessWidget {
     );
     return Scaffold(
       appBar: appBar,
-      body: isWiderLayout(context)
+      body: getViewResource().isWiderLayout(context)
           ? buildDesktopLayout(context)
           : buildMobileLayout(context),
     );

@@ -37,6 +37,14 @@ class ViewsResource {
     }
     return Size.zero;
   }
+
+  bool isWiderLayout(BuildContext context) {
+    if (getViewResource().deviceManager.isDesktop()) {
+      return MediaQuery.of(context).size.width > 400;
+    } else {
+      return MediaQuery.of(context).orientation == Orientation.landscape;
+    }
+  }
 }
 
 ViewsResource _vr;
