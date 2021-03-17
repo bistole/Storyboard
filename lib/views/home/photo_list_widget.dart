@@ -62,7 +62,9 @@ class PhotoListWidget extends StatelessWidget {
             Expanded(
               child: Container(
                 padding: padding,
-                child: ListView(
+                child: GridView.extent(
+                  childAspectRatio: 1,
+                  maxCrossAxisExtent: 192,
                   children: buildList(redux),
                 ),
               ),

@@ -13,7 +13,12 @@ NOW
         - Popup Panel [DONE]
         - Embed Panel [DONE]
   - Split task list and photo list [DONE]
-  - Change to Grid for photos
+  - Change to Grid for photos [DONE]
+  - Change interactive way [DONE]
+    - Tap show details [DONE]
+    - MOBILE: Swipe to show delete button [DONE]
+    - DESKTOP: Hover to show delete button [DONE]
+    - Tap delete button to delete [DONE]
   - Split toolbar into task and photo separately
 
 TODO

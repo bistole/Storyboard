@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:storyboard/redux/actions/actions.dart';
@@ -26,71 +27,146 @@ class ReduxActions {
   }
 }
 
-class PhotoWidget extends StatelessWidget {
+class PhotoWidget extends StatefulWidget {
   final String uuid;
 
   PhotoWidget({this.uuid});
 
-  Widget buildPopupMenu(BuildContext context, ReduxActions redux) {
-    return PopupMenuButton(
-      onSelected: (value) {
-        if (value == 'delete') {
-          redux.delete();
-        } else if (value == 'show') {
-          Navigator.of(context).pushNamed(
-            PhotoPage.routeName,
-            arguments: PhotoPageArguments(redux.photo.uuid),
-          );
-        }
-      },
-      icon: Icon(Icons.more_horiz),
-      itemBuilder: (_) => <PopupMenuItem<String>>[
-        PopupMenuItem<String>(
-          child: Text('Delete'),
-          value: 'delete',
-        ),
-        PopupMenuItem<String>(
-          child: Text('Show'),
-          value: 'show',
-        ),
-      ],
+  @override
+  PhotoWidgetState createState() => PhotoWidgetState();
+}
+
+class PhotoWidgetState extends State<PhotoWidget> {
+  bool isMenuShown = false;
+
+  @override
+  void initState() {
+    isMenuShown = false;
+    super.initState();
+  }
+
+  void pushDetailPage(ReduxActions redux) {
+    Navigator.of(context).pushNamed(
+      PhotoPage.routeName,
+      arguments: PhotoPageArguments(redux.photo.uuid),
     );
   }
 
-  List<Widget> buildLoadingIndicator(BuildContext context, ReduxActions redux) {
-    return [
-      Expanded(
-        child: Container(
-          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          decoration: BoxDecoration(
-            color: Colors.grey[100],
-            border: Border.all(width: 8, color: Colors.grey[100]),
-            borderRadius: BorderRadius.all(Radius.circular(4)),
-          ),
-          alignment: Alignment.center,
-          child: Row(children: [
-            Spacer(),
-            SizedBox(
-              width: 48,
-              height: 48,
-              child: CircularProgressIndicator(
-                strokeWidth: 1,
-              ),
-            ),
-            Spacer(),
-          ]),
-        ),
-      ),
-      this.buildPopupMenu(context, redux),
-    ];
+  void showMenu() {
+    if (isMenuShown) return;
+    setState(() {
+      isMenuShown = true;
+    });
   }
 
-  List<Widget> buildThumb(BuildContext context, ReduxActions redux) {
+  void hideMenu() {
+    if (!isMenuShown) return;
+    setState(() {
+      isMenuShown = false;
+    });
+  }
+
+  Widget buildDeleteWidget(ReduxActions redux) {
+    return AnimatedPositioned(
+      width: 48,
+      right: isMenuShown ? 0 : -48,
+      top: 0,
+      bottom: 0,
+      curve: Curves.ease,
+      duration: Duration(milliseconds: 300),
+      child: GestureDetector(
+        onTap: () => redux.delete(),
+        child: Container(
+          color: Colors.red.withOpacity(0.5),
+          child: Align(
+            alignment: Alignment.center,
+            child: Icon(
+              Icons.delete,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget wrapWidgetWithGestureDetector(ReduxActions redux, Widget child) {
+    if (getViewResource().deviceManager.isDesktop()) {
+      return MouseRegion(
+        onEnter: (event) => showMenu(),
+        onExit: (event) => hideMenu(),
+        onHover: (event) => showMenu(),
+        child: GestureDetector(
+          key:
+              getViewResource().getGlobalKeyByName("PHOTO-LIST:" + widget.uuid),
+          onTap: () {
+            pushDetailPage(redux);
+          },
+          child: child,
+        ),
+      );
+    } else {
+      return GestureDetector(
+        key: getViewResource().getGlobalKeyByName("PHOTO-LIST:" + widget.uuid),
+        onTap: () {
+          if (isMenuShown) {
+            hideMenu();
+          } else {
+            pushDetailPage(redux);
+          }
+        },
+        onPanUpdate: (details) {
+          if (details.delta.dx < 0) {
+            showMenu();
+          } else {
+            hideMenu();
+          }
+        },
+        onLongPress: () {
+          showMenu();
+        },
+        child: child,
+      );
+    }
+  }
+
+  Widget wrapWidget(ReduxActions redux, List<Widget> children) {
+    Widget container = Container(
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        border: Border.all(width: 1, color: Colors.green),
+        borderRadius: BorderRadius.all(Radius.circular(4)),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      margin: EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+      child: Stack(children: [
+        ...children,
+        buildDeleteWidget(redux),
+      ]),
+    );
+    return wrapWidgetWithGestureDetector(redux, container);
+  }
+
+  Widget buildLoadingIndicator(BuildContext context, ReduxActions redux) {
+    return wrapWidget(redux, [
+      Center(
+        child: SizedBox(
+          width: 48,
+          height: 48,
+          child: CircularProgressIndicator(
+            strokeWidth: 1,
+          ),
+        ),
+      ),
+    ]);
+  }
+
+  Widget buildThumb(BuildContext context, ReduxActions redux) {
     var photoPath = redux.photo.hasThumb == PhotoStatus.Ready
-        ? getViewResource().storage.getThumbnailPathByUUID(this.uuid)
-        : getViewResource().storage.getPhotoPathByUUID(this.uuid);
+        ? getViewResource().storage.getThumbnailPathByUUID(widget.uuid)
+        : getViewResource().storage.getPhotoPathByUUID(widget.uuid);
     List<Widget> children = [
-      Expanded(
+      Center(
         child: FittedBox(
           fit: BoxFit.contain,
           child: ConstrainedBox(
@@ -104,35 +180,18 @@ class PhotoWidget extends StatelessWidget {
     ];
     if (redux.photo.ts == 0) {
       children.add(
-        Container(
-          height: 128,
-          child: Align(
-            alignment: Alignment.bottomRight,
-            child: Icon(
-              Icons.cloud_upload,
-              size: 16,
-              color: Colors.orange[700],
-            ),
+        Positioned(
+          right: 0,
+          top: 0,
+          child: Icon(
+            Icons.cloud_upload,
+            size: 16,
+            color: Colors.orange[700],
           ),
         ),
       );
     }
-    return [
-      Expanded(
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.grey[100],
-            border: Border.all(width: 8, color: Colors.grey[100]),
-            borderRadius: BorderRadius.all(Radius.circular(4)),
-          ),
-          height: 128,
-          padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(children: children),
-        ),
-      ),
-      this.buildPopupMenu(context, redux),
-    ];
+    return wrapWidget(redux, children);
   }
 
   @override
@@ -141,13 +200,15 @@ class PhotoWidget extends StatelessWidget {
       converter: (store) {
         return ReduxActions(
           delete: () {
-            store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
-            getViewResource().actPhotos.actDeletePhoto(store, this.uuid);
+            store.dispatch(ChangeStatusAction(status: StatusKey.ListPhoto));
+            getViewResource().actPhotos.actDeletePhoto(store, widget.uuid);
           },
           getThumb: () {
-            getViewResource().actPhotos.actDownloadThumbnail(store, this.uuid);
+            getViewResource()
+                .actPhotos
+                .actDownloadThumbnail(store, widget.uuid);
           },
-          photo: store.state.photoRepo.photos[this.uuid],
+          photo: store.state.photoRepo.photos[widget.uuid],
         );
       },
       builder: (context, ReduxActions redux) {
@@ -155,12 +216,10 @@ class PhotoWidget extends StatelessWidget {
         if (redux.photo.hasThumb == PhotoStatus.None) {
           redux.getThumb();
         }
-        return Row(
-          children: redux.photo.hasThumb == PhotoStatus.Ready ||
-                  redux.photo.hasOrigin == PhotoStatus.Ready
-              ? this.buildThumb(context, redux)
-              : this.buildLoadingIndicator(context, redux),
-        );
+        return (redux.photo.hasThumb == PhotoStatus.Ready ||
+                redux.photo.hasOrigin == PhotoStatus.Ready)
+            ? this.buildThumb(context, redux)
+            : this.buildLoadingIndicator(context, redux);
       },
     );
   }

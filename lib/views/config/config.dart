@@ -38,6 +38,17 @@ class ViewsResource {
     return Size.zero;
   }
 
+  Rect getRectFromWidget(GlobalKey gKey) {
+    final keyContext = gKey.currentContext;
+    if (keyContext != null) {
+      final box = keyContext.findRenderObject() as RenderBox;
+      final offset = box.localToGlobal(Offset.zero);
+      final size = box.hasSize ? box.size : Size.zero;
+      return Rect.fromLTWH(offset.dx, offset.dy, size.width, size.height);
+    }
+    return Rect.zero;
+  }
+
   bool isWiderLayout(BuildContext context) {
     if (getViewResource().deviceManager.isDesktop()) {
       return MediaQuery.of(context).size.width > 400;
