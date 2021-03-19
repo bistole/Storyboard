@@ -1,25 +1,6 @@
 NOW
 ===
 
-- Change layout of home page
-  - Layout for different screen [DONE]
-    - Panel Menu [DONE]
-    - Switch Photo and Task detail view [DONE]
-    - Layout issue [DONE]
-      - Mobile [DONE]
-        - Popup Panel [DONE]
-        - Embed Panel [DONE]
-      - Desktop [DONE]
-        - Popup Panel [DONE]
-        - Embed Panel [DONE]
-  - Split task list and photo list [DONE]
-  - Change to Grid for photos [DONE]
-  - Change interactive way [DONE]
-    - Tap show details [DONE]
-    - MOBILE: Swipe to show delete button [DONE]
-    - DESKTOP: Hover to show delete button [DONE]
-    - Tap delete button to delete [DONE]
-  - Split toolbar into task and photo separately
 
 TODO
 ====
@@ -90,3 +71,27 @@ NOT READY
 
 ISSUE
 =====
+
+
+DONE
+====
+
+- Change layout of home page [DONE]
+  - Layout for different screen [DONE]
+    - Panel Menu [DONE]
+    - Switch Photo and Task detail view [DONE]
+    - Layout issue [DONE]
+      - Mobile [DONE]
+        - Popup Panel [DONE]
+        - Embed Panel [DONE]
+      - Desktop [DONE]
+        - Popup Panel [DONE]
+        - Embed Panel [DONE]
+  - Split task list and photo list [DONE]
+  - Change to Grid for photos [DONE]
+  - Change interactive way [DONE]
+    - Tap show details [DONE]
+    - MOBILE: Swipe to show delete button [DONE]
+    - DESKTOP: Hover to show delete button [DONE]
+    - tap delete button to delete [DONE]
+  - Split toolbar into task and photo separately [DONE]

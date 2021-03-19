@@ -1,13 +1,12 @@
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:storyboard/views/common/app_icons.dart';
-
-import 'package:storyboard/views/common/toolbar.dart';
-import 'package:storyboard/views/common/toolbar_button.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
+import 'package:storyboard/views/common/app_icons.dart';
+import 'package:storyboard/views/common/toolbar.dart';
+import 'package:storyboard/views/common/toolbar_button.dart';
 import 'package:storyboard/views/config/config.dart';
 
 class ReduxActions {
@@ -23,24 +22,10 @@ class ReduxActions {
   });
 }
 
-const String TOOLBAR_ADDING = "TOOLBAR_ADDING";
+const String TASK_TOOLBAR = "TASK_TOOLBAR";
 
-class CreateBarWidget extends StatelessWidget {
-  Widget buildAddingToolbar(ReduxActions redux) {
-    SBToolbarButton photoActionButton;
-    if (getViewResource().deviceManager.isMobile()) {
-      photoActionButton = SBToolbarButton(
-        getViewResource().command.takePhoto,
-        text: "TAKE PHOTO",
-        icon: Icon(AppIcons.picture),
-      );
-    } else {
-      photoActionButton = SBToolbarButton(
-        getViewResource().command.importPhoto,
-        text: "ADD PHOTO",
-        icon: Icon(AppIcons.picture),
-      );
-    }
+class TaskToolbarWidget extends StatelessWidget {
+  Widget buildToolbarWidget(ReduxActions redux) {
     return SBToolbar(
       [
         SBToolbarButton(
@@ -48,13 +33,11 @@ class CreateBarWidget extends StatelessWidget {
           text: "ADD TASK",
           icon: Icon(AppIcons.tasks),
         ),
-        photoActionButton,
       ],
-      key: getViewResource().getGlobalKeyByName(TOOLBAR_ADDING),
     );
   }
 
-  Widget buildWhenAddingTask(ReduxActions redux) {
+  Widget buildCreateBarWidget(ReduxActions redux) {
     return ListTile(
       title: RawKeyboardListener(
         child: TextField(
@@ -73,7 +56,7 @@ class CreateBarWidget extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(Object context) {
     return StoreConnector<AppState, ReduxActions>(
       converter: (store) {
         return ReduxActions(
@@ -94,9 +77,9 @@ class CreateBarWidget extends StatelessWidget {
       },
       builder: (context, ReduxActions redux) {
         if (redux.status.status == StatusKey.AddingTask) {
-          return buildWhenAddingTask(redux);
+          return buildCreateBarWidget(redux);
         }
-        return buildAddingToolbar(redux);
+        return buildToolbarWidget(redux);
       },
     );
   }

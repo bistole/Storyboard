@@ -4,7 +4,6 @@ import 'package:storyboard/views/common/panel_popup_route.dart';
 import 'package:storyboard/views/common/server_status.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/category_panel.dart';
-import 'package:storyboard/views/home/create_bar_widget.dart';
 import 'package:storyboard/views/home/detail_page_widget.dart';
 
 class HomePage extends StatelessWidget {
@@ -18,7 +17,6 @@ class HomePage extends StatelessWidget {
     return Container(
       child: Column(
         children: [
-          CreateBarWidget(),
           Expanded(
             child: Row(
               children: [
@@ -39,7 +37,6 @@ class HomePage extends StatelessWidget {
     return Container(
       child: Column(
         children: [
-          CreateBarWidget(),
           Expanded(
             child: DetailPageWidget(),
           ),
@@ -74,22 +71,14 @@ class HomePage extends StatelessWidget {
       double top = MediaQuery.of(context).padding.top;
       double barHeight = appBar.preferredSize.height;
 
-      GlobalKey funcBarKey =
-          getViewResource().getGlobalKeyByName(TOOLBAR_ADDING);
-      double funcBarHeight =
-          getViewResource().getSizeFromWidget(funcBarKey).height;
-
       Navigator.push(
         context,
         PanelPopupRoute(
           widget: PanelPopupWidget(
             child:
                 CategoryPanel(size: Size(CATEGORY_PANEL_DEFAULT_WIDTH, height)),
-            rect: Rect.fromLTWH(
-                0,
-                top + barHeight + funcBarHeight,
-                CATEGORY_PANEL_DEFAULT_WIDTH,
-                height - top - barHeight - funcBarHeight),
+            rect: Rect.fromLTWH(0, top + barHeight,
+                CATEGORY_PANEL_DEFAULT_WIDTH, height - top - barHeight),
           ),
         ),
       );

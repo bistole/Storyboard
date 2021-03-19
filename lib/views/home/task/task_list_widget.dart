@@ -3,8 +3,9 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
-import 'package:storyboard/views/home/task_widget.dart';
-import 'package:storyboard/views/home/update_task_widget.dart';
+import 'package:storyboard/views/home/task/task_toolbar_widget.dart';
+import 'package:storyboard/views/home/task/task_widget.dart';
+import 'package:storyboard/views/home/task/update_task_widget.dart';
 
 class ReduxActions {
   final List<Task> taskList;
@@ -58,6 +59,7 @@ class TaskListWidget extends StatelessWidget {
             color: Colors.grey[100],
           ),
           child: Column(children: [
+            TaskToolbarWidget(),
             Expanded(
               child: Container(
                 padding: padding,

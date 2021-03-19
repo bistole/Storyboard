@@ -35,6 +35,16 @@ class Status {
     );
   }
 
+  bool get inTask =>
+      status == StatusKey.AddingTask ||
+      status == StatusKey.ListTask ||
+      status == StatusKey.EditingTask;
+
+  bool get inPhoto =>
+      status == StatusKey.AddingPhoto ||
+      status == StatusKey.ListPhoto ||
+      status == StatusKey.EditingPhoto;
+
   @override
   int get hashCode => status.hashCode ^ param1.hashCode ^ param2.hashCode;
 

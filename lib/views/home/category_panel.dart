@@ -32,8 +32,6 @@ class CategoryPanel extends StatelessWidget {
         );
       },
       builder: (context, ReduxActions redux) {
-        bool isTaskList = redux.status.status == StatusKey.ListTask;
-        bool isPhotoList = redux.status.status == StatusKey.ListPhoto;
         return Container(
           constraints: BoxConstraints(
             maxWidth: this.size.width + this.padding.left,
@@ -52,13 +50,13 @@ class CategoryPanel extends StatelessWidget {
               CategoryPanelItem(
                 () => redux.changeStatus(StatusKey.ListTask),
                 text: "Tasks",
-                selected: isTaskList,
+                selected: redux.status.inTask,
                 padding: EdgeInsets.only(left: this.padding.left),
               ),
               CategoryPanelItem(
                 () => redux.changeStatus(StatusKey.ListPhoto),
                 text: "Photos",
-                selected: isPhotoList,
+                selected: redux.status.inPhoto,
                 padding: EdgeInsets.only(left: this.padding.left),
               ),
             ],

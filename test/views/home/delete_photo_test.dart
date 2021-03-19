@@ -17,7 +17,7 @@ import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/storage/storage.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/page.dart';
-import 'package:storyboard/views/home/photo_widget.dart';
+import 'package:storyboard/views/home/photo/photo_widget.dart';
 
 Type typeof<T>() => T;
 

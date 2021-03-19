@@ -3,8 +3,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/views/config/config.dart';
-import 'package:storyboard/views/home/photo_list_widget.dart';
-import 'package:storyboard/views/home/task_list_widget.dart';
+import 'package:storyboard/views/home/photo/photo_list_widget.dart';
+import 'package:storyboard/views/home/task/task_list_widget.dart';
 
 class ReduxActions {
   Status status;
@@ -26,10 +26,12 @@ class DetailPageWidget extends StatelessWidget {
         );
       },
       builder: (context, ReduxActions redux) {
-        if (redux.status.status == StatusKey.ListTask) {
+        if (redux.status.inTask) {
           return TaskListWidget(padding: padding);
-        } else {
+        } else if (redux.status.inPhoto) {
           return PhotoListWidget(padding: padding);
+        } else {
+          return Container();
         }
       },
     );
