@@ -3,6 +3,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
+import 'package:storyboard/views/home/task/create_task_widget.dart';
 import 'package:storyboard/views/home/task/task_toolbar_widget.dart';
 import 'package:storyboard/views/home/task/task_widget.dart';
 import 'package:storyboard/views/home/task/update_task_widget.dart';
@@ -20,18 +21,23 @@ class TaskListWidget extends StatelessWidget {
   List<Widget> buildList(ReduxActions redux) {
     var children = <Widget>[];
 
+    if (redux.status.status == StatusKey.AddingTask) {
+      Widget w = CreateTaskWidget();
+      children.add(w);
+    }
+
     var updatedTaskList = List<Task>.from(redux.taskList);
     updatedTaskList.sort((Task a, Task b) {
       return a.updatedAt == b.updatedAt
           ? 0
-          : (a.updatedAt > b.updatedAt ? 1 : -1);
+          : (a.updatedAt < b.updatedAt ? 1 : -1);
     });
     updatedTaskList.forEach((task) {
       Widget w = redux.status.status == StatusKey.EditingTask &&
               redux.status.param1 == task.uuid
           ? UpdateTaskWidget(task: task)
           : TaskWidget(task: task);
-      children.insert(0, w);
+      children.add(w);
     });
 
     return children;

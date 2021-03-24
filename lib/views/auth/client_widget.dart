@@ -116,28 +116,26 @@ class _ClientWidgetState extends State<ClientWidget> {
       Row(children: [
         Expanded(
           child: Container(
-            child: RawKeyboardListener(
-              child: TextField(
-                controller: redux.serverKeyController,
-                onSubmitted: (String serverKey) {
-                  var code = serverKey.toLowerCase();
-                  if (decodeServerKey(code) != null) {
-                    redux.changeServerKey(code);
-                    endEditing();
-                  } else {
-                    errorEditing(ErrorInvalidServerKey);
-                  }
-                },
-                autofocus: true,
-                decoration: InputDecoration(
-                    hintText: encodeServerKey('127.0.0.1', 3000)),
-              ),
-              focusNode: FocusNode(),
-              onKey: (RawKeyEvent event) {
+            child: TextField(
+              controller: redux.serverKeyController,
+              onSubmitted: (String serverKey) {
+                var code = serverKey.toLowerCase();
+                if (decodeServerKey(code) != null) {
+                  redux.changeServerKey(code);
+                  endEditing();
+                } else {
+                  errorEditing(ErrorInvalidServerKey);
+                }
+              },
+              focusNode: FocusNode(onKey: (node, event) {
                 if (event.isKeyPressed(LogicalKeyboardKey.escape)) {
                   endEditing();
                 }
-              },
+                return false;
+              }),
+              autofocus: true,
+              decoration:
+                  InputDecoration(hintText: encodeServerKey('127.0.0.1', 3000)),
             ),
           ),
         ),

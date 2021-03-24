@@ -8,6 +8,7 @@ class SBToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 40,
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(
