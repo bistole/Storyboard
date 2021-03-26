@@ -6,6 +6,7 @@ import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
 import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/configs/factory.dart';
+import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/tasks.dart';
 import 'package:storyboard/redux/models/app.dart';
@@ -16,6 +17,8 @@ import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
 import 'package:storyboard/redux/models/task_repo.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
+
+class MockLogger extends Mock implements Logger {}
 
 class MockHttpClient extends Mock implements http.Client {}
 
@@ -71,8 +74,10 @@ void main() {
     setUp(() {
       httpClient = MockHttpClient();
       actTasks = MockActTasks();
+      actTasks.setLogger(MockLogger());
 
       netTasks = NetTasks();
+      netTasks.setLogger(MockLogger());
       netTasks.setHttpClient(httpClient);
       netTasks.setActTasks(actTasks);
     });
@@ -226,8 +231,10 @@ void main() {
     setUp(() {
       httpClient = MockHttpClient();
       actTasks = MockActTasks();
+      actTasks.setLogger(MockLogger());
 
       netTasks = NetTasks();
+      netTasks.setLogger(MockLogger());
       netTasks.setHttpClient(httpClient);
       netTasks.setActTasks(actTasks);
     });
@@ -271,8 +278,10 @@ void main() {
     setUp(() {
       httpClient = MockHttpClient();
       actTasks = MockActTasks();
+      actTasks.setLogger(MockLogger());
 
       netTasks = NetTasks();
+      netTasks.setLogger(MockLogger());
       netTasks.setHttpClient(httpClient);
       netTasks.setActTasks(actTasks);
     });
@@ -316,8 +325,10 @@ void main() {
     setUp(() {
       httpClient = MockHttpClient();
       actTasks = MockActTasks();
+      actTasks.setLogger(MockLogger());
 
       netTasks = NetTasks();
+      netTasks.setLogger(MockLogger());
       netTasks.setHttpClient(httpClient);
       netTasks.setActTasks(actTasks);
     });

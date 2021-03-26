@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/rendering.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -10,6 +11,7 @@ import 'package:redux/redux.dart';
 import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/configs/factory.dart';
+import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
@@ -26,6 +28,8 @@ import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/page.dart';
 
 import '../../common.dart';
+
+class MockLogger extends Mock implements Logger {}
 
 class MockCommandChannel extends Mock implements CommandChannel {}
 
@@ -51,7 +55,7 @@ void main() {
         getFactory().store = store = Store<AppState>(
           appReducer,
           initialState: AppState(
-            status: Status.noParam(StatusKey.ListTask),
+            status: Status.noParam(StatusKey.ListPhoto),
             photoRepo: PhotoRepo(photos: <String, Photo>{}, lastTS: 0),
             taskRepo: TaskRepo(tasks: {}, lastTS: 0),
             setting: Setting(
@@ -69,7 +73,10 @@ void main() {
 
         netQueue = MockNetQueue();
         getViewResource().storage = s;
+        getViewResource().storage.setLogger(MockLogger());
+        getViewResource().logger = MockLogger();
         getViewResource().actPhotos = ActPhotos();
+        getViewResource().actPhotos.setLogger(MockLogger());
         getViewResource().actPhotos.setNetQueue(netQueue);
         getViewResource().actPhotos.setStorage(s);
       });
@@ -98,7 +105,7 @@ void main() {
         await tester.pumpWidget(widget);
 
         // Add Button here
-        expect(find.byType(SBToolbarButton), findsNWidgets(2));
+        expect(find.byType(SBToolbarButton), findsNWidgets(1));
         expect(find.text('ADD PHOTO'), findsOneWidget);
 
         // Tap 'ADD' button
@@ -127,7 +134,7 @@ void main() {
         await tester.pump();
 
         // Photo is in redux list
-        expect(store.state.status.status, StatusKey.ListTask);
+        expect(store.state.status.status, StatusKey.ListPhoto);
         expect(store.state.photoRepo.photos.length, 1);
 
         var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;

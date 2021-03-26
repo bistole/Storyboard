@@ -4,6 +4,7 @@ import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
 import 'package:storyboard/actions/server.dart';
 import 'package:storyboard/channel/command.dart';
+import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo_repo.dart';
@@ -12,6 +13,8 @@ import 'package:storyboard/redux/models/setting.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task_repo.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
+
+class MockLogger extends Mock implements Logger {}
 
 class MockMethodChannel extends Mock implements MethodChannel {}
 
@@ -35,11 +38,13 @@ void main() {
 
   test('importPhoto', () async {
     MethodChannel mc = MockMethodChannel();
+
     String path = "project_home/image.jpeg";
     List<String> paths = [path];
     when(mc.invokeListMethod(any, any)).thenAnswer((_) async => paths);
 
     var cc = CommandChannel(mc);
+    cc.setLogger(MockLogger());
     cc.setStore(store);
 
     await cc.importPhoto();
@@ -66,6 +71,7 @@ void main() {
     when(mc.invokeMethod(any, any)).thenAnswer((_) async => path);
 
     var cc = CommandChannel(mc);
+    cc.setLogger(MockLogger());
     cc.setStore(store);
 
     await cc.takePhoto();
@@ -85,6 +91,7 @@ void main() {
     when(mc.invokeMethod(any, any)).thenAnswer((_) async => code);
 
     var cc = CommandChannel(mc);
+    cc.setLogger(MockLogger());
     cc.setStore(store);
     cc.setActServer(actServer);
 

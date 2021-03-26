@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
 import 'package:storyboard/configs/factory.dart';
+import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo_repo.dart';
@@ -9,6 +11,8 @@ import 'package:storyboard/redux/models/queue_item.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task_repo.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
+
+class MockLogger extends Mock implements Logger {}
 
 main() {
   Store<AppState> store;
@@ -29,6 +33,7 @@ main() {
     buildStore(Queue(list: [], tick: 1));
 
     NetQueue netQueue = NetQueue(60);
+    netQueue.setLogger(MockLogger());
     netQueue.setStore(store);
     netQueue.start();
 

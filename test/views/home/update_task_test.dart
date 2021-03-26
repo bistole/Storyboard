@@ -1,6 +1,7 @@
 import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/configs/factory.dart';
+import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo_repo.dart';
@@ -17,6 +18,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
+
+class MockLogger extends Mock implements Logger {}
 
 class MockNetQueue extends Mock implements NetQueue {}
 
@@ -68,7 +71,9 @@ void main() {
         );
 
         netQueue = MockNetQueue();
+        getViewResource().logger = MockLogger();
         getViewResource().actTasks = ActTasks();
+        getViewResource().actTasks.setLogger(MockLogger());
         getViewResource().actTasks.setNetQueue(netQueue);
         getViewResource().command = MockCommandChannel();
       });

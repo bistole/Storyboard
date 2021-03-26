@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
 import 'package:storyboard/channel/backend.dart';
@@ -34,6 +38,50 @@ class MockDeviceManager extends Mock implements DeviceManager {}
 
 class MockNetSSE extends Mock implements NetSSE {}
 
+class MockPathProviderPlatform
+    with MockPlatformInterfaceMixin
+    implements PathProviderPlatform {
+  @override
+  Future<String> getApplicationSupportPath() async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String> getApplicationDocumentsPath() {
+    return Future.value(".");
+  }
+
+  @override
+  Future<String> getDownloadsPath() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<String>> getExternalCachePaths() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String> getExternalStoragePath() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<String>> getExternalStoragePaths({StorageDirectory type}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String> getLibraryPath() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String> getTemporaryPath() {
+    throw UnimplementedError();
+  }
+}
+
 class MockApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -59,6 +107,8 @@ void main() {
   }
 
   test('initMethodChannels', () async {
+    PathProviderPlatform.instance = MockPathProviderPlatform();
+
     Factory f = getFactory();
     f.channelManager = MockChannelManager();
 
@@ -78,6 +128,9 @@ void main() {
     expect(f.command, isNotNull);
     expect(getViewResource().command, f.command);
     expect(getViewResource().backend, f.backend);
+
+    // remove log file
+    File(f.logger.getFilename()).delete();
   });
 
   test('initStoreAndStorage', () async {

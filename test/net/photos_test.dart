@@ -7,6 +7,7 @@ import 'package:mockito/mockito.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/configs/factory.dart';
+import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/photos.dart';
 
@@ -21,6 +22,8 @@ import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/storage/storage.dart';
 
 import '../common.dart';
+
+class MockLogger extends Mock implements Logger {}
 
 class MockHttpClient extends Mock implements http.Client {}
 
@@ -88,6 +91,7 @@ void main() {
       actPhotos = MockActPhotos();
 
       netPhotos = NetPhotos();
+      netPhotos.setLogger(MockLogger());
       netPhotos.setHttpClient(httpClient);
       netPhotos.setActPhotos(actPhotos);
       netPhotos.setStorage(storage);
@@ -264,6 +268,7 @@ void main() {
       actPhotos = MockActPhotos();
 
       netPhotos = NetPhotos();
+      netPhotos.setLogger(MockLogger());
       netPhotos.setHttpClient(httpClient);
       netPhotos.setActPhotos(actPhotos);
     });
@@ -317,6 +322,7 @@ void main() {
       actPhotos = MockActPhotos();
 
       netPhotos = NetPhotos();
+      netPhotos.setLogger(MockLogger());
       netPhotos.setHttpClient(httpClient);
       netPhotos.setActPhotos(actPhotos);
       netPhotos.setStorage(storage);
@@ -355,6 +361,7 @@ void main() {
       actPhotos = MockActPhotos();
 
       netPhotos = NetPhotos();
+      netPhotos.setLogger(MockLogger());
       netPhotos.setHttpClient(httpClient);
       netPhotos.setActPhotos(actPhotos);
       netPhotos.setStorage(storage);
@@ -393,6 +400,7 @@ void main() {
       actPhotos = MockActPhotos();
 
       netPhotos = NetPhotos();
+      netPhotos.setLogger(MockLogger());
       netPhotos.setHttpClient(httpClient);
       netPhotos.setActPhotos(actPhotos);
       netPhotos.setStorage(storage);

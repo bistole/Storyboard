@@ -2,6 +2,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:storyboard/channel/backend.dart';
+import 'package:storyboard/logger/logger.dart';
+
+class MockLogger extends Mock implements Logger {}
 
 class MockMethodChannel extends Mock implements MethodChannel {}
 
@@ -12,6 +15,7 @@ void main() {
     when(mc.invokeMethod(any)).thenAnswer((_) async => path);
 
     var bc = BackendChannel(mc);
+    bc.setLogger(MockLogger());
 
     var datahome = await bc.getDataHome();
     expect(datahome, path);
@@ -26,6 +30,7 @@ void main() {
     when(mc.invokeMethod(any)).thenAnswer((_) async => ip);
 
     var bc = BackendChannel(mc);
+    bc.setLogger(MockLogger());
 
     var getip = await bc.getCurrentIp();
     expect(getip, ip);
@@ -38,6 +43,7 @@ void main() {
     MethodChannel mc = MockMethodChannel();
 
     var bc = BackendChannel(mc);
+    bc.setLogger(MockLogger());
 
     String ip = '192.168.3.199';
     await bc.setCurrentIp(ip);
@@ -53,6 +59,8 @@ void main() {
     when(mc.invokeMapMethod(any)).thenAnswer((_) async => ips);
 
     var bc = BackendChannel(mc);
+    bc.setLogger(MockLogger());
+
     var getips = await bc.getAvailableIps();
     expect(getips, ips);
 

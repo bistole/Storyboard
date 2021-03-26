@@ -8,6 +8,7 @@ import 'package:redux/redux.dart';
 import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/configs/factory.dart';
+import 'package:storyboard/logger/logger.dart';
 
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/actions/actions.dart';
@@ -21,9 +22,12 @@ import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/storage/storage.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/page.dart';
+import 'package:storyboard/views/home/photo/photo_widget.dart';
 import 'package:storyboard/views/photo/page.dart';
 
 Type typeof<T>() => T;
+
+class MockLogger extends Mock implements Logger {}
 
 class MockNetQueue extends Mock implements NetQueue {}
 
@@ -68,7 +72,7 @@ void main() {
       getFactory().store = store = Store<AppState>(
         appReducer,
         initialState: AppState(
-          status: Status.noParam(StatusKey.ListTask),
+          status: Status.noParam(StatusKey.ListPhoto),
           taskRepo: TaskRepo(tasks: {}, lastTS: 0),
           photoRepo: PhotoRepo(
             photos: <String, Photo>{uuid: Photo.fromJson(photoJson)},
@@ -89,8 +93,9 @@ void main() {
       getViewResource().storage = s;
 
       netQueue = MockNetQueue();
-      getViewResource().storage = s;
+      getViewResource().logger = MockLogger();
       getViewResource().actPhotos = ActPhotos();
+      getViewResource().actPhotos.setLogger(MockLogger());
       getViewResource().actPhotos.setNetQueue(netQueue);
       getViewResource().actPhotos.setStorage(s);
       getViewResource().command = MockCommandChannel();
@@ -121,25 +126,8 @@ void main() {
         path.join('project_home', 'thumbnails', uuid),
       );
 
-      // find popmenu button
-      var popbtnFinder = find.byType(typeof<PopupMenuButton<String>>());
-      expect(popbtnFinder, findsOneWidget);
-
-      // tap the button
-      await tester.tap(popbtnFinder);
-      await tester.pumpAndSettle();
-
-      // find two buttons
-      var itmFinder = find.byType(typeof<PopupMenuItem<String>>());
-      expect(itmFinder, findsNWidgets(2));
-
-      // tap change
-      var showItmElem = tester.element(itmFinder.last);
-      expect(
-        (showItmElem.widget as PopupMenuItem<String>).value,
-        "show",
-      );
-      await tester.tap(itmFinder.last);
+      // tap photo to show detail
+      await tester.tap(find.byType(PhotoWidget));
       var c = verify(naviObserver.didPush(captureAny, any)).captured.last
           as MaterialPageRoute;
       expect(c.settings.name, PhotoPage.routeName);

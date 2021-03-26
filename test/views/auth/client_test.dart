@@ -201,7 +201,6 @@ void main() {
 
       // show manually input
       expect(find.byType(TextField), findsOneWidget);
-      expect(find.byType(RawKeyboardListener), findsOneWidget);
 
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await tester.pump();

@@ -1,8 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:storyboard/actions/photos.dart';
+import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/queue_item.dart';
+
+class MockLogger extends Mock implements Logger {}
 
 class MockNetQueue extends Mock implements NetQueue {}
 
@@ -10,6 +13,7 @@ void main() {
   test('actFetchPhotos', () {
     var netQueue = MockNetQueue();
     var actPhotos = ActPhotos();
+    actPhotos.setLogger(MockLogger());
     actPhotos.setNetQueue(netQueue);
 
     actPhotos.actFetchPhotos();

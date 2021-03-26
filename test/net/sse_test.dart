@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
+import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/sse.dart';
 import 'package:storyboard/redux/models/app.dart';
@@ -18,6 +19,8 @@ var mockHostname = "192.168.3.146";
 var mockPort = 3000;
 var mockServerKey = encodeServerKey(mockHostname, mockPort);
 var mockURLPrefix = 'http://' + mockHostname + ":" + mockPort.toString();
+
+class MockLogger extends Mock implements Logger {}
 
 class MockHttpClient extends Mock implements http.Client {}
 
@@ -39,6 +42,7 @@ void main() {
 
   test('connect - welcome - alive - close', () async {
     var netSSE = NetSSE();
+    netSSE.setLogger(MockLogger());
 
     var httpClient = MockHttpClient();
     var welcomePack =
@@ -84,6 +88,7 @@ void main() {
 
   test('connect - wrong server', () async {
     var netSSE = NetSSE();
+    netSSE.setLogger(MockLogger());
 
     var httpClient = MockHttpClient();
 
@@ -111,6 +116,7 @@ void main() {
 
   test('connect - server closed', () async {
     var netSSE = NetSSE();
+    netSSE.setLogger(MockLogger());
 
     var httpClient = MockHttpClient();
 
@@ -144,6 +150,7 @@ void main() {
 
   test('connect - notify', () async {
     var netSSE = NetSSE();
+    netSSE.setLogger(MockLogger());
 
     var httpClient = MockHttpClient();
 

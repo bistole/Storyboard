@@ -18,6 +18,7 @@ class Logger {
   StreamController<String> _streamController;
   Stream<String> _stream;
   Queue<String> _logsInCache;
+  String _filename;
   File _file;
   IOSink _sink;
 
@@ -49,6 +50,10 @@ class Logger {
     return _logLevel;
   }
 
+  String getFilename() {
+    return _filename;
+  }
+
   void setDir(Directory dir) {
     if (this._file != null) {
       if (this._sink != null) {
@@ -59,19 +64,19 @@ class Logger {
     }
 
     var ts = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    var filename = dir.path + '/log-$ts.log';
-    this._file = File(filename);
+    this._filename = dir.path + '/log-$ts.log';
+    this._file = File(_filename);
 
-    this.always(_LOG_TAG, "Log filename: $filename");
+    this.always(_LOG_TAG, "Log filename: $_filename");
 
     this._sink = this._file.openWrite(mode: FileMode.append);
     for (String line in this._logsInCache) {
-      this._sink.write(line);
+      this._sink.write(line + '\n');
     }
 
     this._stream.listen(
       (String line) {
-        this._sink.write(line);
+        this._sink.write(line + '\n');
       },
       onDone: () {
         this._sink.close();

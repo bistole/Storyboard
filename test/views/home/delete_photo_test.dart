@@ -6,6 +6,7 @@ import 'package:redux/redux.dart';
 import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/configs/factory.dart';
+import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
@@ -20,6 +21,8 @@ import 'package:storyboard/views/home/page.dart';
 import 'package:storyboard/views/home/photo/photo_widget.dart';
 
 Type typeof<T>() => T;
+
+class MockLogger extends Mock implements Logger {}
 
 class MockNetQueue extends Mock implements NetQueue {}
 
@@ -57,7 +60,7 @@ void main() {
       getFactory().store = store = Store<AppState>(
         appReducer,
         initialState: AppState(
-          status: Status.noParam(StatusKey.ListTask),
+          status: Status.noParam(StatusKey.ListPhoto),
           photoRepo: PhotoRepo(
             photos: <String, Photo>{uuid: Photo.fromJson(photoJson)},
             lastTS: 0,
@@ -75,8 +78,11 @@ void main() {
       s.dataHome = "project_home";
 
       netQueue = MockNetQueue();
+      getViewResource().logger = MockLogger();
       getViewResource().storage = s;
+      getViewResource().storage.setLogger(MockLogger());
       getViewResource().actPhotos = ActPhotos();
+      getViewResource().actPhotos.setLogger(MockLogger());
       getViewResource().actPhotos.setNetQueue(netQueue);
       getViewResource().actPhotos.setStorage(s);
       getViewResource().command = MockCommandChannel();
@@ -88,29 +94,19 @@ void main() {
 
       expect(find.text('ADD PHOTO'), findsOneWidget);
 
-      // find popmenu button
-      expect(find.byType(PhotoWidget), findsOneWidget);
-      var popbtnFinder = find.descendant(
-        of: find.byType(PhotoWidget).first,
-        matching: find.byType(typeof<PopupMenuButton<String>>()),
-      );
-      expect(popbtnFinder, findsOneWidget);
+      // find delete icon
+      expect(find.byIcon(Icons.delete), findsOneWidget);
 
-      // tap the button
-      await tester.tap(popbtnFinder);
+      // hover
+      final gesture = await tester.createGesture();
+      await gesture.addPointer(location: Offset.zero);
+      addTearDown(gesture.removePointer);
+      await tester.pump();
+      await gesture.moveTo(tester.getCenter(find.byType(PhotoWidget)));
       await tester.pumpAndSettle();
 
-      // find two buttons
-      var itmFinder = find.byType(typeof<PopupMenuItem<String>>());
-      expect(itmFinder, findsNWidgets(2));
-
-      // tap delete
-      var deleteItmElem = tester.element(itmFinder.first);
-      expect(
-        (deleteItmElem.widget as PopupMenuItem<String>).value,
-        "delete",
-      );
-      await tester.tap(itmFinder.first);
+      // tap to delete
+      await tester.tap(find.byIcon(Icons.delete));
       await tester.pumpAndSettle();
 
       expect(find.byType(PhotoWidget), findsNothing);

@@ -8,6 +8,7 @@
 import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/configs/factory.dart';
+import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo_repo.dart';
@@ -25,6 +26,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+
+class MockLogger extends Mock implements Logger {}
 
 class MockNetQueue extends Mock implements NetQueue {}
 
@@ -62,7 +65,9 @@ void main() {
         );
 
         netQueue = MockNetQueue();
+        getViewResource().logger = MockLogger();
         getViewResource().actTasks = ActTasks();
+        getViewResource().actTasks.setLogger(MockLogger());
         getViewResource().actTasks.setNetQueue(netQueue);
         getViewResource().command = MockCommandChannel();
       });
@@ -73,7 +78,7 @@ void main() {
         await tester.pumpWidget(widget);
 
         // Add Button here
-        expect(find.byType(SBToolbarButton), findsNWidgets(2));
+        expect(find.byType(SBToolbarButton), findsNWidgets(1));
         expect(find.text('ADD TASK'), findsOneWidget);
 
         // Tap 'ADD' button
