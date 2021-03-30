@@ -30,7 +30,6 @@ class Logger {
     _logsInCache = Queue<String>();
 
     _streamController = StreamController<String>();
-    _streamController.stream;
     _stream = _streamController.stream.asBroadcastStream();
     _stream.listen((line) {
       print(line);
@@ -71,12 +70,12 @@ class Logger {
 
     this._sink = this._file.openWrite(mode: FileMode.append);
     for (String line in this._logsInCache) {
-      this._sink.write(line + '\n');
+      this._sink.writeln(line);
     }
 
     this._stream.listen(
       (String line) {
-        this._sink.write(line + '\n');
+        this._sink.writeln(line);
       },
       onDone: () {
         this._sink.close();

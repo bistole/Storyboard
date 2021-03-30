@@ -59,14 +59,19 @@ class _LogListState extends State<LogListWidget> {
       itemBuilder: (context, i) {
         Color color = Colors.black;
         List<String> logSegments = logs[i].split(" ");
-        LogLevel logLevel = LogLevel.valueOfName(logSegments[2]);
 
-        if (logLevel == LogLevel.warn()) {
-          color = Colors.orange;
-        } else if (logLevel == LogLevel.error()) {
-          color = Colors.red;
-        } else if (logLevel == LogLevel.fatal()) {
-          color = Colors.deepPurple;
+        LogLevel logLevel = LogLevel.debug();
+        if (logSegments.length <= 2) {
+          logLevel = LogLevel.debug();
+        } else {
+          logLevel = LogLevel.valueOfName(logSegments[2]);
+          if (logLevel == LogLevel.warn()) {
+            color = Colors.orange;
+          } else if (logLevel == LogLevel.error()) {
+            color = Colors.red;
+          } else if (logLevel == LogLevel.fatal()) {
+            color = Colors.deepPurple;
+          }
         }
 
         return Row(

@@ -27,7 +27,7 @@ import 'package:storyboard/views/common/toolbar_button.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/page.dart';
 
-import '../../common.dart';
+import '../../../common.dart';
 
 class MockLogger extends Mock implements Logger {}
 
