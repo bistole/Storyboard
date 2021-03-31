@@ -6,19 +6,14 @@ import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
 import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/configs/factory.dart';
-import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/tasks.dart';
 import 'package:storyboard/redux/models/app.dart';
-import 'package:storyboard/redux/models/photo_repo.dart';
-import 'package:storyboard/redux/models/queue.dart';
 import 'package:storyboard/redux/models/setting.dart';
-import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
 import 'package:storyboard/redux/models/task_repo.dart';
-import 'package:storyboard/redux/reducers/app_reducer.dart';
 
-class MockLogger extends Mock implements Logger {}
+import '../common.dart';
 
 class MockHttpClient extends Mock implements http.Client {}
 
@@ -35,15 +30,15 @@ void main() {
   ActTasks actTasks;
   NetTasks netTasks;
 
+  setUp(() {
+    setFactoryLogger(MockLogger());
+  });
+
   buildStore(Map<String, Task> tasks) {
-    getFactory().store = store = Store<AppState>(
-      appReducer,
-      initialState: AppState(
-        status: Status.noParam(StatusKey.ListTask),
-        photoRepo: PhotoRepo(photos: {}, lastTS: 0),
-        taskRepo: TaskRepo(tasks: tasks, lastTS: 0),
-        queue: Queue(),
-        setting: Setting(serverKey: mockServerKey),
+    getFactory().store = store = getMockStore(
+      tr: TaskRepo(tasks: tasks, lastTS: 0),
+      setting: Setting(
+        serverKey: mockServerKey,
       ),
     );
   }
@@ -74,8 +69,6 @@ void main() {
     setUp(() {
       httpClient = MockHttpClient();
       actTasks = MockActTasks();
-      actTasks.setLogger(MockLogger());
-
       netTasks = NetTasks();
       netTasks.setLogger(MockLogger());
       netTasks.setHttpClient(httpClient);
@@ -231,8 +224,6 @@ void main() {
     setUp(() {
       httpClient = MockHttpClient();
       actTasks = MockActTasks();
-      actTasks.setLogger(MockLogger());
-
       netTasks = NetTasks();
       netTasks.setLogger(MockLogger());
       netTasks.setHttpClient(httpClient);
@@ -278,8 +269,6 @@ void main() {
     setUp(() {
       httpClient = MockHttpClient();
       actTasks = MockActTasks();
-      actTasks.setLogger(MockLogger());
-
       netTasks = NetTasks();
       netTasks.setLogger(MockLogger());
       netTasks.setHttpClient(httpClient);
@@ -325,8 +314,6 @@ void main() {
     setUp(() {
       httpClient = MockHttpClient();
       actTasks = MockActTasks();
-      actTasks.setLogger(MockLogger());
-
       netTasks = NetTasks();
       netTasks.setLogger(MockLogger());
       netTasks.setHttpClient(httpClient);

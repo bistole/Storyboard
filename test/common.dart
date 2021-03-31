@@ -1,15 +1,23 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:mockito/mockito.dart';
 import 'package:path/path.dart' as path;
+import 'package:http/http.dart' as http;
 import 'package:redux/redux.dart';
+import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/photo_repo.dart';
+import 'package:storyboard/redux/models/queue.dart';
 import 'package:storyboard/redux/models/setting.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task_repo.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
+
+class MockLogger extends Mock implements Logger {}
+
+class MockHttpClient extends Mock implements http.Client {}
 
 String getResourcePath(String relativePath) {
   int cnt = 0;
@@ -35,18 +43,28 @@ String getHomePath(String relativePath) {
   return Directory(resourcePath).absolute.path;
 }
 
-Store<AppState> getMockStore() {
+Store<AppState> getMockStore({
+  Status status,
+  PhotoRepo pr,
+  TaskRepo tr,
+  Queue q,
+  Setting setting,
+}) {
   return Store<AppState>(
     appReducer,
     initialState: AppState(
-      status: Status.noParam(StatusKey.ListPhoto),
-      photoRepo: PhotoRepo(photos: <String, Photo>{}, lastTS: 0),
-      taskRepo: TaskRepo(tasks: {}, lastTS: 0),
-      setting: Setting(
-        clientID: 'client-id',
-        serverKey: 'server-key',
-        serverReachable: Reachable.Unknown,
-      ),
+      status: status != null ? status : Status.noParam(StatusKey.ListPhoto),
+      photoRepo:
+          pr != null ? pr : PhotoRepo(photos: <String, Photo>{}, lastTS: 0),
+      taskRepo: tr != null ? tr : TaskRepo(tasks: {}, lastTS: 0),
+      queue: q != null ? q : Queue(),
+      setting: setting != null
+          ? setting
+          : Setting(
+              clientID: 'client-id',
+              serverKey: 'server-key',
+              serverReachable: Reachable.Unknown,
+            ),
     ),
   );
 }

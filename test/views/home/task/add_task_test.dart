@@ -8,15 +8,10 @@
 import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/configs/factory.dart';
-import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
-import 'package:storyboard/redux/models/photo_repo.dart';
-import 'package:storyboard/redux/models/setting.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
-import 'package:storyboard/redux/models/task_repo.dart';
-import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/page.dart';
@@ -27,7 +22,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-class MockLogger extends Mock implements Logger {}
+import '../../../common.dart';
 
 class MockNetQueue extends Mock implements NetQueue {}
 
@@ -50,22 +45,12 @@ void main() {
     "add item",
     () {
       setUp(() {
-        getFactory().store = store = Store<AppState>(
-          appReducer,
-          initialState: AppState(
-            status: Status.noParam(StatusKey.ListTask),
-            taskRepo: TaskRepo(tasks: <String, Task>{}, lastTS: 0),
-            photoRepo: PhotoRepo(photos: {}, lastTS: 0),
-            setting: Setting(
-              clientID: 'client-id',
-              serverKey: 'server-key',
-              serverReachable: Reachable.Unknown,
-            ),
-          ),
+        setFactoryLogger(MockLogger());
+        getFactory().store = store = getMockStore(
+          status: Status.noParam(StatusKey.ListTask),
         );
 
         netQueue = MockNetQueue();
-        getViewResource().logger = MockLogger();
         getViewResource().actTasks = ActTasks();
         getViewResource().actTasks.setLogger(MockLogger());
         getViewResource().actTasks.setNetQueue(netQueue);

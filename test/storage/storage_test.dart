@@ -2,14 +2,10 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
 import 'package:path/path.dart' as path;
-import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/storage/storage.dart';
 
 import '../common.dart';
-
-class MockLogger extends Mock implements Logger {}
 
 void main() {
   const root = "./project_home";

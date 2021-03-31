@@ -6,23 +6,17 @@ import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
 import 'package:storyboard/configs/factory.dart';
-import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/net/auth.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/redux/models/app.dart';
-import 'package:storyboard/redux/models/photo_repo.dart';
-import 'package:storyboard/redux/models/queue.dart';
 import 'package:storyboard/redux/models/setting.dart';
-import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task_repo.dart';
-import 'package:storyboard/redux/reducers/app_reducer.dart';
+
+import '../common.dart';
 
 var mockHostname = "192.168.3.146";
 var mockPort = 3000;
 var mockServerKey = encodeServerKey(mockHostname, mockPort);
 var mockURLPrefix = 'http://' + mockHostname + ":" + mockPort.toString();
-
-class MockLogger extends Mock implements Logger {}
 
 class MockHttpClient extends Mock implements http.Client {}
 
@@ -31,22 +25,21 @@ void main() {
   Store<AppState> store;
   MockHttpClient httpClient;
 
+  setUp(() {
+    setFactoryLogger(MockLogger());
+  });
+
   buildStore() {
-    getFactory().store = store = Store<AppState>(
-      appReducer,
-      initialState: AppState(
-        status: Status.noParam(StatusKey.ListTask),
-        photoRepo: PhotoRepo(photos: {}, lastTS: 0),
-        taskRepo: TaskRepo(tasks: {}, lastTS: 0),
-        queue: Queue(),
-        setting: Setting(
-            serverKey: mockServerKey, serverReachable: Reachable.Unknown),
+    getFactory().store = store = getMockStore(
+      setting: Setting(
+        serverKey: mockServerKey,
+        serverReachable: Reachable.Unknown,
       ),
     );
   }
 
-  group('netPing', () {
-    test('netPing succ', () async {
+  group('.netPing', () {
+    test('succ', () async {
       buildStore();
 
       httpClient = MockHttpClient();
@@ -70,7 +63,7 @@ void main() {
       expect(store.state.setting.serverReachable, Reachable.Yes);
     });
 
-    test('netPing timeout', () async {
+    test('timeout', () async {
       buildStore();
 
       httpClient = MockHttpClient();
@@ -95,7 +88,7 @@ void main() {
       expect(store.state.setting.serverReachable, Reachable.No);
     });
 
-    test('netPing have exception', () async {
+    test('have exception', () async {
       buildStore();
 
       httpClient = MockHttpClient();

@@ -37,6 +37,7 @@ main() {
   }
 
   setUp(() {
+    setFactoryLogger(MockLogger());
     getViewResource().backend = MockBackendChannel();
     when(getViewResource().backend.getCurrentIp())
         .thenAnswer((_) async => "192.168.7.128");

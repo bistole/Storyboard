@@ -35,6 +35,7 @@ void main() {
 
   group('init', () {
     setUp(() {
+      setFactoryLogger(MockLogger());
       getFactory().store = store = getMockStore();
     });
 

@@ -7,23 +7,16 @@ import 'package:mockito/mockito.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/configs/factory.dart';
-import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/photos.dart';
 
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/photo_repo.dart';
-import 'package:storyboard/redux/models/queue.dart';
 import 'package:storyboard/redux/models/setting.dart';
-import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task_repo.dart';
-import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/storage/storage.dart';
 
 import '../common.dart';
-
-class MockLogger extends Mock implements Logger {}
 
 class MockHttpClient extends Mock implements http.Client {}
 
@@ -43,16 +36,14 @@ void main() {
   ActPhotos actPhotos;
   Storage storage;
 
+  setUp(() {
+    setFactoryLogger(MockLogger());
+  });
+
   buildStore(Map<String, Photo> photos) {
-    getFactory().store = store = Store<AppState>(
-      appReducer,
-      initialState: AppState(
-        status: Status.noParam(StatusKey.ListTask),
-        photoRepo: PhotoRepo(photos: photos, lastTS: 0),
-        taskRepo: TaskRepo(tasks: {}, lastTS: 0),
-        queue: Queue(),
-        setting: Setting(serverKey: mockServerKey),
-      ),
+    getFactory().store = store = getMockStore(
+      pr: PhotoRepo(photos: photos, lastTS: 0),
+      setting: Setting(serverKey: mockServerKey),
     );
   }
 

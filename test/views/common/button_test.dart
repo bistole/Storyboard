@@ -4,14 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:redux/redux.dart';
 import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/redux/models/app.dart';
-import 'package:storyboard/redux/models/photo.dart';
-import 'package:storyboard/redux/models/photo_repo.dart';
-import 'package:storyboard/redux/models/setting.dart';
-import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task_repo.dart';
-import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/views/common/app_icons.dart';
 import 'package:storyboard/views/common/button.dart';
+
+import '../../common.dart';
 
 void main() {
   Store<AppState> store;
@@ -26,19 +22,8 @@ void main() {
   }
 
   setUp(() {
-    getFactory().store = store = Store<AppState>(
-      appReducer,
-      initialState: AppState(
-        status: Status.noParam(StatusKey.ListPhoto),
-        photoRepo: PhotoRepo(photos: <String, Photo>{}, lastTS: 0),
-        taskRepo: TaskRepo(tasks: {}, lastTS: 0),
-        setting: Setting(
-          clientID: 'client-id',
-          serverKey: 'server-key',
-          serverReachable: Reachable.Unknown,
-        ),
-      ),
-    );
+    setFactoryLogger(MockLogger());
+    getFactory().store = store = getMockStore();
   });
 
   testWidgets('button with icon', (WidgetTester tester) async {

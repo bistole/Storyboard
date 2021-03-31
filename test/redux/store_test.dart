@@ -6,9 +6,9 @@ import 'package:storyboard/redux/models/queue.dart';
 import 'package:storyboard/redux/store.dart';
 import 'package:storyboard/storage/storage.dart';
 
-class MockStorage extends Mock implements Storage {}
+import '../common.dart';
 
-class MockLogger extends Mock implements Logger {}
+class MockStorage extends Mock implements Storage {}
 
 class MockMenuChannel extends Mock implements MenuChannel {}
 

@@ -1,29 +1,21 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:mockito/mockito.dart';
-import 'package:redux/redux.dart';
 import 'package:storyboard/channel/backend.dart';
 import 'package:storyboard/configs/channel_manager.dart';
 import 'package:storyboard/configs/device_manager.dart';
 import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/sse.dart';
-import 'package:storyboard/redux/models/app.dart';
-import 'package:storyboard/redux/models/photo_repo.dart';
-import 'package:storyboard/redux/models/queue.dart';
 import 'package:storyboard/redux/models/setting.dart';
-import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task_repo.dart';
-import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/storage/storage.dart';
 import 'package:storyboard/views/config/config.dart';
 
 import '../channel/menu_test.dart';
+import '../common.dart';
 import '../redux/store_test.dart';
 
 class MockStorage extends Mock implements Storage {}
@@ -93,17 +85,12 @@ class MockApp extends StatelessWidget {
 }
 
 void main() {
+  setUp(() {
+    setFactoryLogger(MockLogger());
+  });
+
   buildStore(String serverKey) {
-    return Store<AppState>(
-      appReducer,
-      initialState: AppState(
-        status: Status.noParam(StatusKey.ListTask),
-        photoRepo: PhotoRepo(photos: {}, lastTS: 0),
-        taskRepo: TaskRepo(tasks: {}, lastTS: 0),
-        queue: Queue(),
-        setting: Setting(serverKey: serverKey),
-      ),
-    );
+    return getMockStore(setting: Setting(serverKey: serverKey));
   }
 
   test('initMethodChannels', () async {
@@ -128,9 +115,6 @@ void main() {
     expect(f.command, isNotNull);
     expect(getViewResource().command, f.command);
     expect(getViewResource().backend, f.backend);
-
-    // remove log file
-    File(f.logger.getFilename()).delete();
   });
 
   test('initStoreAndStorage', () async {

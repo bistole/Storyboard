@@ -8,26 +8,21 @@ import 'package:redux/redux.dart';
 import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/configs/factory.dart';
-import 'package:storyboard/logger/logger.dart';
 
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/photo_repo.dart';
-import 'package:storyboard/redux/models/setting.dart';
-import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task_repo.dart';
-import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/storage/storage.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/page.dart';
 import 'package:storyboard/views/home/photo/photo_widget.dart';
 import 'package:storyboard/views/photo/page.dart';
 
-Type typeof<T>() => T;
+import '../../../common.dart';
 
-class MockLogger extends Mock implements Logger {}
+Type typeof<T>() => T;
 
 class MockNetQueue extends Mock implements NetQueue {}
 
@@ -69,20 +64,11 @@ void main() {
 
   group("update item", () {
     setUp(() {
-      getFactory().store = store = Store<AppState>(
-        appReducer,
-        initialState: AppState(
-          status: Status.noParam(StatusKey.ListPhoto),
-          taskRepo: TaskRepo(tasks: {}, lastTS: 0),
-          photoRepo: PhotoRepo(
-            photos: <String, Photo>{uuid: Photo.fromJson(photoJson)},
-            lastTS: 0,
-          ),
-          setting: Setting(
-            clientID: 'client-id',
-            serverKey: 'server-key',
-            serverReachable: Reachable.Unknown,
-          ),
+      setFactoryLogger(MockLogger());
+      getFactory().store = store = getMockStore(
+        pr: PhotoRepo(
+          photos: <String, Photo>{uuid: Photo.fromJson(photoJson)},
+          lastTS: 0,
         ),
       );
 
@@ -93,7 +79,6 @@ void main() {
       getViewResource().storage = s;
 
       netQueue = MockNetQueue();
-      getViewResource().logger = MockLogger();
       getViewResource().actPhotos = ActPhotos();
       getViewResource().actPhotos.setLogger(MockLogger());
       getViewResource().actPhotos.setNetQueue(netQueue);

@@ -29,6 +29,7 @@ class MockForGetContext extends StatelessWidget {
 void main() {
   Store<AppState> store;
   setUp(() {
+    setFactoryLogger(MockLogger());
     getFactory().store = store = getMockStore();
   });
 

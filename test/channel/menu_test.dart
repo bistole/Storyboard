@@ -3,15 +3,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/channel/menu.dart';
-import 'package:storyboard/logger/logger.dart';
+import 'package:storyboard/configs/factory.dart';
 
-class MockLogger extends Mock implements Logger {}
+import '../common.dart';
 
 class MockMethodChannel extends Mock implements MethodChannel {}
 
 class MockCommandChannel extends Mock implements CommandChannel {}
 
 void main() {
+  setUp(() {
+    setFactoryLogger(MockLogger());
+  });
+
   test('menu', () async {
     MethodChannel mc = MockMethodChannel();
     CommandChannel commandC = MockCommandChannel();

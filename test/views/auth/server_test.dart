@@ -9,13 +9,11 @@ import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/configs/device_manager.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/redux/models/app.dart';
-import 'package:storyboard/redux/models/photo_repo.dart';
 import 'package:storyboard/redux/models/setting.dart';
-import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task_repo.dart';
-import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/views/auth/page.dart';
 import 'package:storyboard/views/config/config.dart';
+
+import '../../common.dart';
 
 class MockDeviceManager extends Mock implements DeviceManager {}
 
@@ -47,17 +45,11 @@ void main() {
     });
 
     buildStore(String serverkey) {
-      store = Store<AppState>(
-        appReducer,
-        initialState: AppState(
-          status: Status.noParam(StatusKey.ListTask),
-          photoRepo: PhotoRepo(photos: {}, lastTS: 0),
-          taskRepo: TaskRepo(tasks: {}, lastTS: 0),
-          setting: Setting(
-            clientID: 'client-id',
-            serverKey: serverkey,
-            serverReachable: Reachable.Unknown,
-          ),
+      store = getMockStore(
+        setting: Setting(
+          clientID: 'client-id',
+          serverKey: serverkey,
+          serverReachable: Reachable.Unknown,
         ),
       );
     }

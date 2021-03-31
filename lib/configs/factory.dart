@@ -56,9 +56,8 @@ class Factory {
   Store<AppState> store;
   Storage storage;
 
-  Factory() {
+  Factory({@required this.logger}) {
     deviceManager = DeviceManager();
-    logger = Logger();
     logger.setLevel(LogLevel.debug());
 
     actServer = ActServer();
@@ -210,10 +209,15 @@ class Factory {
 }
 
 Factory _instance;
+Logger _logger;
+
+setFactoryLogger(Logger logger) {
+  _logger = logger;
+}
 
 Factory getFactory() {
   if (_instance == null) {
-    _instance = Factory();
+    _instance = Factory(logger: _logger == null ? Logger() : _logger);
   }
   return _instance;
 }

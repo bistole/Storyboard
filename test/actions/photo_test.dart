@@ -1,11 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:storyboard/actions/photos.dart';
-import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/queue_item.dart';
 
-class MockLogger extends Mock implements Logger {}
+import '../common.dart';
 
 class MockNetQueue extends Mock implements NetQueue {}
 
