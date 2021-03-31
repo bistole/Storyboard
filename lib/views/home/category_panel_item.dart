@@ -19,7 +19,6 @@ class CategoryPanelItem extends StatelessWidget {
           this.onTap();
         }
       },
-      onHover: (bool hovered) => {},
       child: Container(
         height: 32,
         width: double.infinity,

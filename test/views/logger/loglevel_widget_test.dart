@@ -21,7 +21,7 @@ void main() {
   testWidgets('init', (WidgetTester tester) async {
     when(getViewResource().logger.getLevel()).thenReturn(LogLevel.error());
 
-    Widget w = buildDefaultTestableWidget(LogLevelWidget(), store);
+    Widget w = buildTestableWidget(LogLevelWidget(), store);
     await tester.pumpWidget(w);
 
     // show log level

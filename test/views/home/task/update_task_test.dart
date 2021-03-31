@@ -58,8 +58,7 @@ void main() {
 
       testWidgets("update item succ", (WidgetTester tester) async {
         // home page
-        var widget =
-            buildDefaultTestableWidget(HomePage(title: 'title'), store);
+        var widget = buildTestableWidget(HomePage(title: 'title'), store);
         await tester.pumpWidget(widget);
 
         // find one task

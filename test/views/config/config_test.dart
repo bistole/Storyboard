@@ -42,7 +42,7 @@ void main() {
   testWidgets('.getRectFromWidget', (WidgetTester tester) async {
     Key key = GlobalKey();
     Text t = Text('Text', key: key);
-    Widget w = buildDefaultTestableWidget(t, store);
+    Widget w = buildTestableWidget(t, store);
     await tester.pumpWidget(w);
 
     Rect rect = getViewResource().getRectFromWidget(key);
@@ -55,7 +55,7 @@ void main() {
   testWidgets('.getSizeFromWidget', (WidgetTester tester) async {
     Key key = GlobalKey();
     Text t = Text('Text', key: key);
-    Widget w = buildDefaultTestableWidget(t, store);
+    Widget w = buildTestableWidget(t, store);
     await tester.pumpWidget(w);
 
     Size size = getViewResource().getSizeFromWidget(key);
@@ -74,8 +74,8 @@ void main() {
         triggered = true;
         ans = getViewResource().isWiderLayout(context);
       };
-      Widget w = buildDefaultTestableWidget(
-          MockForGetContext(callback: callback), store);
+      Widget w =
+          buildTestableWidget(MockForGetContext(callback: callback), store);
       await tester.pumpWidget(w);
       await tester.tap(find.byType(TextButton));
 
@@ -93,8 +93,8 @@ void main() {
         triggered = true;
         ans = getViewResource().isWiderLayout(context);
       };
-      Widget w = buildDefaultTestableWidget(
-          MockForGetContext(callback: callback), store);
+      Widget w =
+          buildTestableWidget(MockForGetContext(callback: callback), store);
       await tester.pumpWidget(w);
       await tester.tap(find.byType(TextButton));
 

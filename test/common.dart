@@ -69,11 +69,20 @@ Store<AppState> getMockStore({
   );
 }
 
-Widget buildDefaultTestableWidget(Widget widget, Store<AppState> store) {
+Widget buildTestableWidget(Widget widget, Store<AppState> store) {
   return StoreProvider(
     store: store,
     child: MaterialApp(
       home: widget,
+    ),
+  );
+}
+
+Widget buildTestableWidgetInMaterial(Widget widget, Store<AppState> store) {
+  return StoreProvider(
+    store: store,
+    child: MaterialApp(
+      home: Scaffold(body: widget),
     ),
   );
 }

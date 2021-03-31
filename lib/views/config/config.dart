@@ -60,6 +60,10 @@ class ViewsResource {
 
 ViewsResource _vr;
 
+setViewResource(ViewsResource vr) {
+  _vr = vr;
+}
+
 ViewsResource getViewResource() {
   if (_vr == null) {
     _vr = ViewsResource();

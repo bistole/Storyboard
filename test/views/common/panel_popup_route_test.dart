@@ -40,8 +40,7 @@ void main() {
     });
 
     testWidgets('show popup and cancel', (WidgetTester tester) async {
-      Widget w =
-          buildDefaultTestableWidget(_TestPanelPopupRouteWidget(), store);
+      Widget w = buildTestableWidget(_TestPanelPopupRouteWidget(), store);
       await tester.pumpWidget(w);
 
       expect(find.text('PUSH ME'), findsOneWidget);
@@ -64,8 +63,7 @@ void main() {
     });
 
     testWidgets('show popup and cancel', (WidgetTester tester) async {
-      Widget w =
-          buildDefaultTestableWidget(_TestPanelPopupRouteWidget(), store);
+      Widget w = buildTestableWidget(_TestPanelPopupRouteWidget(), store);
       await tester.pumpWidget(w);
 
       expect(find.text('PUSH ME'), findsOneWidget);

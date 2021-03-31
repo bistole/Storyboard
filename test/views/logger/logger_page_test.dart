@@ -24,7 +24,7 @@ void main() {
     when(getViewResource().logger.getLogsInCache()).thenReturn([]);
     when(getViewResource().logger.getStream()).thenAnswer((_) => MockStream());
 
-    Widget w = buildDefaultTestableWidget(LoggerPage(), store);
+    Widget w = buildTestableWidget(LoggerPage(), store);
     await tester.pumpWidget(w);
     await tester.pump(Duration(seconds: 1));
   });

@@ -29,7 +29,7 @@ void main() {
       when(getViewResource().logger.getStream())
           .thenAnswer((_) => MockStream());
 
-      Widget w = buildDefaultTestableWidget(LogListWidget(), store);
+      Widget w = buildTestableWidget(LogListWidget(), store);
       await tester.pumpWidget(w);
     });
 
@@ -41,7 +41,7 @@ void main() {
       when(getViewResource().logger.getLogsInCache()).thenReturn([]);
       when(getViewResource().logger.getStream()).thenAnswer((_) => func());
 
-      Widget w = buildDefaultTestableWidget(LogListWidget(), store);
+      Widget w = buildTestableWidget(LogListWidget(), store);
       await tester.pumpWidget(w);
 
       await tester.pump(Duration(seconds: 1));
