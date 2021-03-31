@@ -11,7 +11,7 @@ const MAX_LOG_IN_CACHE = 100;
 class EndOfStreamError extends Error {}
 
 class Logger {
-  String _LOG_TAG = (Logger).toString();
+  String _logTag = (Logger).toString();
 
   LogLevel _logLevel;
 
@@ -41,7 +41,7 @@ class Logger {
   }
 
   void setLevel(LogLevel logLevel) {
-    this.always(_LOG_TAG, "Set Log Level: ${logLevel.name()}");
+    this.always(_logTag, "Set Log Level: ${logLevel.name()}");
     _logLevel = logLevel;
   }
 
@@ -66,7 +66,7 @@ class Logger {
     this._filename = dir.path + '/log-$ts.log';
     this._file = File(_filename);
 
-    this.always(_LOG_TAG, "Log filename: $_filename");
+    this.always(_logTag, "Log filename: $_filename");
 
     this._sink = this._file.openWrite(mode: FileMode.append);
     for (String line in this._logsInCache) {

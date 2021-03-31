@@ -12,7 +12,7 @@ const CMD_TAKE_PHOTO = 'CMD:TAKE_PHOTO';
 const CMD_TAKE_QRCODE = "CMD:TAKE_QRCODE";
 
 class CommandChannel {
-  String _LOG_TAG = (CommandChannel).toString();
+  String _logTag = (CommandChannel).toString();
   Logger _logger;
   void setLogger(Logger logger) {
     _logger = logger;
@@ -43,14 +43,14 @@ class CommandChannel {
   }
 
   Future<void> importPhoto() async {
-    _logger.info(_LOG_TAG, "importPhoto");
+    _logger.info(_logTag, "importPhoto");
     List<String> paths = await _openFileDialog(
       "Import Photo",
       "jpeg;jpg;gif;png",
     );
 
     if (paths.length > 0) {
-      _logger.info(_LOG_TAG, "importPhoto succ");
+      _logger.info(_logTag, "importPhoto succ");
       _store.dispatch(
         ChangeStatusWithPathAction(
           status: StatusKey.AddingPhoto,
@@ -58,15 +58,15 @@ class CommandChannel {
         ),
       );
     } else {
-      _logger.info(_LOG_TAG, "importPhoto cancel");
+      _logger.info(_logTag, "importPhoto cancel");
     }
   }
 
   Future<void> takePhoto() async {
-    _logger.info(_LOG_TAG, "takePhoto");
+    _logger.info(_logTag, "takePhoto");
     String path = await _channel.invokeMethod<String>(CMD_TAKE_PHOTO);
     if (path != null) {
-      _logger.info(_LOG_TAG, "takePhoto succ");
+      _logger.info(_logTag, "takePhoto succ");
       _store.dispatch(
         ChangeStatusWithPathAction(
           status: StatusKey.AddingPhoto,
@@ -74,24 +74,24 @@ class CommandChannel {
         ),
       );
     } else {
-      _logger.info(_LOG_TAG, "takePhoto cancel");
+      _logger.info(_logTag, "takePhoto cancel");
     }
   }
 
   Future<void> takeQRCode() async {
-    _logger.info(_LOG_TAG, "takeQRCode");
+    _logger.info(_logTag, "takeQRCode");
     String code = await _channel.invokeMethod<String>(CMD_TAKE_QRCODE);
     if (code != null) {
       if (decodeServerKey(code) == null) {
-        _logger.warn(_LOG_TAG, "takeQRCode invalid");
+        _logger.warn(_logTag, "takeQRCode invalid");
         throw new Exception("invalid");
       }
-      _logger.info(_LOG_TAG, "takeQRCode succ");
-      _logger.debug(_LOG_TAG, "takeQRCode code = $code");
+      _logger.info(_logTag, "takeQRCode succ");
+      _logger.debug(_logTag, "takeQRCode code = $code");
       _actServer.actChangeServerKey(_store, code);
       return true;
     }
-    _logger.info(_LOG_TAG, "takeQRCode cancel");
+    _logger.info(_logTag, "takeQRCode cancel");
     return false;
   }
 }

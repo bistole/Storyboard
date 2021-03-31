@@ -15,15 +15,6 @@ class ReduxActions {
   final void Function() delete;
   final void Function() getThumb;
   ReduxActions({this.delete, this.getThumb, this.photo});
-
-  @override
-  int get hashCode => photo.hashCode;
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other is ReduxActions && photo == other.photo);
-  }
 }
 
 class PhotoWidget extends StatefulWidget {

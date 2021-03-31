@@ -9,7 +9,7 @@ import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 
 class NetAuth {
-  String _LOG_TAG = (NetAuth).toString();
+  String _logTag = (NetAuth).toString();
   Logger _logger;
   void setLogger(Logger logger) {
     _logger = logger;
@@ -21,7 +21,7 @@ class NetAuth {
   }
 
   Future<bool> netPing(Store<AppState> store) async {
-    _logger.info(_LOG_TAG, "netPing");
+    _logger.info(_logTag, "netPing");
     try {
       String prefix = getURLPrefix(store);
       if (prefix == null) return false;
@@ -31,17 +31,17 @@ class NetAuth {
       if (response.statusCode == 200) {
         Map<String, dynamic> object = jsonDecode(response.body);
         if (object['pong'] == true) {
-          _logger.info(_LOG_TAG, "netPing succ");
+          _logger.info(_logTag, "netPing succ");
           handleNetworkSucc(store);
           return true;
         }
       }
     } on TimeoutException catch (_) {
-      _logger.info(_LOG_TAG, "netPing timeout");
+      _logger.info(_logTag, "netPing timeout");
       store.dispatch(SettingServerReachableAction(reachable: false));
     } catch (e) {
       if (!handleNetworkError(store, e)) {
-        _logger.warn(_LOG_TAG, "netPing failed: $e");
+        _logger.warn(_logTag, "netPing failed: $e");
       }
     }
     return false;

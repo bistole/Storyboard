@@ -11,7 +11,7 @@ import 'package:storyboard/storage/storage.dart';
 import 'package:uuid/uuid.dart';
 
 class ActPhotos {
-  String _LOG_TAG = (ActPhotos).toString();
+  String _logTag = (ActPhotos).toString();
   Logger _logger;
   void setLogger(Logger logger) {
     _logger = logger;
@@ -30,7 +30,7 @@ class ActPhotos {
   }
 
   void actFetchPhotos() {
-    _logger.info(_LOG_TAG, "actFetchPhotos");
+    _logger.info(_logTag, "actFetchPhotos");
     _netQueue.addQueueItem(
       QueueItemType.Photo,
       QueueItemAction.List,
@@ -39,7 +39,7 @@ class ActPhotos {
   }
 
   void actDownloadPhoto(Store<AppState> store, String uuid) {
-    _logger.info(_LOG_TAG, "actDownloadPhoto");
+    _logger.info(_logTag, "actDownloadPhoto");
     store.dispatch(DownloadPhotoAction(
       uuid: uuid,
       status: PhotoStatus.Loading,
@@ -52,7 +52,7 @@ class ActPhotos {
   }
 
   void actDownloadThumbnail(Store<AppState> store, String uuid) {
-    _logger.info(_LOG_TAG, "actDownloadThumbnail");
+    _logger.info(_logTag, "actDownloadThumbnail");
     store.dispatch(ThumbnailPhotoAction(
       uuid: uuid,
       status: PhotoStatus.Loading,
@@ -67,11 +67,11 @@ class ActPhotos {
   var validMimeTypes = ["image/jpeg", "image/png", "image/gif"];
 
   void actUploadPhoto(Store<AppState> store, String path) async {
-    _logger.info(_LOG_TAG, "actUploadPhoto");
+    _logger.info(_logTag, "actUploadPhoto");
     var mimeType = lookupMimeType(path);
     if (!validMimeTypes.contains(mimeType)) {
       // TODO: show error in UI
-      _logger.error(_LOG_TAG, "Invalid mimeType: $mimeType");
+      _logger.error(_logTag, "Invalid mimeType: $mimeType");
       return;
     }
 
@@ -102,7 +102,7 @@ class ActPhotos {
   }
 
   void actDeletePhoto(Store<AppState> store, String uuid) {
-    _logger.info(_LOG_TAG, "actDeletePhoto");
+    _logger.info(_logTag, "actDeletePhoto");
     Photo photo = store.state.photoRepo.photos[uuid];
     int ts = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     Photo newPhoto = photo.copyWith(

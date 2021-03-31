@@ -8,7 +8,7 @@ const MENU_IMPORT_PHOTO = "MENU_EVENTS:IMPORT_PHOTO";
 const MENU_TIMER = "TIMER";
 
 class MenuChannel {
-  String _LOG_TAG = (MenuChannel).toString();
+  String _logTag = (MenuChannel).toString();
   Logger _logger;
   void setLogger(Logger logger) {
     _logger = logger;
@@ -29,11 +29,11 @@ class MenuChannel {
   Future<void> notifyMenuEvent(MethodCall call) async {
     switch (call.method) {
       case MENU_IMPORT_PHOTO:
-        _logger.info(_LOG_TAG, "notifyMenuEvent: MENU_IMPORT_PHOTO");
+        _logger.info(_logTag, "notifyMenuEvent: MENU_IMPORT_PHOTO");
         _command.importPhoto();
         break;
       case MENU_TIMER:
-        _logger.info(_LOG_TAG, "notifyMenuEvent: MENU_TIMER");
+        _logger.info(_logTag, "notifyMenuEvent: MENU_TIMER");
         break;
     }
   }
