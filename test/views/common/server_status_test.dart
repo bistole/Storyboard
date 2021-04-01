@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
@@ -14,27 +13,10 @@ import 'package:storyboard/views/config/config.dart';
 
 import '../../common.dart';
 
-class MockNavigatorObserver extends Mock implements NavigatorObserver {}
-
 class MockBackendChannel extends Mock implements BackendChannel {}
 
 main() {
   Store<AppState> store;
-  NavigatorObserver mockObserver;
-
-  Widget buildTestableWidget(Widget widget) {
-    mockObserver = MockNavigatorObserver();
-    return StoreProvider(
-      store: store,
-      child: MaterialApp(
-        home: widget,
-        navigatorObservers: [mockObserver],
-        routes: {
-          AuthPage.routeName: (_) => AuthPage(),
-        },
-      ),
-    );
-  }
 
   setUp(() {
     setFactoryLogger(MockLogger());
@@ -50,7 +32,9 @@ main() {
   });
 
   testWidgets('init and tap', (WidgetTester tester) async {
-    Widget w = buildTestableWidget(ServerStatus());
+    NavigatorObserver mockObserver = MockNavigatorObserver();
+    Widget w =
+        buildTestableWidget(ServerStatus(), store, navigator: mockObserver);
     await tester.pumpWidget(w);
 
     await tester.tap(find.ancestor(

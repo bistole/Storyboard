@@ -10,7 +10,6 @@ import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/page.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
@@ -36,14 +35,6 @@ void main() {
     'createdAt': 1606406017,
     '_ts': 1606406017000,
   };
-  Widget buildTestableWidget(Widget widget) {
-    return new StoreProvider(
-      store: store,
-      child: new MaterialApp(
-        home: widget,
-      ),
-    );
-  }
 
   group(
     "delete item",
@@ -67,7 +58,7 @@ void main() {
 
       testWidgets("delete item succ", (WidgetTester tester) async {
         // home page
-        var widget = buildTestableWidget(HomePage(title: 'title'));
+        var widget = buildTestableWidget(HomePage(title: 'title'), store);
         await tester.pumpWidget(widget);
 
         // find one task

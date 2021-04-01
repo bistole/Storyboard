@@ -4,6 +4,7 @@ import 'package:storyboard/actions/server.dart';
 import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/channel/backend.dart';
 import 'package:storyboard/channel/command.dart';
+import 'package:storyboard/channel/menu.dart';
 import 'package:storyboard/configs/device_manager.dart';
 import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/storage/storage.dart';
@@ -18,6 +19,7 @@ class ViewsResource {
   DeviceManager deviceManager;
   Storage storage;
   BackendChannel backend;
+  MenuChannel menu;
   CommandChannel command;
 
   Map<String, GlobalKey> keyPool = {};

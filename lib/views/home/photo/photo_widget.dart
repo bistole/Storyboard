@@ -8,7 +8,7 @@ import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/views/config/config.dart';
-import 'package:storyboard/views/photo/page.dart';
+import 'package:storyboard/views/photo/photo_page.dart';
 
 class ReduxActions {
   final Photo photo;

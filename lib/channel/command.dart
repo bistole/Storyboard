@@ -3,9 +3,7 @@ import 'package:redux/redux.dart';
 import 'package:storyboard/actions/server.dart';
 import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/net/config.dart';
-import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
-import 'package:storyboard/redux/models/status.dart';
 
 const CMD_OPEN_DIALOG = 'CMD:OPEN_DIALOG';
 const CMD_TAKE_PHOTO = 'CMD:TAKE_PHOTO';
@@ -42,7 +40,7 @@ class CommandChannel {
     return answer;
   }
 
-  Future<void> importPhoto() async {
+  Future<String> importPhoto() async {
     _logger.info(_logTag, "importPhoto");
     List<String> paths = await _openFileDialog(
       "Import Photo",
@@ -51,30 +49,22 @@ class CommandChannel {
 
     if (paths.length > 0) {
       _logger.info(_logTag, "importPhoto succ");
-      _store.dispatch(
-        ChangeStatusWithPathAction(
-          status: StatusKey.AddingPhoto,
-          path: paths[0],
-        ),
-      );
+      return paths[0];
     } else {
       _logger.info(_logTag, "importPhoto cancel");
+      return null;
     }
   }
 
-  Future<void> takePhoto() async {
+  Future<String> takePhoto() async {
     _logger.info(_logTag, "takePhoto");
     String path = await _channel.invokeMethod<String>(CMD_TAKE_PHOTO);
     if (path != null) {
       _logger.info(_logTag, "takePhoto succ");
-      _store.dispatch(
-        ChangeStatusWithPathAction(
-          status: StatusKey.AddingPhoto,
-          path: path,
-        ),
-      );
+      return path;
     } else {
       _logger.info(_logTag, "takePhoto cancel");
+      return null;
     }
   }
 

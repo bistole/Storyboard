@@ -34,7 +34,7 @@ void main() {
     cc.setLogger(MockLogger());
     cc.setStore(store);
 
-    await cc.importPhoto();
+    String newPath = await cc.importPhoto();
 
     var captured = verify(mc.invokeListMethod(captureAny, captureAny)).captured;
     expect(captured[0] as String, 'CMD:OPEN_DIALOG');
@@ -46,10 +46,7 @@ void main() {
       },
     );
 
-    expect(
-      store.state.status,
-      Status(status: StatusKey.AddingPhoto, param1: path),
-    );
+    expect(newPath, path);
   });
 
   test('takePhoto', () async {
@@ -61,13 +58,12 @@ void main() {
     cc.setLogger(MockLogger());
     cc.setStore(store);
 
-    await cc.takePhoto();
+    String getPath = await cc.takePhoto();
 
     var captured = verify(mc.invokeMethod(captureAny)).captured;
     expect(captured[0] as String, 'CMD:TAKE_PHOTO');
 
-    expect(store.state.status,
-        Status(status: StatusKey.AddingPhoto, param1: path));
+    expect(getPath, path);
   });
 
   test('takeQRCode', () async {

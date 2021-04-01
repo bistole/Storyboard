@@ -178,11 +178,11 @@ class Factory {
     MethodChannel mcMenu = await createChannelByName(CHANNEL_MENU_EVENTS);
     menu = MenuChannel(mcMenu);
     menu.setLogger(logger);
-    menu.setCommandChannel(command);
 
     // set to view resource
     getViewResource().command = command;
     getViewResource().backend = backend;
+    getViewResource().menu = menu;
   }
 
   Future<void> initStoreAndStorage() async {
@@ -213,6 +213,10 @@ Logger _logger;
 
 setFactoryLogger(Logger logger) {
   _logger = logger;
+}
+
+setFactory(Factory fact) {
+  _instance = fact;
 }
 
 Factory getFactory() {

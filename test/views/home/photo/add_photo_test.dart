@@ -1,26 +1,15 @@
-import 'dart:io';
-
-import 'package:flutter/rendering.dart';
-import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:redux/redux.dart';
 
-import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/channel/command.dart';
-import 'package:storyboard/configs/factory.dart';
+import 'package:storyboard/channel/menu.dart';
+import 'package:storyboard/configs/device_manager.dart';
 import 'package:storyboard/net/queue.dart';
-import 'package:storyboard/redux/actions/actions.dart';
-import 'package:storyboard/redux/models/app.dart';
-import 'package:storyboard/redux/models/photo.dart';
-import 'package:storyboard/redux/models/queue_item.dart';
-import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/storage/storage.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/page.dart';
+import 'package:storyboard/views/photo/create_photo_page.dart';
 
 import '../../../common.dart';
 
@@ -28,119 +17,81 @@ class MockCommandChannel extends Mock implements CommandChannel {}
 
 class MockNetQueue extends Mock implements NetQueue {}
 
+class MockDeviceManager extends Mock implements DeviceManager {}
+
+class MockMenuChannel extends Mock implements MenuChannel {}
+
 void main() {
-  Store<AppState> store;
-  MockNetQueue netQueue;
+  group("HomePage", () {
+    MockCommandChannel mcc;
+    MockMenuChannel mc;
+    setUp(() {
+      // mock import photo
+      String resourcePath = getResourcePath("test_resources/photo_test.jpg");
 
-  Widget buildTestableWidget(Widget widget) {
-    return StoreProvider(
-      store: store,
-      child: MaterialApp(
-        home: widget,
-      ),
-    );
-  }
+      mcc = MockCommandChannel();
+      when(mcc.importPhoto()).thenAnswer((_) => Future.value(resourcePath));
+      getViewResource().command = mcc;
 
-  group(
-    "add photo",
-    () {
-      setUp(() {
-        setFactoryLogger(MockLogger());
-        getFactory().store = store = getMockStore();
+      MockDeviceManager dm = MockDeviceManager();
+      when(dm.isDesktop()).thenReturn(true);
+      when(dm.isMobile()).thenReturn(false);
+      getViewResource().deviceManager = dm;
 
-        Storage s = Storage();
-        String homePath = getHomePath("test_resources/home/");
-        s.setDataHome(homePath);
-        Directory(path.join(homePath, 'photos')).createSync(recursive: true);
+      mc = MockMenuChannel();
+      getViewResource().menu = mc;
+    });
+    testWidgets('click button', (WidgetTester tester) async {
+      NavigatorObserver naviObserver = MockNavigatorObserver();
 
-        netQueue = MockNetQueue();
-        getViewResource().storage = s;
-        getViewResource().storage.setLogger(MockLogger());
-        getViewResource().actPhotos = ActPhotos();
-        getViewResource().actPhotos.setLogger(MockLogger());
-        getViewResource().actPhotos.setNetQueue(netQueue);
-        getViewResource().actPhotos.setStorage(s);
-      });
+      var store = getMockStore();
+      var widget = buildTestableWidget(
+        HomePage(title: 'title'),
+        store,
+        navigator: naviObserver,
+      );
+      await tester.pumpWidget(widget);
 
-      tearDown(() {
-        String homePath = getHomePath("test_resources/home/");
-        Directory(path.join(homePath, 'photos')).deleteSync(recursive: true);
-      });
+      // Add Button here
+      print(find.byType(SBToolbarButton));
+      expect(find.byType(SBToolbarButton), findsNWidgets(1));
+      expect(find.text('ADD PHOTO'), findsOneWidget);
 
-      testWidgets('add item succ', (WidgetTester tester) async {
-        // mock import photo
-        String resourcePath = getResourcePath("test_resources/photo_test.jpg");
+      // Tap 'ADD' button
+      await tester.tap(find.text('ADD PHOTO'));
+      await tester.pump();
 
-        MockCommandChannel mcc = MockCommandChannel();
-        when(mcc.importPhoto()).thenAnswer((invoke) async {
-          getFactory().store.dispatch(
-                ChangeStatusWithPathAction(
-                  status: StatusKey.AddingPhoto,
-                  path: resourcePath,
-                ),
-              );
-        });
-        getViewResource().command = mcc;
+      verify(mcc.importPhoto()).called(1);
 
-        var widget = buildTestableWidget(HomePage(title: 'title'));
-        await tester.pumpWidget(widget);
+      // pushed
+      var c = verify(naviObserver.didPush(captureAny, any)).captured.last
+          as MaterialPageRoute;
+      expect(c.settings.name, CreatePhotoPage.routeName);
+    });
 
-        // Add Button here
-        expect(find.byType(SBToolbarButton), findsNWidgets(1));
-        expect(find.text('ADD PHOTO'), findsOneWidget);
+    testWidgets('click menu', (WidgetTester tester) async {
+      NavigatorObserver naviObserver = MockNavigatorObserver();
 
-        // Tap 'ADD' button
-        await tester.tap(find.text('ADD PHOTO'));
-        await tester.pump();
+      var store = getMockStore();
+      var widget = buildTestableWidget(
+        HomePage(title: 'title'),
+        store,
+        navigator: naviObserver,
+      );
+      await tester.pumpWidget(widget);
 
-        verify(mcc.importPhoto()).called(1);
+      var c = verify(mc.listenAction(captureAny, captureAny)).captured;
+      expect(c[0] as String, MENU_IMPORT_PHOTO);
 
-        expect(store.state.status.status, StatusKey.AddingPhoto);
-        expect(store.state.status.param1, resourcePath);
+      // callback
+      await c[1]();
 
-        // Show the selected image
-        expect(find.byType(SBToolbarButton), findsNWidgets(2));
-        expect(find.text("OK"), findsOneWidget);
-        expect(find.text("CANCEL"), findsOneWidget);
-        expect(find.byType(Image), findsOneWidget);
+      verify(mcc.importPhoto()).called(1);
 
-        Image img = find.byType(Image).evaluate().single.widget as Image;
-        expect(img.image is FileImage, true);
-
-        FileImage imgProvider = img.image as FileImage;
-        expect(imgProvider.file.path, resourcePath);
-
-        // click 'OK'
-        await tester.tap(find.text("OK"));
-        await tester.pump();
-
-        // Photo is in redux list
-        expect(store.state.status.status, StatusKey.ListPhoto);
-        expect(store.state.photoRepo.photos.length, 1);
-
-        var now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-        var photo = store.state.photoRepo.photos.values.first;
-        expect(photo.filename, "photo_test.jpg");
-        expect(photo.mime, "image/jpeg");
-        expect(photo.size, "5938");
-        expect(photo.hasOrigin, PhotoStatus.Ready);
-        expect(photo.hasThumb, PhotoStatus.Loading);
-        expect(photo.deleted, 0);
-        expect(photo.updatedAt, lessThan(now + 1000));
-        expect(photo.updatedAt, greaterThan(now - 5000));
-        expect(photo.updatedAt, photo.createdAt);
-
-        // No thumbnail, but have origin, show origin
-        expect(find.text('ADD PHOTO'), findsOneWidget);
-        expect(find.byType(Image), findsOneWidget);
-        expect(find.byType(CircularProgressIndicator), findsNothing);
-
-        verify(netQueue.addQueueItem(
-          QueueItemType.Photo,
-          QueueItemAction.DownloadThumbnail,
-          photo.uuid,
-        )).called(1);
-      });
-    },
-  );
+      // pushed
+      var c2 = verify(naviObserver.didPush(captureAny, any)).captured.last
+          as MaterialPageRoute;
+      expect(c2.settings.name, CreatePhotoPage.routeName);
+    });
+  });
 }

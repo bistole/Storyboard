@@ -23,10 +23,12 @@ class PhotoPage extends StatelessWidget {
   static const routeName = '/photos';
 
   Widget buildPhotoWiget(BuildContext context, ReduxActions redux) {
+    final PhotoPageArguments args = ModalRoute.of(context).settings.arguments;
+    var photoPath = getViewResource().storage.getPhotoPathByUUID(args.uuid);
     return OverflowBox(
       maxWidth: MediaQuery.of(context).size.width,
       maxHeight: MediaQuery.of(context).size.height - 44,
-      child: ViewPhotoWidget(photo: redux.photo),
+      child: ViewPhotoWidget(path: photoPath),
     );
   }
 

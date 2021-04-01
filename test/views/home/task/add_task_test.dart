@@ -18,7 +18,6 @@ import 'package:storyboard/views/home/page.dart';
 
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
@@ -31,15 +30,6 @@ class MockCommandChannel extends Mock implements CommandChannel {}
 void main() {
   Store<AppState> store;
   MockNetQueue netQueue;
-
-  Widget buildTestableWidget(Widget widget) {
-    return new StoreProvider(
-      store: store,
-      child: new MaterialApp(
-        home: widget,
-      ),
-    );
-  }
 
   group(
     "add item",
@@ -59,7 +49,7 @@ void main() {
 
       testWidgets('add item succ', (WidgetTester tester) async {
         // home page
-        var widget = buildTestableWidget(HomePage(title: 'title'));
+        var widget = buildTestableWidget(HomePage(title: 'title'), store);
         await tester.pumpWidget(widget);
 
         // Add Button here

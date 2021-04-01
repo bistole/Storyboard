@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
 import 'package:storyboard/channel/command.dart';
+import 'package:storyboard/channel/menu.dart';
 import 'package:storyboard/configs/device_manager.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/views/common/app_icons.dart';
@@ -19,17 +20,22 @@ class MockDeviceManager extends Mock implements DeviceManager {}
 
 class MockCommandChannel extends Mock implements CommandChannel {}
 
+class MockMenuChannel extends Mock implements MenuChannel {}
+
 void main() {
   ViewsResource vr;
   DeviceManager dm;
   CommandChannel cmd;
+  MenuChannel menu;
 
   setUp(() {
     vr = MockViewsResource();
     dm = MockDeviceManager();
     cmd = MockCommandChannel();
+    menu = MockMenuChannel();
     when(vr.deviceManager).thenReturn(dm);
     when(vr.command).thenReturn(cmd);
+    when(vr.menu).thenReturn(menu);
 
     setViewResource(vr);
   });

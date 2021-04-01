@@ -9,23 +9,30 @@ import 'package:storyboard/views/common/app_icons.dart';
 import 'package:storyboard/views/common/footerbar.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
 import 'package:storyboard/views/config/config.dart';
+import 'package:storyboard/views/photo/view_photo_widget.dart';
 
 class ReduxActions {
   final void Function(String) createPhoto;
   final void Function() cancel;
-  final Status status;
   ReduxActions({
     this.createPhoto,
     this.cancel,
-    this.status,
   });
 }
 
-class CreatePhotoWidget extends StatelessWidget {
-  Widget buildAddingPhotoToolbar(ReduxActions redux) {
+class CreatePhotoPageArguments {
+  final String path;
+  CreatePhotoPageArguments(this.path);
+}
+
+class CreatePhotoPage extends StatelessWidget {
+  static const routeName = '/photos/new';
+
+  Widget buildAddingPhotoToolbar(
+      CreatePhotoPageArguments args, ReduxActions redux) {
     return SBFooterbar([
       SBToolbarButton(
-        () => redux.createPhoto(redux.status.param1),
+        () => redux.createPhoto(args.path),
         icon: Icon(AppIcons.ok),
         text: "OK",
       ),
@@ -37,36 +44,48 @@ class CreatePhotoWidget extends StatelessWidget {
     ]);
   }
 
-  Widget buildWhenAddingPhoto(context, ReduxActions redux) {
+  Widget buildWhenAddingPhoto(
+      context, CreatePhotoPageArguments args, ReduxActions redux) {
     return Column(
       children: [
         Expanded(
-          child: Container(
-            child: Image.file(File(redux.status.param1)),
+          child: OverflowBox(
+            maxWidth: MediaQuery.of(context).size.width,
+            maxHeight: MediaQuery.of(context).size.height - 44,
+            child: ViewPhotoWidget(path: args.path),
           ),
         ),
-        buildAddingPhotoToolbar(redux),
+        buildAddingPhotoToolbar(args, redux),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final CreatePhotoPageArguments args =
+        ModalRoute.of(context).settings.arguments;
     return StoreConnector<AppState, ReduxActions>(
       converter: (store) {
         return ReduxActions(
           createPhoto: (String path) {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListPhoto));
-            getViewResource().actPhotos.actUploadPhoto(store, path);
+            getViewResource().actPhotos.actUploadPhoto(store, args.path);
+            Navigator.of(context).pop();
           },
           cancel: () {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListPhoto));
+            Navigator.of(context).pop();
           },
-          status: store.state.status,
         );
       },
       builder: (context, ReduxActions redux) {
-        return buildWhenAddingPhoto(context, redux);
+        return Scaffold(
+          appBar: AppBar(
+            elevation: 0,
+            title: Text("New Photo"),
+          ),
+          body: buildWhenAddingPhoto(context, args, redux),
+        );
       },
     );
   }

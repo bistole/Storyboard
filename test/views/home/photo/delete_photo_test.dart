@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
 import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/channel/command.dart';
+import 'package:storyboard/channel/menu.dart';
 import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
@@ -23,6 +23,8 @@ class MockNetQueue extends Mock implements NetQueue {}
 
 class MockCommandChannel extends Mock implements CommandChannel {}
 
+class MockMenuChannel extends Mock implements MenuChannel {}
+
 void main() {
   Store<AppState> store;
   MockNetQueue netQueue;
@@ -40,15 +42,6 @@ void main() {
     'createdAt': 1606406017,
     '_ts': 1606406017000,
   };
-
-  Widget buildTestableWidget(Widget widget) {
-    return new StoreProvider(
-      store: store,
-      child: new MaterialApp(
-        home: widget,
-      ),
-    );
-  }
 
   group("delete item", () {
     setUp(() {
@@ -70,10 +63,11 @@ void main() {
       getViewResource().actPhotos.setNetQueue(netQueue);
       getViewResource().actPhotos.setStorage(s);
       getViewResource().command = MockCommandChannel();
+      getViewResource().menu = MockMenuChannel();
     });
 
     testWidgets("delete item succ", (WidgetTester tester) async {
-      var widget = buildTestableWidget(HomePage(title: 'title'));
+      var widget = buildTestableWidget(HomePage(title: 'title'), store);
       await tester.pumpWidget(widget);
 
       expect(find.text('ADD PHOTO'), findsOneWidget);

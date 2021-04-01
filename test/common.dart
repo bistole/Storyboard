@@ -5,6 +5,7 @@ import 'package:mockito/mockito.dart';
 import 'package:path/path.dart' as path;
 import 'package:http/http.dart' as http;
 import 'package:redux/redux.dart';
+import 'package:storyboard/app.dart';
 import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
@@ -18,6 +19,8 @@ import 'package:storyboard/redux/reducers/app_reducer.dart';
 class MockLogger extends Mock implements Logger {}
 
 class MockHttpClient extends Mock implements http.Client {}
+
+class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 
 String getResourcePath(String relativePath) {
   int cnt = 0;
@@ -69,11 +72,37 @@ Store<AppState> getMockStore({
   );
 }
 
-Widget buildTestableWidget(Widget widget, Store<AppState> store) {
+Widget buildTestableWidget(
+  Widget widget,
+  Store<AppState> store, {
+  NavigatorObserver navigator,
+}) {
   return StoreProvider(
     store: store,
     child: MaterialApp(
+      routes: StoryBoardApp.routes,
       home: widget,
+      navigatorObservers: navigator != null ? [navigator] : [],
+    ),
+  );
+}
+
+// need to tap before use
+Widget buildTestablePageWithArguments(
+    Widget widget, Store<AppState> store, Object args) {
+  final key = GlobalKey<NavigatorState>();
+  return StoreProvider(
+    store: store,
+    child: MaterialApp(
+      navigatorKey: key,
+      routes: StoryBoardApp.routes,
+      home: TextButton(
+        onPressed: () => key.currentState.push(MaterialPageRoute(
+          settings: RouteSettings(arguments: args),
+          builder: (_) => widget,
+        )),
+        child: SizedBox(),
+      ),
     ),
   );
 }

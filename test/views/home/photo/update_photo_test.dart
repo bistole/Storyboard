@@ -1,12 +1,12 @@
 import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:redux/redux.dart';
 import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/channel/command.dart';
+import 'package:storyboard/channel/menu.dart';
 import 'package:storyboard/configs/factory.dart';
 
 import 'package:storyboard/net/queue.dart';
@@ -18,7 +18,7 @@ import 'package:storyboard/storage/storage.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/page.dart';
 import 'package:storyboard/views/home/photo/photo_widget.dart';
-import 'package:storyboard/views/photo/page.dart';
+import 'package:storyboard/views/photo/photo_page.dart';
 
 import '../../../common.dart';
 
@@ -26,9 +26,9 @@ Type typeof<T>() => T;
 
 class MockNetQueue extends Mock implements NetQueue {}
 
-class MockNavigatorObserver extends Mock implements NavigatorObserver {}
-
 class MockCommandChannel extends Mock implements CommandChannel {}
+
+class MockMenuChannel extends Mock implements MenuChannel {}
 
 void main() {
   Store<AppState> store;
@@ -48,19 +48,6 @@ void main() {
     'createdAt': 1606406017,
     '_ts': 1606406017000,
   };
-
-  Widget buildTestableWidget(Widget widget) {
-    return new StoreProvider(
-      store: store,
-      child: new MaterialApp(
-        home: widget,
-        navigatorObservers: [naviObserver],
-        routes: {
-          PhotoPage.routeName: (_) => PhotoPage(),
-        },
-      ),
-    );
-  }
 
   group("update item", () {
     setUp(() {
@@ -84,10 +71,12 @@ void main() {
       getViewResource().actPhotos.setNetQueue(netQueue);
       getViewResource().actPhotos.setStorage(s);
       getViewResource().command = MockCommandChannel();
+      getViewResource().menu = MockMenuChannel();
     });
 
     testWidgets("update item succ", (WidgetTester tester) async {
-      var widget = buildTestableWidget(HomePage(title: 'title'));
+      var widget = buildTestableWidget(HomePage(title: 'title'), store,
+          navigator: naviObserver);
       await tester.pumpWidget(widget);
 
       // No thumbnail, show indicator

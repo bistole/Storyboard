@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:redux/redux.dart';
 import 'package:storyboard/configs/factory.dart';
@@ -12,15 +11,6 @@ import '../../common.dart';
 void main() {
   Store<AppState> store;
 
-  Widget buildTestableWidget(Widget widget) {
-    return StoreProvider(
-      store: store,
-      child: MaterialApp(
-        home: widget,
-      ),
-    );
-  }
-
   setUp(() {
     setFactoryLogger(MockLogger());
     getFactory().store = store = getMockStore();
@@ -31,11 +21,13 @@ void main() {
     var onPress = () {
       pressed = true;
     };
-    Widget w = buildTestableWidget(SBButton(
-      onPress,
-      icon: Icon(AppIcons.android),
-      text: 'HELLO TEXT',
-    ));
+    Widget w = buildTestableWidget(
+        SBButton(
+          onPress,
+          icon: Icon(AppIcons.android),
+          text: 'HELLO TEXT',
+        ),
+        store);
     await tester.pumpWidget(w);
 
     // find

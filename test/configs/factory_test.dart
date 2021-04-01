@@ -5,6 +5,7 @@ import 'package:path_provider_platform_interface/path_provider_platform_interfac
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:mockito/mockito.dart';
 import 'package:storyboard/channel/backend.dart';
+import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/configs/channel_manager.dart';
 import 'package:storyboard/configs/device_manager.dart';
 import 'package:storyboard/configs/factory.dart';
@@ -14,7 +15,6 @@ import 'package:storyboard/redux/models/setting.dart';
 import 'package:storyboard/storage/storage.dart';
 import 'package:storyboard/views/config/config.dart';
 
-import '../channel/menu_test.dart';
 import '../common.dart';
 import '../redux/store_test.dart';
 
@@ -23,6 +23,8 @@ class MockStorage extends Mock implements Storage {}
 class MockChannelManager extends Mock implements ChannelManager {}
 
 class MockMethodChannel extends Mock implements MethodChannel {}
+
+class MockCommandChannel extends Mock implements CommandChannel {}
 
 class MockBackendChannel extends Mock implements BackendChannel {}
 

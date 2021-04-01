@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
@@ -30,15 +29,6 @@ void main() {
 
   Store<AppState> store;
 
-  Widget buildTestableWidget(Widget widget) {
-    return StoreProvider(
-      store: store,
-      child: MaterialApp(
-        home: widget,
-      ),
-    );
-  }
-
   group('auth_client', () {
     setUp(() {
       setFactoryLogger(MockLogger());
@@ -52,7 +42,7 @@ void main() {
     testWidgets('qr scan failed', (WidgetTester tester) async {
       when(getViewResource().deviceManager.isDesktop()).thenReturn(false);
 
-      var widget = buildTestableWidget(AuthPage());
+      var widget = buildTestableWidget(AuthPage(), store);
       await tester.pumpWidget(widget);
 
       expect(find.text(btnTextQR), findsOneWidget);
@@ -79,7 +69,7 @@ void main() {
     testWidgets('qr scan succeed', (WidgetTester tester) async {
       when(getViewResource().deviceManager.isDesktop()).thenReturn(false);
 
-      var widget = buildTestableWidget(AuthPage());
+      var widget = buildTestableWidget(AuthPage(), store);
       await tester.pumpWidget(widget);
 
       expect(find.text(btnTextQR), findsOneWidget);
@@ -107,7 +97,7 @@ void main() {
     testWidgets('manual input - keyboard', (WidgetTester tester) async {
       when(getViewResource().deviceManager.isDesktop()).thenReturn(false);
 
-      var widget = buildTestableWidget(AuthPage());
+      var widget = buildTestableWidget(AuthPage(), store);
       await tester.pumpWidget(widget);
 
       expect(find.text(btnTextInput), findsOneWidget);
@@ -143,7 +133,7 @@ void main() {
     testWidgets('manual input - button', (WidgetTester tester) async {
       when(getViewResource().deviceManager.isDesktop()).thenReturn(false);
 
-      var widget = buildTestableWidget(AuthPage());
+      var widget = buildTestableWidget(AuthPage(), store);
       await tester.pumpWidget(widget);
 
       expect(find.text(btnTextInput), findsOneWidget);
@@ -179,7 +169,7 @@ void main() {
     testWidgets('manual input - escape', (WidgetTester tester) async {
       when(getViewResource().deviceManager.isDesktop()).thenReturn(false);
 
-      var widget = buildTestableWidget(AuthPage());
+      var widget = buildTestableWidget(AuthPage(), store);
       await tester.pumpWidget(widget);
 
       expect(find.text(btnTextInput), findsOneWidget);
