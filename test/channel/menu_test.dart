@@ -14,23 +14,28 @@ void main() {
   });
 
   test('menu', () async {
-    var triggered = false;
+    var called = 0;
+    var func = () {
+      called++;
+    };
 
     MethodChannel mc = MockMethodChannel();
 
-    MenuChannel menuC = MenuChannel(mc);
+    MenuChannel menuC = MenuChannel(mc, logger: MockLogger());
     menuC.setLogger(MockLogger());
-    menuC.listenAction(MENU_IMPORT_PHOTO, () {
-      triggered = true;
-    });
+    menuC.listenAction(MENU_IMPORT_PHOTO, func);
 
     var captured = verify(mc.setMethodCallHandler(captureAny)).captured.single;
     expect(captured, menuC.notifyMenuEvent);
 
     menuC.notifyMenuEvent(MethodCall('MENU_EVENTS:IMPORT_PHOTO'));
-    var ret =
-        await Future.delayed(Duration(milliseconds: 300), () => triggered);
-    expect(ret, true);
+    var ret1 = await Future.delayed(Duration(milliseconds: 300), () => called);
+    expect(ret1, 1);
+
+    menuC.removeAction(MENU_IMPORT_PHOTO, func);
+    menuC.notifyMenuEvent(MethodCall('MENU_EVENTS:IMPORT_PHOTO'));
+    var ret2 = await Future.delayed(Duration(milliseconds: 300), () => called);
+    expect(ret2, 1);
 
     menuC.notifyMenuEvent(MethodCall('TIMER', 'test current timestamp'));
   });

@@ -2,7 +2,6 @@ import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:redux/redux.dart';
 import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/channel/command.dart';
@@ -105,47 +104,6 @@ void main() {
       var c = verify(naviObserver.didPush(captureAny, any)).captured.last
           as MaterialPageRoute;
       expect(c.settings.name, PhotoPage.routeName);
-      await tester.pump();
-      await tester.pump();
-      await tester.pump();
-
-      // show detail but origin is not downloaded
-      expect(find.text('RESET'), findsOneWidget);
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-      expect(
-          find.descendant(
-            of: find.byType(PhotoPage).first,
-            matching: find.byType(PhotoView),
-          ),
-          findsNothing);
-
-      // download origin is succ
-      getFactory().store.dispatch(DownloadPhotoAction(
-            uuid: uuid,
-            status: PhotoStatus.Ready,
-          ));
-      await tester.pumpAndSettle();
-
-      expect(
-          find.descendant(
-            of: find.byType(PhotoPage).first,
-            matching: find.byType(PhotoView),
-          ),
-          findsOneWidget);
-      PhotoView imgDetail = find
-          .descendant(
-            of: find.byType(PhotoPage).first,
-            matching: find.byType(PhotoView),
-          )
-          .evaluate()
-          .first
-          .widget;
-
-      FileImage imgDetailProvider = imgDetail.imageProvider;
-      expect(
-        imgDetailProvider.file.path,
-        path.join('project_home', 'photos', uuid),
-      );
     });
   });
 }

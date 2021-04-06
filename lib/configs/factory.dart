@@ -176,7 +176,7 @@ class Factory {
 
     // init menu
     MethodChannel mcMenu = await createChannelByName(CHANNEL_MENU_EVENTS);
-    menu = MenuChannel(mcMenu);
+    menu = MenuChannel(mcMenu, logger: logger);
     menu.setLogger(logger);
 
     // set to view resource

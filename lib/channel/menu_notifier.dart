@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:storyboard/logger/logger.dart';
 
 typedef VoidCallback = void Function();
 
@@ -12,41 +13,32 @@ class _MenuItemNotifierListener
 }
 
 class _MenuItemNotifier extends Listenable implements ChangeNotifier {
+  String _logTag = (_MenuItemNotifier).toString();
+  Logger _logger;
+
   LinkedList<_MenuItemNotifierListener> _listeners;
 
-  bool _debugAssertNotDisposed() {
-    assert(() {
-      if (_listeners == null) {
-        throw FlutterError('A $runtimeType was used after being disposed.\n'
-            'Once you have called dispose() on a $runtimeType, it can no longer be used.');
-      }
-      return true;
-    }());
-    return true;
-  }
-
-  _MenuItemNotifier() {
+  _MenuItemNotifier({@required logger}) : this._logger = logger {
     _listeners = LinkedList();
   }
 
   void dispose() {
-    assert(_debugAssertNotDisposed());
     _listeners = null;
   }
 
   @protected
   bool get hasListeners {
-    assert(_debugAssertNotDisposed());
+    if (_listeners == null) return false;
     return _listeners.isNotEmpty;
   }
 
   void addListener(VoidCallback listener) {
-    assert(_debugAssertNotDisposed());
+    if (_listeners == null) return;
     _listeners.add(_MenuItemNotifierListener(listener: listener));
   }
 
   void removeListener(VoidCallback listener) {
-    assert(_debugAssertNotDisposed());
+    if (_listeners == null) return;
     for (final _MenuItemNotifierListener entry in _listeners) {
       if (entry.listener == listener) {
         entry.unlink();
@@ -56,7 +48,6 @@ class _MenuItemNotifier extends Listenable implements ChangeNotifier {
   }
 
   void notifyListeners() {
-    assert(_debugAssertNotDisposed());
     if (_listeners.isEmpty) return;
 
     final List<_MenuItemNotifierListener> localListeners =
@@ -65,66 +56,49 @@ class _MenuItemNotifier extends Listenable implements ChangeNotifier {
     for (final _MenuItemNotifierListener entry in localListeners) {
       try {
         if (entry.list != null) entry.listener();
-      } catch (exception, stack) {
-        FlutterError.reportError(FlutterErrorDetails(
-          exception: exception,
-          stack: stack,
-          library: 'foundation library',
-          context: ErrorDescription(
-              'while dispatching notifications for $runtimeType'),
-          informationCollector: () sync* {
-            yield DiagnosticsProperty<ChangeNotifier>(
-              'The $runtimeType sending notification was',
-              this,
-              style: DiagnosticsTreeStyle.errorProperty,
-            );
-          },
-        ));
+      } catch (e) {
+        _logger.error(_logTag, "notify listener failed: $e");
       }
     }
   }
 }
 
 class MenuNotifier {
+  Logger _logger;
+
   LinkedHashMap<String, _MenuItemNotifier> _map;
 
-  bool _debugAssertNotDisposed() {
-    assert(() {
-      if (_map == null) {
-        throw FlutterError('A $runtimeType was used after being disposed.\n'
-            'Once you have called dispose() on a $runtimeType, it can no longer be used.');
-      }
-      return true;
-    }());
-    return true;
-  }
-
-  MenuNotifier() {
+  MenuNotifier({@required logger}) : this._logger = logger {
     _map = LinkedHashMap();
   }
 
   void dispose() {
-    assert(_debugAssertNotDisposed());
     _map = null;
   }
 
+  bool hasListeners(String menu) {
+    if (_map == null) return false;
+    if (_map[menu] == null) return false;
+    return _map[menu].hasListeners;
+  }
+
   void addListener(String menu, VoidCallback listener) {
-    assert(_debugAssertNotDisposed());
+    if (_map == null) return;
     if (_map[menu] == null) {
-      _map[menu] = _MenuItemNotifier();
+      _map[menu] = _MenuItemNotifier(logger: this._logger);
     }
     _map[menu].addListener(listener);
   }
 
   void removeListener(String menu, VoidCallback listener) {
-    assert(_debugAssertNotDisposed());
+    if (_map == null) return;
     if (_map[menu] != null) {
       _map[menu].removeListener(listener);
     }
   }
 
   void notifyListeners(String menu) {
-    assert(_debugAssertNotDisposed());
+    if (_map == null) return;
     if (_map[menu] != null) {
       _map[menu].notifyListeners();
     }

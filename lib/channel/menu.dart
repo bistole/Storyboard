@@ -25,10 +25,11 @@ class MenuChannel {
   }
 
   MethodChannel _channel;
-  MenuChannel(MethodChannel channel) {
+  MenuChannel(MethodChannel channel, {@required logger})
+      : this._logger = logger {
     _channel = channel;
     _channel.setMethodCallHandler(notifyMenuEvent);
-    _notifier = MenuNotifier();
+    _notifier = MenuNotifier(logger: this._logger);
   }
 
   Future<void> notifyMenuEvent(MethodCall call) async {

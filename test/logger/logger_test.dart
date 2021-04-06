@@ -85,5 +85,8 @@ void main() {
     logger.setDir(Directory("."));
 
     await Future.delayed(Duration(milliseconds: 100));
+
+    // delete it finally
+    File(logger.getFilename()).delete();
   });
 }

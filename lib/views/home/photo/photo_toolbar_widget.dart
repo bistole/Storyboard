@@ -10,12 +10,6 @@ const String PHOTO_TOOLBAR = "PHOTO_TOOLBAR";
 
 typedef VoidCallback = void Function();
 
-class ReduxActions {
-  final void Function() add;
-
-  ReduxActions({this.add});
-}
-
 class PhotoToolbarWidget extends StatefulWidget {
   @override
   PhotoToolbarState createState() => PhotoToolbarState();

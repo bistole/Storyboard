@@ -22,6 +22,7 @@ class MockDeviceManager extends Mock implements DeviceManager {}
 class MockMenuChannel extends Mock implements MenuChannel {}
 
 void main() {
+  MockDeviceManager dm;
   group("HomePage", () {
     MockCommandChannel mcc;
     MockMenuChannel mc;
@@ -31,67 +32,106 @@ void main() {
 
       mcc = MockCommandChannel();
       when(mcc.importPhoto()).thenAnswer((_) => Future.value(resourcePath));
+      when(mcc.takePhoto()).thenAnswer((_) => Future.value(resourcePath));
       getViewResource().command = mcc;
 
-      MockDeviceManager dm = MockDeviceManager();
-      when(dm.isDesktop()).thenReturn(true);
-      when(dm.isMobile()).thenReturn(false);
+      dm = MockDeviceManager();
       getViewResource().deviceManager = dm;
 
       mc = MockMenuChannel();
       getViewResource().menu = mc;
     });
-    testWidgets('click button', (WidgetTester tester) async {
-      NavigatorObserver naviObserver = MockNavigatorObserver();
 
-      var store = getMockStore();
-      var widget = buildTestableWidget(
-        HomePage(title: 'title'),
-        store,
-        navigator: naviObserver,
-      );
-      await tester.pumpWidget(widget);
+    group('desktop', () {
+      setUp(() {
+        when(dm.isDesktop()).thenReturn(true);
+        when(dm.isMobile()).thenReturn(false);
+      });
 
-      // Add Button here
-      print(find.byType(SBToolbarButton));
-      expect(find.byType(SBToolbarButton), findsNWidgets(1));
-      expect(find.text('ADD PHOTO'), findsOneWidget);
+      testWidgets('click button', (WidgetTester tester) async {
+        NavigatorObserver naviObserver = MockNavigatorObserver();
 
-      // Tap 'ADD' button
-      await tester.tap(find.text('ADD PHOTO'));
-      await tester.pump();
+        var store = getMockStore();
+        var widget = buildTestableWidget(
+          HomePage(title: 'title'),
+          store,
+          navigator: naviObserver,
+        );
+        await tester.pumpWidget(widget);
 
-      verify(mcc.importPhoto()).called(1);
+        // Find button here
+        expect(find.byType(SBToolbarButton), findsNWidgets(1));
+        expect(find.text('ADD PHOTO'), findsOneWidget);
 
-      // pushed
-      var c = verify(naviObserver.didPush(captureAny, any)).captured.last
-          as MaterialPageRoute;
-      expect(c.settings.name, CreatePhotoPage.routeName);
+        // Tap button
+        await tester.tap(find.text('ADD PHOTO'));
+        await tester.pump();
+
+        verify(mcc.importPhoto()).called(1);
+
+        // Page pushed
+        var c = verify(naviObserver.didPush(captureAny, any)).captured.last
+            as MaterialPageRoute;
+        expect(c.settings.name, CreatePhotoPage.routeName);
+      });
+
+      testWidgets('click menu', (WidgetTester tester) async {
+        NavigatorObserver naviObserver = MockNavigatorObserver();
+
+        var store = getMockStore();
+        var widget = buildTestableWidget(
+          HomePage(title: 'title'),
+          store,
+          navigator: naviObserver,
+        );
+        await tester.pumpWidget(widget);
+
+        var c = verify(mc.listenAction(captureAny, captureAny)).captured;
+        expect(c[0] as String, MENU_IMPORT_PHOTO);
+
+        // callback
+        await c[1]();
+
+        verify(mcc.importPhoto()).called(1);
+
+        // Page pushed
+        var c2 = verify(naviObserver.didPush(captureAny, any)).captured.last
+            as MaterialPageRoute;
+        expect(c2.settings.name, CreatePhotoPage.routeName);
+      });
     });
+    group('Mobile', () {
+      setUp(() {
+        when(dm.isDesktop()).thenReturn(false);
+        when(dm.isMobile()).thenReturn(true);
+      });
 
-    testWidgets('click menu', (WidgetTester tester) async {
-      NavigatorObserver naviObserver = MockNavigatorObserver();
+      testWidgets('click button', (WidgetTester tester) async {
+        NavigatorObserver naviObserver = MockNavigatorObserver();
 
-      var store = getMockStore();
-      var widget = buildTestableWidget(
-        HomePage(title: 'title'),
-        store,
-        navigator: naviObserver,
-      );
-      await tester.pumpWidget(widget);
+        var store = getMockStore();
+        var widget = buildTestableWidget(
+          HomePage(title: 'title'),
+          store,
+          navigator: naviObserver,
+        );
+        await tester.pumpWidget(widget);
 
-      var c = verify(mc.listenAction(captureAny, captureAny)).captured;
-      expect(c[0] as String, MENU_IMPORT_PHOTO);
+        // Find button
+        expect(find.byType(SBToolbarButton), findsNWidgets(1));
+        expect(find.text('TAKE PHOTO'), findsOneWidget);
 
-      // callback
-      await c[1]();
+        // Tap button
+        await tester.tap(find.text('TAKE PHOTO'));
+        await tester.pump();
 
-      verify(mcc.importPhoto()).called(1);
+        verify(mcc.takePhoto()).called(1);
 
-      // pushed
-      var c2 = verify(naviObserver.didPush(captureAny, any)).captured.last
-          as MaterialPageRoute;
-      expect(c2.settings.name, CreatePhotoPage.routeName);
+        // pushed
+        var c = verify(naviObserver.didPush(captureAny, any)).captured.last
+            as MaterialPageRoute;
+        expect(c.settings.name, CreatePhotoPage.routeName);
+      });
     });
   });
 }
