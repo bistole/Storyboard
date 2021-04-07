@@ -40,6 +40,14 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".channels.CameraActivity"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="fullSensor"
+            android:stateNotNeeded="true"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
+            android:windowSoftInputMode="stateAlwaysHidden">
+        </activity>
+        <activity
             android:name=".channels.QRCodeScannerActivity"
             android:screenOrientation="fullSensor"
             android:stateNotNeeded="true"

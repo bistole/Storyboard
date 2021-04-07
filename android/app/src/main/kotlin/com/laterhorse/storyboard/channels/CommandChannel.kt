@@ -6,6 +6,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import androidx.annotation.NonNull
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.FileProvider
 import com.google.zxing.integration.android.IntentIntegrator
 import com.laterhorse.storyboard.MainActivity
@@ -39,25 +40,19 @@ class CommandChannel {
     }
 
     private fun dispatchTakePictureIntent(activity: MainActivity, result: MethodChannel.Result) {
-        currentMethodChannelResult = result
-        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
-            takePictureIntent.resolveActivity(activity.packageManager)?.also {
-                var photoFile : File
-                try {
-                    photoFile = createPhotoFile(activity);
-                } catch (ex: IOException) {
-                    // error occurred
-                    ex.message?.let {
-                        result.run { error(it) }
-                    }
-                    return@also
+        currentMethodChannelResult = result;
+        try {
+            createPhotoFile(activity).also { photoFile ->
+                val photoURI: Uri = Uri.fromFile(photoFile)
+                var intent = Intent(activity, CameraActivity::class.java).apply {
+                    putExtra(CameraActivity.EXTRA_OUTPUT_FILENAME, photoURI.toString())
                 }
-
-                photoFile.also {
-                    val photoURI: Uri = FileProvider.getUriForFile(activity, "com.laterhorse.storyboard.fileprovider", it)
-                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                    activity.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
-                }
+                activity.startActivityForResult(intent, REQUEST_IMAGE_CAPTURE, null)
+            }
+        } catch (ex: IOException) {
+            // error occurred
+            ex.message?.let {
+                result.run { error(it) }
             }
         }
     }
