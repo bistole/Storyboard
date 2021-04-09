@@ -1,19 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="100">
+
     <TextureView
         android:id="@+id/camera_surface"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="100"/>
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
-    <Button
+    <ImageButton
+        android:id="@+id/camera_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="32dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/close"
+        android:padding="0dp"
+        android:src="@drawable/ic_close" />
+
+    <ImageButton
         android:id="@+id/camera_capture"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Capture"/>
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="32dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/capture"
+        android:padding="0dp"
+        android:src="@drawable/ic_camera" />
+    
+    <ImageButton
+        android:id="@+id/camera_flip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="64dp"
+        android:layout_marginRight="32dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/flip"
+        android:padding="0dp"
+        android:src="@drawable/ic_camera_back"/>
 
-</LinearLayout>
+</RelativeLayout>
