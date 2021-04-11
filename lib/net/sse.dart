@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:redux/redux.dart';
@@ -183,10 +184,14 @@ class NetSSE {
       }, cancelOnError: true);
 
       return completer.future;
-    } catch (e) {
+    } on SocketException catch (_) {
       // exception: SocketException: OS Error: Connection refused, errno = 61, address = 192.168.3.135, port = 55223
+      _changeStatus(store, NetSSEStatus.WrongServer);
+    } on TimeoutException catch (_) {
       // exception: TimeoutException after 0:00:05.000000: Future not completed
-      _logger.error(_logTag, "SSE catch unexpected exception: $e");
+      _changeStatus(store, NetSSEStatus.WrongServer);
+    } catch (e) {
+      _logger.error(_logTag, "SSE Catch unexpected exception: $e");
       _changeStatus(store, NetSSEStatus.WrongServer);
     }
     _closeHTTP();
