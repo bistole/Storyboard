@@ -5,12 +5,14 @@ import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/channel/backend.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/channel/menu.dart';
+import 'package:storyboard/channel/notifier.dart';
 import 'package:storyboard/configs/device_manager.dart';
 import 'package:storyboard/logger/logger.dart';
 import 'package:storyboard/storage/storage.dart';
 
 class ViewsResource {
   Logger logger;
+  Notifier notifier;
 
   ActServer actServer;
   ActPhotos actPhotos;

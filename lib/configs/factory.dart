@@ -14,6 +14,7 @@ import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/channel/backend.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/channel/menu.dart';
+import 'package:storyboard/channel/notifier.dart';
 import 'package:storyboard/configs/channel_manager.dart';
 import 'package:storyboard/configs/device_manager.dart';
 import 'package:storyboard/logger/log_level.dart';
@@ -37,6 +38,7 @@ const CHANNEL_COMMANDS = '/COMMANDS';
 class Factory {
   DeviceManager deviceManager;
   Logger logger;
+  Notifier notifier;
 
   ActServer actServer;
   ActPhotos actPhotos;
@@ -59,6 +61,8 @@ class Factory {
   Factory({@required this.logger}) {
     deviceManager = DeviceManager();
     logger.setLevel(LogLevel.debug());
+    notifier = Notifier();
+    notifier.setLogger(logger);
 
     actServer = ActServer();
     actPhotos = ActPhotos();
@@ -113,6 +117,7 @@ class Factory {
     getViewResource().actTasks = actTasks;
     getViewResource().actServer = actServer;
     getViewResource().logger = logger;
+    getViewResource().notifier = notifier;
   }
 
   Future<void> initCrashlytics() async {
@@ -178,6 +183,7 @@ class Factory {
     MethodChannel mcMenu = await createChannelByName(CHANNEL_MENU_EVENTS);
     menu = MenuChannel(mcMenu, logger: logger);
     menu.setLogger(logger);
+    menu.setNotifier(notifier);
 
     // set to view resource
     getViewResource().command = command;

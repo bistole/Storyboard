@@ -6,19 +6,18 @@ import 'package:storyboard/logger/logger.dart';
 
 typedef VoidCallback = void Function();
 
-class _MenuItemNotifierListener
-    extends LinkedListEntry<_MenuItemNotifierListener> {
+class _ItemNotifierListener extends LinkedListEntry<_ItemNotifierListener> {
   VoidCallback listener;
-  _MenuItemNotifierListener({this.listener});
+  _ItemNotifierListener({this.listener});
 }
 
-class _MenuItemNotifier extends Listenable implements ChangeNotifier {
-  String _logTag = (_MenuItemNotifier).toString();
+class _ItemNotifier<T> extends ValueListenable implements ChangeNotifier {
+  String _logTag = (_ItemNotifier).toString();
   Logger _logger;
 
-  LinkedList<_MenuItemNotifierListener> _listeners;
+  LinkedList<_ItemNotifierListener> _listeners;
 
-  _MenuItemNotifier({@required logger}) : this._logger = logger {
+  _ItemNotifier({@required logger}) : this._logger = logger {
     _listeners = LinkedList();
   }
 
@@ -34,12 +33,12 @@ class _MenuItemNotifier extends Listenable implements ChangeNotifier {
 
   void addListener(VoidCallback listener) {
     if (_listeners == null) return;
-    _listeners.add(_MenuItemNotifierListener(listener: listener));
+    _listeners.add(_ItemNotifierListener(listener: listener));
   }
 
   void removeListener(VoidCallback listener) {
     if (_listeners == null) return;
-    for (final _MenuItemNotifierListener entry in _listeners) {
+    for (final _ItemNotifierListener entry in _listeners) {
       if (entry.listener == listener) {
         entry.unlink();
         return;
@@ -47,13 +46,15 @@ class _MenuItemNotifier extends Listenable implements ChangeNotifier {
     }
   }
 
-  void notifyListeners() {
+  void notifyListeners({T param}) {
     if (_listeners.isEmpty) return;
 
-    final List<_MenuItemNotifierListener> localListeners =
-        List<_MenuItemNotifierListener>.from(_listeners);
+    this.value = param;
 
-    for (final _MenuItemNotifierListener entry in localListeners) {
+    final List<_ItemNotifierListener> localListeners =
+        List<_ItemNotifierListener>.from(_listeners);
+
+    for (final _ItemNotifierListener entry in localListeners) {
       try {
         if (entry.list != null) entry.listener();
       } catch (e) {
@@ -61,14 +62,24 @@ class _MenuItemNotifier extends Listenable implements ChangeNotifier {
       }
     }
   }
+
+  T getValue() {
+    return value;
+  }
+
+  @override
+  T value;
 }
 
-class MenuNotifier {
+class Notifier {
   Logger _logger;
+  void setLogger(Logger logger) {
+    _logger = logger;
+  }
 
-  LinkedHashMap<String, _MenuItemNotifier> _map;
+  LinkedHashMap<String, _ItemNotifier> _map;
 
-  MenuNotifier({@required logger}) : this._logger = logger {
+  Notifier() {
     _map = LinkedHashMap();
   }
 
@@ -82,12 +93,21 @@ class MenuNotifier {
     return _map[menu].hasListeners;
   }
 
-  void addListener(String menu, VoidCallback listener) {
+  void registerNotifier<T>(String menu) {
     if (_map == null) return;
     if (_map[menu] == null) {
-      _map[menu] = _MenuItemNotifier(logger: this._logger);
+      _map[menu] = _ItemNotifier<T>(logger: this._logger);
     }
-    _map[menu].addListener(listener);
+  }
+
+  void addListener<T>(
+    String menu,
+    VoidCallback listener,
+  ) {
+    if (_map == null) return;
+    if (_map[menu] != null) {
+      _map[menu].addListener(listener);
+    }
   }
 
   void removeListener(String menu, VoidCallback listener) {
@@ -97,10 +117,14 @@ class MenuNotifier {
     }
   }
 
-  void notifyListeners(String menu) {
+  void notifyListeners<T>(String menu, {T param}) {
     if (_map == null) return;
     if (_map[menu] != null) {
-      _map[menu].notifyListeners();
+      _map[menu].notifyListeners(param: param);
     }
+  }
+
+  T getValue<T>(String menu) {
+    return _map[menu].getValue();
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:storyboard/channel/menu_notifier.dart';
+import 'package:storyboard/channel/notifier.dart';
 import 'package:storyboard/logger/logger.dart';
 
 import '../common.dart';
@@ -8,7 +8,8 @@ import '../common.dart';
 void main() {
   group('MenuNotifier', () {
     test('add notify remove succ', () {
-      MenuNotifier mn = MenuNotifier(logger: MockLogger());
+      Notifier mn = Notifier();
+      mn.setLogger(MockLogger());
 
       var called = false;
       VoidCallback func = () {
@@ -26,7 +27,9 @@ void main() {
 
     test('err in callback', () {
       Logger logger = MockLogger();
-      MenuNotifier mn = MenuNotifier(logger: logger);
+      Notifier mn = Notifier();
+      mn.setLogger(logger);
+
       VoidCallback func = () {
         throw Exception('error');
       };
@@ -38,7 +41,8 @@ void main() {
     });
 
     test('dispose menu item notifier', () {
-      MenuNotifier mn = MenuNotifier(logger: MockLogger());
+      Notifier mn = Notifier();
+      mn.setLogger(MockLogger());
       mn.dispose();
       mn.hasListeners('event_id');
     });

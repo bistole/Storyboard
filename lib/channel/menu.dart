@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:storyboard/channel/menu_notifier.dart';
+import 'package:storyboard/channel/notifier.dart';
 import 'package:storyboard/logger/logger.dart';
 
 const MENU_IMPORT_PHOTO = "MENU_EVENTS:IMPORT_PHOTO";
@@ -15,13 +15,19 @@ class MenuChannel {
     _logger = logger;
   }
 
-  MenuNotifier _notifier;
+  Notifier _notifier;
+  void setNotifier(Notifier notifier) {
+    _notifier = notifier;
+    _notifier.registerNotifier("MENU|" + MENU_IMPORT_PHOTO);
+    _notifier.registerNotifier("MENU|" + MENU_TIMER);
+  }
+
   listenAction(String menu, VoidCallback cb) {
-    _notifier.addListener(menu, cb);
+    _notifier.addListener("MENU|" + menu, cb);
   }
 
   removeAction(String menu, VoidCallback cb) {
-    _notifier.removeListener(menu, cb);
+    _notifier.removeListener("MENU|" + menu, cb);
   }
 
   MethodChannel _channel;
@@ -29,14 +35,13 @@ class MenuChannel {
       : this._logger = logger {
     _channel = channel;
     _channel.setMethodCallHandler(notifyMenuEvent);
-    _notifier = MenuNotifier(logger: this._logger);
   }
 
   Future<void> notifyMenuEvent(MethodCall call) async {
     switch (call.method) {
       case MENU_IMPORT_PHOTO:
         _logger.info(_logTag, "notifyMenuEvent: MENU_IMPORT_PHOTO");
-        _notifier.notifyListeners(call.method);
+        _notifier.notifyListeners("MENU|" + call.method);
         break;
       case MENU_TIMER:
         _logger.info(_logTag, "notifyMenuEvent: MENU_TIMER");
