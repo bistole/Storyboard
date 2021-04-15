@@ -12,13 +12,6 @@ import 'package:storyboard/views/photo/create_photo_page.dart';
 import 'package:storyboard/views/photo/photo_page.dart';
 
 class StoryBoardApp extends StatelessWidget {
-  static Map<String, WidgetBuilder> routes = {
-    PhotoPage.routeName: (_) => PhotoPage(),
-    CreatePhotoPage.routeName: (_) => CreatePhotoPage(),
-    AuthPage.routeName: (_) => AuthPage(),
-    LoggerPage.routeName: (_) => LoggerPage(),
-  };
-
   // This widget is the root of your application.
   StoryBoardApp();
 
@@ -65,6 +58,18 @@ class StoryBoardApp extends StatelessWidget {
     return Future.value(getFactory().store);
   }
 
+  static MaterialPageRoute onGenerateRoute(RouteSettings settings) {
+    Map<String, WidgetBuilder> routes = {
+      PhotoPage.routeName: (_) =>
+          PhotoPage(settings.arguments as PhotoPageArguments),
+      CreatePhotoPage.routeName: (_) =>
+          CreatePhotoPage(settings.arguments as CreatePhotoPageArguments),
+      AuthPage.routeName: (_) => AuthPage(),
+      LoggerPage.routeName: (_) => LoggerPage(),
+    };
+    return MaterialPageRoute(builder: routes[settings.name]);
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Store<AppState>>(
@@ -78,7 +83,7 @@ class StoryBoardApp extends StatelessWidget {
           store: snapshot.data,
           child: MaterialApp(
             title: 'Storyboard',
-            routes: routes,
+            onGenerateRoute: onGenerateRoute,
             theme: ThemeData(
               primarySwatch: Colors.green,
               visualDensity: VisualDensity.adaptivePlatformDensity,

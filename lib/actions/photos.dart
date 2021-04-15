@@ -66,7 +66,7 @@ class ActPhotos {
 
   var validMimeTypes = ["image/jpeg", "image/png", "image/gif"];
 
-  void actUploadPhoto(Store<AppState> store, String path) async {
+  void actUploadPhoto(Store<AppState> store, String path, int direction) async {
     _logger.info(_logTag, "actUploadPhoto");
     var mimeType = lookupMimeType(path);
     if (!validMimeTypes.contains(mimeType)) {
@@ -85,6 +85,7 @@ class ActPhotos {
       filename: filename,
       mime: mimeType,
       size: size,
+      direction: direction,
       hasOrigin: PhotoStatus.Ready,
       hasThumb: PhotoStatus.None,
       deleted: 0,
@@ -97,6 +98,22 @@ class ActPhotos {
     _netQueue.addQueueItem(
       QueueItemType.Photo,
       QueueItemAction.Upload,
+      uuid,
+    );
+  }
+
+  void actRotatePhoto(Store<AppState> store, String uuid, int direction) {
+    _logger.info(_logTag, "actRotatePhoto");
+    Photo photo = store.state.photoRepo.photos[uuid];
+    int ts = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    Photo newPhoto = photo.copyWith(
+      direction: direction,
+      updatedAt: ts,
+    );
+    store.dispatch(UpdatePhotoAction(photo: newPhoto));
+    _netQueue.addQueueItem(
+      QueueItemType.Photo,
+      QueueItemAction.Update,
       uuid,
     );
   }

@@ -38,7 +38,7 @@ class PhotoWidgetState extends State<PhotoWidget> {
   void pushDetailPage(ReduxActions redux) {
     Navigator.of(context).pushNamed(
       PhotoPage.routeName,
-      arguments: PhotoPageArguments(redux.photo.uuid),
+      arguments: PhotoPageArguments(redux.photo.uuid, redux.photo.direction),
     );
   }
 
@@ -161,8 +161,11 @@ class PhotoWidgetState extends State<PhotoWidget> {
           fit: BoxFit.contain,
           child: ConstrainedBox(
             constraints: BoxConstraints(minWidth: 1, minHeight: 1),
-            child: Image.file(
-              File(photoPath),
+            child: RotatedBox(
+              quarterTurns: redux.photo.direction ~/ 90,
+              child: Image.file(
+                File(photoPath),
+              ),
             ),
           ),
         ),

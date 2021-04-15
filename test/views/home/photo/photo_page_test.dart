@@ -69,13 +69,11 @@ void main() {
 
   testWidgets('show detail', (WidgetTester tester) async {
     // show detail but origin is not downloaded
-    Widget w = buildTestablePageWithArguments(
-        PhotoPage(), store, PhotoPageArguments(uuid));
+    Widget w = buildTestableWidget(
+      PhotoPage(PhotoPageArguments(uuid, 0)),
+      store,
+    );
     await tester.pumpWidget(w);
-    await tester.tap(find.byType(TextButton));
-    await tester.pump();
-    await tester.pump();
-    await tester.pump();
 
     expect(find.text('RESET'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);

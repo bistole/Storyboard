@@ -7,23 +7,33 @@ import 'package:storyboard/views/common/app_icons.dart';
 import 'package:storyboard/views/common/footerbar.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/config/constants.dart';
-import 'package:storyboard/views/photo/origin_photo_widget.dart';
 import 'package:storyboard/views/photo/photo_scroller_widget.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
 
 class ReduxActions {
   final Photo photo;
   final Function() getPhoto;
-  ReduxActions({this.getPhoto, this.photo});
+  final Function(int direction) rotatePhoto;
+  ReduxActions({this.getPhoto, this.rotatePhoto, this.photo});
 }
 
 class PhotoPageArguments {
   final String uuid;
-  PhotoPageArguments(this.uuid);
+  final int direction;
+  PhotoPageArguments(this.uuid, this.direction);
+
+  @override
+  String toString() {
+    return "PhotoPageArguments{ uuid: $uuid, direction: $direction }";
+  }
 }
 
 class PhotoPage extends StatefulWidget {
   static const routeName = '/photos';
+
+  final PhotoPageArguments args;
+
+  PhotoPage(this.args);
 
   @override
   _PhotoPageState createState() => _PhotoPageState();
@@ -34,14 +44,17 @@ class _PhotoPageState extends State<PhotoPage> {
 
   @override
   void initState() {
-    direction = 0;
+    direction = widget.args.direction;
     super.initState();
   }
 
   Widget buildPhotoWiget(BuildContext context, ReduxActions redux) {
-    final PhotoPageArguments args = ModalRoute.of(context).settings.arguments;
-    var photoPath = getViewResource().storage.getPhotoPathByUUID(args.uuid);
-    return PhotoScollerWidget(path: photoPath);
+    var photoPath =
+        getViewResource().storage.getPhotoPathByUUID(widget.args.uuid);
+    return PhotoScollerWidget(
+      path: photoPath,
+      direction: redux.photo.direction,
+    );
   }
 
   Widget buildWaitingIndicator() {
@@ -66,6 +79,7 @@ class _PhotoPageState extends State<PhotoPage> {
             getViewResource().notifier.notifyListeners<int>(
                 Constant.eventPhotoRotate,
                 param: direction);
+            redux.rotatePhoto(direction);
           });
         },
         icon: Icon(AppIcons.angle_left),
@@ -77,6 +91,7 @@ class _PhotoPageState extends State<PhotoPage> {
             getViewResource().notifier.notifyListeners<int>(
                 Constant.eventPhotoRotate,
                 param: direction);
+            redux.rotatePhoto(direction);
           });
         },
         icon: Icon(AppIcons.angle_right),
@@ -92,14 +107,20 @@ class _PhotoPageState extends State<PhotoPage> {
 
   @override
   Widget build(BuildContext context) {
-    final PhotoPageArguments args = ModalRoute.of(context).settings.arguments;
     return StoreConnector<AppState, ReduxActions>(
       converter: (Store<AppState> store) {
         return ReduxActions(
           getPhoto: () {
-            getViewResource().actPhotos.actDownloadPhoto(store, args.uuid);
+            getViewResource()
+                .actPhotos
+                .actDownloadPhoto(store, widget.args.uuid);
           },
-          photo: store.state.photoRepo.photos[args.uuid],
+          rotatePhoto: (int direction) {
+            getViewResource()
+                .actPhotos
+                .actRotatePhoto(store, widget.args.uuid, direction);
+          },
+          photo: store.state.photoRepo.photos[widget.args.uuid],
         );
       },
       builder: (BuildContext context, ReduxActions redux) {

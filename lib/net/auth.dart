@@ -26,15 +26,21 @@ class NetAuth {
       String prefix = getURLPrefix(store);
       if (prefix == null) return false;
 
+      _logger.debug(_logTag, "req: null");
+
       final response =
           await _httpClient.get(prefix + "/ping").timeout(Duration(seconds: 1));
       if (response.statusCode == 200) {
+        _logger.debug(_logTag, "body: ${response.body}");
         Map<String, dynamic> object = jsonDecode(response.body);
         if (object['pong'] == true) {
           _logger.info(_logTag, "netPing succ");
           handleNetworkSucc(store);
           return true;
         }
+      } else {
+        _logger.warn(_logTag, "netPing failed: remote: ${response.statusCode}");
+        _logger.debug(_logTag, "body: ${response.body}");
       }
     } on TimeoutException catch (_) {
       _logger.info(_logTag, "netPing timeout");

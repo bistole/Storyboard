@@ -54,11 +54,11 @@ void main() {
     testWidgets('click ok', (WidgetTester tester) async {
       String resourcePath = getResourcePath("test_resources/photo_test.jpg");
 
-      Widget w = buildTestablePageWithArguments(
-          CreatePhotoPage(), store, CreatePhotoPageArguments(resourcePath));
+      Widget w = buildTestableWidget(
+        CreatePhotoPage(CreatePhotoPageArguments(resourcePath)),
+        store,
+      );
       await tester.pumpWidget(w);
-      await tester.tap(find.byType(TextButton));
-      await tester.pumpAndSettle();
 
       // Show the selected image
       expect(find.byType(SBToolbarButton), findsNWidgets(2));

@@ -195,7 +195,6 @@ class _PhotoScollerWidgetState extends State<PhotoScollerWidget>
       );
     }
 
-    print("build 2");
     var childSize = direction == Constant.directionLeft ||
             direction == Constant.directionRight
         ? Size(image.height.toDouble(), image.width.toDouble())

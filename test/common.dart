@@ -80,7 +80,7 @@ Widget buildTestableWidget(
   return StoreProvider(
     store: store,
     child: MaterialApp(
-      routes: StoryBoardApp.routes,
+      onGenerateRoute: StoryBoardApp.onGenerateRoute,
       home: widget,
       navigatorObservers: navigator != null ? [navigator] : [],
     ),
@@ -95,7 +95,7 @@ Widget buildTestablePageWithArguments(
     store: store,
     child: MaterialApp(
       navigatorKey: key,
-      routes: StoryBoardApp.routes,
+      onGenerateRoute: StoryBoardApp.onGenerateRoute,
       home: TextButton(
         onPressed: () => key.currentState.push(MaterialPageRoute(
           settings: RouteSettings(arguments: args),

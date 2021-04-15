@@ -22,10 +22,19 @@ class ReduxActions {
 class CreatePhotoPageArguments {
   final String path;
   CreatePhotoPageArguments(this.path);
+
+  @override
+  String toString() {
+    return "PhotoPageArguments{ path: $path }";
+  }
 }
 
 class CreatePhotoPage extends StatefulWidget {
   static const routeName = '/photos/new';
+
+  final CreatePhotoPageArguments args;
+
+  CreatePhotoPage(this.args);
 
   @override
   _CreatePhotoPageState createState() => _CreatePhotoPageState();
@@ -40,8 +49,7 @@ class _CreatePhotoPageState extends State<CreatePhotoPage> {
     super.initState();
   }
 
-  Widget buildAddingPhotoToolbar(
-      CreatePhotoPageArguments args, ReduxActions redux) {
+  Widget buildAddingPhotoToolbar(ReduxActions redux) {
     return SBFooterbar([
       SBToolbarButton(
         () {
@@ -72,7 +80,7 @@ class _CreatePhotoPageState extends State<CreatePhotoPage> {
         text: "RESET",
       ),
       SBToolbarButton(
-        () => redux.createPhoto(args.path),
+        () => redux.createPhoto(widget.args.path),
         icon: Icon(AppIcons.ok),
         text: "OK",
       ),
@@ -84,28 +92,27 @@ class _CreatePhotoPageState extends State<CreatePhotoPage> {
     ]);
   }
 
-  Widget buildWhenAddingPhoto(
-      context, CreatePhotoPageArguments args, ReduxActions redux) {
+  Widget buildWhenAddingPhoto(context, ReduxActions redux) {
     return Column(
       children: [
         Expanded(
-          child: PhotoScollerWidget(path: args.path),
+          child: PhotoScollerWidget(path: widget.args.path),
         ),
-        buildAddingPhotoToolbar(args, redux),
+        buildAddingPhotoToolbar(redux),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final CreatePhotoPageArguments args =
-        ModalRoute.of(context).settings.arguments;
     return StoreConnector<AppState, ReduxActions>(
       converter: (store) {
         return ReduxActions(
           createPhoto: (String path) {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListPhoto));
-            getViewResource().actPhotos.actUploadPhoto(store, args.path);
+            getViewResource()
+                .actPhotos
+                .actUploadPhoto(store, widget.args.path, direction);
             Navigator.of(context).pop();
           },
           cancel: () {
@@ -120,7 +127,7 @@ class _CreatePhotoPageState extends State<CreatePhotoPage> {
             elevation: 0,
             title: Text("New Photo"),
           ),
-          body: buildWhenAddingPhoto(context, args, redux),
+          body: buildWhenAddingPhoto(context, redux),
         );
       },
     );
