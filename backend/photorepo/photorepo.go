@@ -58,7 +58,7 @@ func isMimeTypeValid(mimeType string) bool {
 
 // AddPhoto add photo
 func (p PhotoRepo) AddPhoto(uuid string, filename string, mimeType string, size string,
-	src io.Reader, createdAt int64) (outPhoto *Photo, err error) {
+	direction int32, src io.Reader, createdAt int64) (outPhoto *Photo, err error) {
 	if !isMimeTypeValid(mimeType) {
 		return nil, fmt.Errorf("Invalid MIME type")
 	}
@@ -83,6 +83,7 @@ func (p PhotoRepo) AddPhoto(uuid string, filename string, mimeType string, size 
 		Filename:  filename,
 		Size:      size,
 		Mime:      mimeType,
+		Direction: direction,
 		UpdatedAt: createdAt,
 		CreatedAt: createdAt,
 	}
@@ -96,6 +97,25 @@ func (p PhotoRepo) AddPhoto(uuid string, filename string, mimeType string, size 
 		return nil, fmt.Errorf("Failed to load from DB")
 	}
 
+	return outPhoto, nil
+}
+
+func (p PhotoRepo) UpdatePhoto(UUID string, inPhoto Photo) (outPhoto *Photo, err error) {
+	photo, err := p._getPhoto(UUID)
+	if err != nil {
+		return nil, fmt.Errorf("Photo is not existed")
+	}
+
+	inPhoto.UUID = UUID
+	inPhoto.CreatedAt = photo.CreatedAt
+
+	if err := p._updatePhoto(inPhoto); err != nil {
+		return nil, err
+	}
+	outPhoto, err = p._getPhoto(UUID)
+	if err != nil {
+		return nil, err
+	}
 	return outPhoto, nil
 }
 
@@ -143,8 +163,9 @@ func (p PhotoRepo) DeletePhoto(UUID string, updatedAt int64) (outPhoto *Photo, e
 func (p PhotoRepo) _createPhoto(photo Photo) error {
 	db := p.db.GetConnection()
 	stmt, err := db.Prepare("INSERT INTO `photos` (" +
-		"uuid, filename, size, mime, updatedAt, createdAt, _ts" +
-		") VALUES (:uuid, :filename, :size, :mime, :updatedAt, :createdAt, :ts)")
+		"uuid, filename, size, mime, direction, updatedAt, createdAt, _ts" +
+		") VALUES (" +
+		":uuid, :filename, :size, :mime, :direction, :updatedAt, :createdAt, :ts)")
 	if err != nil {
 		return err
 	}
@@ -156,6 +177,7 @@ func (p PhotoRepo) _createPhoto(photo Photo) error {
 		sql.Named("filename", photo.Filename),
 		sql.Named("size", photo.Size),
 		sql.Named("mime", photo.Mime),
+		sql.Named("direction", photo.Direction),
 		sql.Named("updatedAt", photo.UpdatedAt),
 		sql.Named("createdAt", photo.CreatedAt),
 		sql.Named("ts", ts),
@@ -173,6 +195,43 @@ func (p PhotoRepo) _createPhoto(photo Photo) error {
 		return nil
 	}
 	return fmt.Errorf("Failed to create photo")
+}
+
+func (p PhotoRepo) _updatePhoto(photo Photo) error {
+	db := p.db.GetConnection()
+	stmt, err := db.Prepare("UPDATE `photos` SET " +
+		"`filename` = :filename," +
+		"`direction` = :direction, " +
+		"`updatedAt` = :updatedAt, " +
+		"`_ts` = :ts " +
+		"WHERE `uuid` = :uuid ")
+	if err != nil {
+		return err
+	}
+
+	ts := p.db.GetTS()
+
+	result, err := stmt.Exec(
+		sql.Named("filename", photo.Filename),
+		sql.Named("direction", photo.Direction),
+		sql.Named("updatedAt", photo.UpdatedAt),
+		sql.Named("uuid", photo.UUID),
+		sql.Named("ts", ts),
+	)
+	if err != nil {
+		return err
+	}
+
+	affectRow, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	log.Printf("Updated: %t\n", affectRow > 0)
+	if affectRow > 0 {
+		return nil
+	}
+	return fmt.Errorf("Failed to update task")
 }
 
 func (p PhotoRepo) _deletePhoto(UUID string, updatedAt int64) error {
@@ -211,7 +270,7 @@ func (p PhotoRepo) _deletePhoto(UUID string, updatedAt int64) error {
 
 func (p PhotoRepo) _getPhoto(UUID string) (*Photo, error) {
 	db := p.db.GetConnection()
-	stmt, err := db.Prepare("SELECT uuid, filename, size, mime, deleted, updatedAt, createdAt, _ts " +
+	stmt, err := db.Prepare("SELECT uuid, filename, size, mime, direction, deleted, updatedAt, createdAt, _ts " +
 		"FROM `photos` WHERE `uuid` = :uuid ")
 	if err != nil {
 		return nil, err
@@ -221,7 +280,7 @@ func (p PhotoRepo) _getPhoto(UUID string) (*Photo, error) {
 
 	var photo Photo
 	err = row.Scan(
-		&photo.UUID, &photo.Filename, &photo.Size, &photo.Mime,
+		&photo.UUID, &photo.Filename, &photo.Size, &photo.Mime, &photo.Direction,
 		&photo.Deleted, &photo.UpdatedAt, &photo.CreatedAt, &photo.TS,
 	)
 	if err == sql.ErrNoRows {

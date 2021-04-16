@@ -68,6 +68,26 @@ func (d Database) createDBInstance(dirPath string, dbName string) (fullPath stri
 }
 
 func (d Database) initDBInstance() {
+	ver := d._getUserVersion()
+	if ver < 1 {
+		d._initFromBegin()
+	}
+	if ver < 2 {
+		d._upgradeToVer2()
+	}
+}
+
+func (d Database) _getUserVersion() int64 {
+	row := d.connDB.QueryRow("PRAGMA user_version")
+
+	var ver int64
+	err := row.Scan(&ver)
+	processError("_getUserVersion", err)
+
+	return ver
+}
+
+func (d Database) _initFromBegin() {
 	// create task table
 	_, err := d.connDB.Exec("CREATE TABLE IF NOT EXISTS `tasks` (" +
 		"`id` INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -78,12 +98,12 @@ func (d Database) initDBInstance() {
 		"`createdAt` INTEGER NOT NULL," +
 		"`_ts` INTEGER NOT NULL" +
 		")")
-	processError("initDBInstance", err)
+	processError("_initFromBegin", err)
 
 	// create task ts index
 	_, err = d.connDB.Exec("CREATE INDEX IF NOT EXISTS `index_tasks_ts` " +
 		" ON `tasks` ( `_ts` )")
-	processError("initDBInstance", err)
+	processError("_initFromBegin", err)
 
 	// create photo table
 	_, err = d.connDB.Exec("CREATE TABLE IF NOT EXISTS `photos` (" +
@@ -97,12 +117,24 @@ func (d Database) initDBInstance() {
 		"`createdAt` INTEGER NOT NULL," +
 		"`_ts` INTEGER NOT NULL" +
 		")")
-	processError("initDBInstance", err)
+	processError("_initFromBegin", err)
 
 	// create photo ts index
 	_, err = d.connDB.Exec("CREATE INDEX IF NOT EXISTS `index_photos_ts` " +
 		" ON `photos` ( `_ts` )")
-	processError("initDBInstance", err)
+	processError("_initFromBegin", err)
+
+	_, err = d.connDB.Exec("PRAGMA user_version=1")
+	processError("_initFromBegin", err)
+}
+
+func (d Database) _upgradeToVer2() {
+	_, err := d.connDB.Exec("ALTER TABLE `photos` " +
+		"ADD COLUMN `direction` INT NOT NULL DEFAULT 0")
+	processError("_upgradeToVer2", err)
+
+	_, err = d.connDB.Exec("PRAGMA user_version=2")
+	processError("_upgradeToVer2", err)
 }
 
 // Init to init database
