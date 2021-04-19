@@ -7,6 +7,7 @@ import 'package:storyboard/views/home/category_panel.dart';
 import 'package:storyboard/views/home/detail_page_widget.dart';
 
 class HomePage extends StatelessWidget {
+  static const routeName = '/';
   HomePage({Key key, this.title}) : super(key: key);
 
   final String title;

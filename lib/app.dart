@@ -60,6 +60,7 @@ class StoryBoardApp extends StatelessWidget {
 
   static MaterialPageRoute onGenerateRoute(RouteSettings settings) {
     Map<String, WidgetBuilder> routes = {
+      HomePage.routeName: (_) => HomePage(),
       PhotoPage.routeName: (_) =>
           PhotoPage(settings.arguments as PhotoPageArguments),
       CreatePhotoPage.routeName: (_) =>
@@ -67,7 +68,8 @@ class StoryBoardApp extends StatelessWidget {
       AuthPage.routeName: (_) => AuthPage(),
       LoggerPage.routeName: (_) => LoggerPage(),
     };
-    return MaterialPageRoute(builder: routes[settings.name]);
+    return MaterialPageRoute(
+        builder: routes[settings.name], settings: settings);
   }
 
   @override

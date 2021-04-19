@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -10,6 +12,9 @@ import 'package:storyboard/views/logger/loglist_widget.dart';
 import '../../common.dart';
 
 class MockStream extends Mock implements Stream<String> {}
+
+class MockStreamSubscription extends Mock
+    implements StreamSubscription<String> {}
 
 void main() {
   Store<AppState> store;
@@ -26,8 +31,9 @@ void main() {
         "2021-02-03 13:00:08 FATAL fatal",
         "exception",
       ]);
-      when(getViewResource().logger.getStream())
-          .thenAnswer((_) => MockStream());
+      Stream<String> mockStream = MockStream();
+      when(mockStream.listen(any)).thenAnswer((_) => MockStreamSubscription());
+      when(getViewResource().logger.getStream()).thenAnswer((_) => mockStream);
 
       Widget w = buildTestableWidget(LogListWidget(), store);
       await tester.pumpWidget(w);

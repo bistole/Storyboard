@@ -31,8 +31,7 @@ class MenuChannel {
   }
 
   MethodChannel _channel;
-  MenuChannel(MethodChannel channel, {@required logger})
-      : this._logger = logger {
+  MenuChannel(MethodChannel channel) {
     _channel = channel;
     _channel.setMethodCallHandler(notifyMenuEvent);
   }

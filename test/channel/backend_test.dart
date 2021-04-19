@@ -2,7 +2,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:storyboard/channel/backend.dart';
-import 'package:storyboard/configs/factory.dart';
 
 import '../common.dart';
 

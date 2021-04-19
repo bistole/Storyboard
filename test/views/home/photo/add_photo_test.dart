@@ -4,6 +4,7 @@ import 'package:mockito/mockito.dart';
 
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/channel/menu.dart';
+import 'package:storyboard/channel/notifier.dart';
 import 'package:storyboard/configs/device_manager.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
@@ -12,6 +13,7 @@ import 'package:storyboard/views/home/page.dart';
 import 'package:storyboard/views/photo/create_photo_page.dart';
 
 import '../../../common.dart';
+import '../../../helper/route_aware_widget.dart';
 
 class MockCommandChannel extends Mock implements CommandChannel {}
 
@@ -21,14 +23,19 @@ class MockDeviceManager extends Mock implements DeviceManager {}
 
 class MockMenuChannel extends Mock implements MenuChannel {}
 
+class MockNotifier extends Mock implements Notifier {}
+
 void main() {
+  String resourcePath;
   MockDeviceManager dm;
   group("HomePage", () {
     MockCommandChannel mcc;
     MockMenuChannel mc;
+    MockNotifier mnf;
+
     setUp(() {
       // mock import photo
-      String resourcePath = getResourcePath("test_resources/photo_test.jpg");
+      resourcePath = getResourcePath("test_resources/photo_test.jpg");
 
       mcc = MockCommandChannel();
       when(mcc.importPhoto()).thenAnswer((_) => Future.value(resourcePath));
@@ -40,6 +47,9 @@ void main() {
 
       mc = MockMenuChannel();
       getViewResource().menu = mc;
+
+      mnf = MockNotifier();
+      getViewResource().notifier = mnf;
     });
 
     group('desktop', () {
@@ -50,6 +60,9 @@ void main() {
 
       testWidgets('click button', (WidgetTester tester) async {
         NavigatorObserver naviObserver = MockNavigatorObserver();
+        setRouteObserver(naviObserver);
+
+        await mockImageHelper(tester, resourcePath);
 
         var store = getMockStore();
         var widget = buildTestableWidget(
@@ -65,10 +78,9 @@ void main() {
 
         // Tap button
         await tester.tap(find.text('ADD PHOTO'));
-        await tester.pump();
+        await tester.pumpAndSettle();
 
         verify(mcc.importPhoto()).called(1);
-
         // Page pushed
         var c = verify(naviObserver.didPush(captureAny, any)).captured.last
             as MaterialPageRoute;
@@ -77,6 +89,9 @@ void main() {
 
       testWidgets('click menu', (WidgetTester tester) async {
         NavigatorObserver naviObserver = MockNavigatorObserver();
+        setRouteObserver(naviObserver);
+
+        await mockImageHelper(tester, resourcePath);
 
         var store = getMockStore();
         var widget = buildTestableWidget(
@@ -108,6 +123,9 @@ void main() {
 
       testWidgets('click button', (WidgetTester tester) async {
         NavigatorObserver naviObserver = MockNavigatorObserver();
+        setRouteObserver(naviObserver);
+
+        await mockImageHelper(tester, resourcePath);
 
         var store = getMockStore();
         var widget = buildTestableWidget(
@@ -123,7 +141,7 @@ void main() {
 
         // Tap button
         await tester.tap(find.text('TAKE PHOTO'));
-        await tester.pump();
+        await tester.pumpAndSettle();
 
         verify(mcc.takePhoto()).called(1);
 

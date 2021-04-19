@@ -16,6 +16,7 @@ import 'package:storyboard/redux/models/photo_repo.dart';
 import 'package:storyboard/storage/storage.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/photo/photo_page.dart';
+import 'package:storyboard/views/photo/photo_scroller_widget.dart';
 
 import '../../../common.dart';
 
@@ -68,6 +69,8 @@ void main() {
   });
 
   testWidgets('show detail', (WidgetTester tester) async {
+    String resourcePath = getResourcePath("test_resources/photo_test.jpg");
+    await mockImageHelper(tester, resourcePath);
     // show detail but origin is not downloaded
     Widget w = buildTestableWidget(
       PhotoPage(PhotoPageArguments(uuid, 0)),
@@ -97,20 +100,16 @@ void main() {
           matching: find.byType(PhotoView),
         ),
         findsOneWidget);
-    PhotoView imgDetail = find
+    PhotoScollerWidget scrollerWidget = find
         .descendant(
           of: find.byType(PhotoPage).first,
-          matching: find.byType(PhotoView),
+          matching: find.byType(PhotoScollerWidget),
         )
         .evaluate()
         .first
         .widget;
 
-    FileImage imgDetailProvider = imgDetail.imageProvider;
     String homePath = getHomePath("test_resources/home/");
-    expect(
-      imgDetailProvider.file.path,
-      path.join(homePath, 'photos', uuid),
-    );
+    expect(scrollerWidget.path, path.join(homePath, 'photos', uuid));
   });
 }

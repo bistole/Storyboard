@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -12,6 +14,9 @@ import '../../common.dart';
 
 class MockStream extends Mock implements Stream<String> {}
 
+class MockStreamSubscription extends Mock
+    implements StreamSubscription<String> {}
+
 void main() {
   Store<AppState> store;
   setUp(() {
@@ -22,7 +27,10 @@ void main() {
   testWidgets('init', (WidgetTester tester) async {
     when(getViewResource().logger.getLevel()).thenReturn(LogLevel.debug());
     when(getViewResource().logger.getLogsInCache()).thenReturn([]);
-    when(getViewResource().logger.getStream()).thenAnswer((_) => MockStream());
+
+    MockStream mockStream = MockStream();
+    when(mockStream.listen(any)).thenAnswer((_) => MockStreamSubscription());
+    when(getViewResource().logger.getStream()).thenAnswer((_) => mockStream);
 
     Widget w = buildTestableWidget(LoggerPage(), store);
     await tester.pumpWidget(w);

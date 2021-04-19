@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:storyboard/channel/menu.dart';
+import 'package:storyboard/channel/notifier.dart';
 import 'package:storyboard/configs/factory.dart';
 
 import '../common.dart';
@@ -21,7 +22,11 @@ void main() {
 
     MethodChannel mc = MockMethodChannel();
 
-    MenuChannel menuC = MenuChannel(mc, logger: MockLogger());
+    Notifier nf = Notifier();
+    nf.setLogger(MockLogger());
+
+    MenuChannel menuC = MenuChannel(mc);
+    menuC.setNotifier(nf);
     menuC.setLogger(MockLogger());
     menuC.listenAction(MENU_IMPORT_PHOTO, func);
 

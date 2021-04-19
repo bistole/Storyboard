@@ -16,6 +16,7 @@ void main() {
         called = true;
       };
 
+      mn.registerNotifier('event_id');
       mn.addListener('event_id', func);
       var has = mn.hasListeners('event_id');
       mn.notifyListeners('event_id');
@@ -34,6 +35,7 @@ void main() {
         throw Exception('error');
       };
 
+      mn.registerNotifier('event_id');
       mn.addListener('event_id', func);
       mn.notifyListeners('event_id');
 

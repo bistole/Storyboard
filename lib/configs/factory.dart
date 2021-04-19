@@ -181,7 +181,7 @@ class Factory {
 
     // init menu
     MethodChannel mcMenu = await createChannelByName(CHANNEL_MENU_EVENTS);
-    menu = MenuChannel(mcMenu, logger: logger);
+    menu = MenuChannel(mcMenu);
     menu.setLogger(logger);
     menu.setNotifier(notifier);
 

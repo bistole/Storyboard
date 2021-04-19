@@ -5,7 +5,6 @@ import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:redux/redux.dart';
 import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/configs/factory.dart';
@@ -18,6 +17,7 @@ import 'package:storyboard/storage/storage.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/photo/create_photo_page.dart';
+import 'package:storyboard/views/photo/photo_scroller_widget.dart';
 
 import '../../../common.dart';
 
@@ -54,6 +54,8 @@ void main() {
     testWidgets('click ok', (WidgetTester tester) async {
       String resourcePath = getResourcePath("test_resources/photo_test.jpg");
 
+      await mockImageHelper(tester, resourcePath);
+
       Widget w = buildTestableWidget(
         CreatePhotoPage(CreatePhotoPageArguments(resourcePath)),
         store,
@@ -61,17 +63,17 @@ void main() {
       await tester.pumpWidget(w);
 
       // Show the selected image
-      expect(find.byType(SBToolbarButton), findsNWidgets(2));
+      expect(find.byType(SBToolbarButton), findsNWidgets(5));
       expect(find.text("OK"), findsOneWidget);
       expect(find.text("CANCEL"), findsOneWidget);
-      expect(find.byType(PhotoView), findsOneWidget);
+      expect(find.byType(PhotoScollerWidget), findsOneWidget);
 
-      PhotoView img =
-          find.byType(PhotoView).evaluate().single.widget as PhotoView;
-      expect(img.imageProvider is FileImage, true);
-
-      FileImage imgProvider = img.imageProvider as FileImage;
-      expect(imgProvider.file.path, resourcePath);
+      PhotoScollerWidget scrollerWidget = find
+          .byType(PhotoScollerWidget)
+          .evaluate()
+          .single
+          .widget as PhotoScollerWidget;
+      expect(scrollerWidget.path, resourcePath);
 
       // click 'OK'
       await tester.tap(find.text("OK"));
