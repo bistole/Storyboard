@@ -166,13 +166,16 @@ class PhotoCaptureViewController : UIViewController, AVCapturePhotoCaptureDelega
     @objc func handleTakePhoto() {
         self.cameraController.captureImage() { image, err in
             if let image = image {
-                let previewView = PhotoPreviewView(frame: self.view.frame)
-                previewView.photoImageView.image = image
-                previewView.cancelButton.addTarget(self, action: #selector(self.handleCancelPreview), for: .touchUpInside)
-                previewView.savePhotoButton.addTarget(self, action: #selector(self.handleSavePhoto), for: .touchUpInside)
-                self.view.addSubview(previewView);
-                
-                self.photoPreviewView = previewView
+                DispatchQueue.main.async {
+                    self.delegate?.photoCaptureSucceed(image: image)
+                }
+//                let previewView = PhotoPreviewView(frame: self.view.frame)
+//                previewView.photoImageView.image = image
+//                previewView.cancelButton.addTarget(self, action: #selector(self.handleCancelPreview), for: .touchUpInside)
+//                previewView.savePhotoButton.addTarget(self, action: #selector(self.handleSavePhoto), for: .touchUpInside)
+//                self.view.addSubview(previewView);
+//
+//                self.photoPreviewView = previewView
                 return
             }
             

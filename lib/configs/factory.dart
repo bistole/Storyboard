@@ -14,6 +14,7 @@ import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/channel/backend.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/channel/menu.dart';
+import 'package:storyboard/channel/notifier.dart';
 import 'package:storyboard/configs/channel_manager.dart';
 import 'package:storyboard/configs/device_manager.dart';
 import 'package:storyboard/logger/log_level.dart';
@@ -37,6 +38,7 @@ const CHANNEL_COMMANDS = '/COMMANDS';
 class Factory {
   DeviceManager deviceManager;
   Logger logger;
+  Notifier notifier;
 
   ActServer actServer;
   ActPhotos actPhotos;
@@ -56,10 +58,11 @@ class Factory {
   Store<AppState> store;
   Storage storage;
 
-  Factory() {
+  Factory({@required this.logger}) {
     deviceManager = DeviceManager();
-    logger = Logger();
     logger.setLevel(LogLevel.debug());
+    notifier = Notifier();
+    notifier.setLogger(logger);
 
     actServer = ActServer();
     actPhotos = ActPhotos();
@@ -114,6 +117,7 @@ class Factory {
     getViewResource().actTasks = actTasks;
     getViewResource().actServer = actServer;
     getViewResource().logger = logger;
+    getViewResource().notifier = notifier;
   }
 
   Future<void> initCrashlytics() async {
@@ -179,11 +183,12 @@ class Factory {
     MethodChannel mcMenu = await createChannelByName(CHANNEL_MENU_EVENTS);
     menu = MenuChannel(mcMenu);
     menu.setLogger(logger);
-    menu.setCommandChannel(command);
+    menu.setNotifier(notifier);
 
     // set to view resource
     getViewResource().command = command;
     getViewResource().backend = backend;
+    getViewResource().menu = menu;
   }
 
   Future<void> initStoreAndStorage() async {
@@ -210,10 +215,19 @@ class Factory {
 }
 
 Factory _instance;
+Logger _logger;
+
+setFactoryLogger(Logger logger) {
+  _logger = logger;
+}
+
+setFactory(Factory fact) {
+  _instance = fact;
+}
 
 Factory getFactory() {
   if (_instance == null) {
-    _instance = Factory();
+    _instance = Factory(logger: _logger == null ? Logger() : _logger);
   }
   return _instance;
 }

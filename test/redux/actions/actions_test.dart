@@ -21,6 +21,7 @@ void main() {
     'filename': 'image.jpeg',
     'mime': 'image/jpeg',
     'size': '100',
+    'direction': 180,
     'hasOrigin': 'PhotoStatus.None',
     'hasThumb': 'PhotoStatus.None',
     'deleted': 1,
@@ -59,7 +60,7 @@ void main() {
   test("CreatePhotoAction", () {
     final act = CreatePhotoAction(photo: photo);
     expect(act.toString(),
-        "CreatePhotoAction{photo: Photo{uuid: uuid, filename: image.jpeg, mime: image/jpeg, size: 100, hasOrigin: PhotoStatus.None, hasThumb: PhotoStatus.None, deleted: 1, updatedAt: 1000, createdAt: 1000}}");
+        "CreatePhotoAction{photo: Photo{uuid: uuid, filename: image.jpeg, mime: image/jpeg, size: 100, direction: 180, hasOrigin: PhotoStatus.None, hasThumb: PhotoStatus.None, deleted: 1, updatedAt: 1000, createdAt: 1000}}");
   });
 
   test("DownloadPhotoAction", () {
@@ -77,7 +78,7 @@ void main() {
   test("UpdatePhotoAction", () {
     final act = UpdatePhotoAction(photo: photo);
     expect(act.toString(),
-        "UpdatePhotoAction{photo: Photo{uuid: uuid, filename: image.jpeg, mime: image/jpeg, size: 100, hasOrigin: PhotoStatus.None, hasThumb: PhotoStatus.None, deleted: 1, updatedAt: 1000, createdAt: 1000}}");
+        "UpdatePhotoAction{photo: Photo{uuid: uuid, filename: image.jpeg, mime: image/jpeg, size: 100, direction: 180, hasOrigin: PhotoStatus.None, hasThumb: PhotoStatus.None, deleted: 1, updatedAt: 1000, createdAt: 1000}}");
   });
 
   test("DeletePhotoAction", () {

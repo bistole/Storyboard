@@ -25,6 +25,7 @@ type Photo struct {
 	Filename  string `json:"filename"`
 	Size      string `json:"size"`
 	Mime      string `json:"mime"`
+	Direction int32  `json:"direction"`
 	Deleted   int8   `json:"deleted"`
 	CreatedAt int64  `json:"createdAt"`
 	UpdatedAt int64  `json:"updatedAt"`
@@ -76,8 +77,9 @@ type TaskRepo interface {
 
 // PhotoRepo is interface of photo package
 type PhotoRepo interface {
-	AddPhoto(uuid string, filename string, mimeType string, size string, src io.Reader,
+	AddPhoto(uuid string, filename string, mimeType string, size string, direction int32, src io.Reader,
 		createdAt int64) (outPhoto *Photo, err error)
+	UpdatePhoto(string, Photo) (outPhoto *Photo, err error)
 	DeletePhoto(UUID string, updatedAt int64) (outPhoto *Photo, err error)
 	GetPhoto(UUID string) (src io.ReadCloser, err error)
 	GetPhotoThumbnail(UUID string) (src io.ReadCloser, err error)

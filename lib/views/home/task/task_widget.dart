@@ -42,14 +42,14 @@ class TaskWidget extends StatelessWidget {
   }
 
   Widget buildTimeAndSync(context) {
-    var fmt = new DateFormat('HH:mm a');
-    var date = DateTime.fromMicrosecondsSinceEpoch(task.updatedAt * 1000);
+    var fmt = new DateFormat('yyyy/MM/dd hh:mm a');
+    var date = DateTime.fromMillisecondsSinceEpoch(task.updatedAt * 1000);
 
     if (task.ts == 0) {
       // wait for sync
       return Row(children: [
         Expanded(
-          child: Text(fmt.format(date) + " (${task.ts})",
+          child: Text(fmt.format(date),
               style: Theme.of(context).textTheme.headline3),
         ),
         Align(
@@ -63,7 +63,7 @@ class TaskWidget extends StatelessWidget {
     } else {
       return Align(
         alignment: Alignment.centerLeft,
-        child: Text(fmt.format(date) + " (${task.ts})",
+        child: Text(fmt.format(date),
             style: Theme.of(context).textTheme.headline3),
       );
     }
@@ -74,7 +74,6 @@ class TaskWidget extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.grey[100],
-          border: Border.all(width: 8, color: Colors.grey[100]),
           borderRadius: BorderRadius.all(Radius.circular(4)),
         ),
         margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),

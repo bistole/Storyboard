@@ -14,6 +14,7 @@ void main() {
   setUp(() {
     storage = Storage();
     storage.dataHome = root;
+    storage.setLogger(MockLogger());
   });
 
   test("getPersistDataPath", () {

@@ -8,10 +8,10 @@ import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/storage/storage.dart';
 
 Future<Store<AppState>> initStore(Storage storage, Logger logger) async {
-  String _LOG_TAG = 'Store';
+  String _logTag = 'Store';
 
   final statePath = storage.getPersistDataPath();
-  logger.info(_LOG_TAG, "state path: $statePath");
+  logger.info(_logTag, "state path: $statePath");
 
   final persistor = Persistor<AppState>(
     storage: FileStorage(File(statePath)),

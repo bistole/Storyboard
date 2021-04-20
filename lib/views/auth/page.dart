@@ -10,6 +10,7 @@ class AuthPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         title: Text('Server Configuration'),
       ),
       body: getViewResource().deviceManager.isDesktop()

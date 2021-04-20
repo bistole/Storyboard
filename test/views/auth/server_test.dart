@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
@@ -9,13 +7,11 @@ import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/configs/device_manager.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/redux/models/app.dart';
-import 'package:storyboard/redux/models/photo_repo.dart';
 import 'package:storyboard/redux/models/setting.dart';
-import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task_repo.dart';
-import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/views/auth/page.dart';
 import 'package:storyboard/views/config/config.dart';
+
+import '../../common.dart';
 
 class MockDeviceManager extends Mock implements DeviceManager {}
 
@@ -29,15 +25,6 @@ void main() {
   var newServerKey = encodeServerKey('192.168.77.88', 3000);
   Store<AppState> store;
 
-  Widget buildTestableWidget(Widget widget) {
-    return StoreProvider(
-      store: store,
-      child: MaterialApp(
-        home: widget,
-      ),
-    );
-  }
-
   group('auth_server', () {
     setUp(() {
       getViewResource().actServer = MockActServer();
@@ -47,17 +34,11 @@ void main() {
     });
 
     buildStore(String serverkey) {
-      store = Store<AppState>(
-        appReducer,
-        initialState: AppState(
-          status: Status.noParam(StatusKey.ListTask),
-          photoRepo: PhotoRepo(photos: {}, lastTS: 0),
-          taskRepo: TaskRepo(tasks: {}, lastTS: 0),
-          setting: Setting(
-            clientID: 'client-id',
-            serverKey: serverkey,
-            serverReachable: Reachable.Unknown,
-          ),
+      store = getMockStore(
+        setting: Setting(
+          clientID: 'client-id',
+          serverKey: serverkey,
+          serverReachable: Reachable.Unknown,
         ),
       );
     }
@@ -73,7 +54,7 @@ void main() {
       when(getViewResource().backend.getAvailableIps()).thenAnswer(
           (_) async => {"eth0": "192.168.7.128", "eth1": "192.168.3.110"});
 
-      var widget = buildTestableWidget(AuthPage());
+      var widget = buildTestableWidget(AuthPage(), store);
       await tester.pumpWidget(widget);
       await tester.pumpAndSettle();
 
@@ -110,7 +91,7 @@ void main() {
       when(getViewResource().backend.getAvailableIps()).thenAnswer(
           (_) async => {"eth0": "192.168.7.128", "eth1": "192.168.3.110"});
 
-      var widget = buildTestableWidget(AuthPage());
+      var widget = buildTestableWidget(AuthPage(), store);
       await tester.pumpWidget(widget);
     });
   });

@@ -1,112 +1,108 @@
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter/material.dart';
-import 'package:storyboard/redux/models/app.dart';
-import 'package:storyboard/redux/models/photo.dart';
-import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task.dart';
+import 'package:storyboard/views/common/app_icons.dart';
+import 'package:storyboard/views/common/panel_popup_route.dart';
 import 'package:storyboard/views/common/server_status.dart';
-import 'package:storyboard/views/home/create_photo_widget.dart';
-import 'package:storyboard/views/home/photo_widget.dart';
-
-import 'create_bar_widget.dart';
-import 'update_task_widget.dart';
-import 'task_widget.dart';
-
-class ReduxActions {
-  final List<Task> taskList;
-  final List<Photo> photoList;
-  final Status status;
-  ReduxActions({this.status, this.taskList, this.photoList});
-}
+import 'package:storyboard/views/config/config.dart';
+import 'package:storyboard/views/home/category_panel.dart';
+import 'package:storyboard/views/home/detail_page_widget.dart';
 
 class HomePage extends StatelessWidget {
+  static const routeName = '/';
   HomePage({Key key, this.title}) : super(key: key);
 
   final String title;
 
-  List<Widget> buildList(ReduxActions redux) {
-    var children = <Widget>[];
+  Widget buildDesktopLayout(BuildContext context) {
+    EdgeInsets padding = MediaQuery.of(context).padding;
+    double height = MediaQuery.of(context).size.height;
+    return Container(
+      child: Column(
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                CategoryPanel(
+                  padding: EdgeInsets.only(left: padding.left),
+                  size: Size(CATEGORY_PANEL_DEFAULT_WIDTH, height),
+                ),
+                Expanded(child: DetailPageWidget())
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-    var updatedTaskList = List<Task>.from(redux.taskList);
-    updatedTaskList.sort((Task a, Task b) {
-      return a.updatedAt == b.updatedAt
-          ? 0
-          : (a.updatedAt > b.updatedAt ? 1 : -1);
-    });
-    updatedTaskList.forEach((task) {
-      Widget w = redux.status.status == StatusKey.EditingTask &&
-              redux.status.param1 == task.uuid
-          ? UpdateTaskWidget(task: task)
-          : TaskWidget(task: task);
-      children.insert(0, w);
-    });
+  Widget buildMobileLayout(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          Expanded(
+            child: DetailPageWidget(),
+          ),
+        ],
+      ),
+    );
+  }
 
-    var updatedPhotoList = List<Photo>.from(redux.photoList);
-    updatedPhotoList.sort((Photo a, Photo b) {
-      return a.updatedAt == b.updatedAt
-          ? 0
-          : (a.updatedAt > b.updatedAt ? 1 : -1);
-    });
-    updatedPhotoList.forEach((photo) {
-      Widget w = PhotoWidget(uuid: photo.uuid);
-      children.insert(0, w);
-    });
+  Widget buildMenuButton(context, Function onTap) {
+    return TextButton.icon(
+      onPressed: onTap,
+      icon: Icon(AppIcons.menu, color: Colors.white),
+      label: Text(""),
+    );
+  }
 
-    return children;
+  Widget buildTitle() {
+    return Expanded(
+      child: Text(
+        this.title,
+        textAlign: TextAlign.center,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(this.title),
-        actions: [
+    AppBar appBar;
+
+    Function onTap = () {
+      double height = MediaQuery.of(context).size.height;
+      double top = MediaQuery.of(context).padding.top;
+      double barHeight = appBar.preferredSize.height;
+
+      Navigator.push(
+        context,
+        PanelPopupRoute(
+          widget: PanelPopupWidget(
+            child:
+                CategoryPanel(size: Size(CATEGORY_PANEL_DEFAULT_WIDTH, height)),
+            rect: Rect.fromLTWH(0, top + barHeight,
+                CATEGORY_PANEL_DEFAULT_WIDTH, height - top - barHeight),
+          ),
+        ),
+      );
+    };
+
+    appBar = AppBar(
+      elevation: 0,
+      titleSpacing: 0.0,
+      title: Row(
+        children: [
+          getViewResource().isWiderLayout(context)
+              ? Container()
+              : buildMenuButton(context, onTap),
+          buildTitle(),
           ServerStatus(),
         ],
       ),
-      body: StoreConnector<AppState, ReduxActions>(
-        converter: (store) {
-          List<Task> taskList = [];
-          store.state.taskRepo.tasks.forEach((uuid, task) {
-            if (task.deleted == 0) {
-              taskList.add(task);
-            }
-          });
-
-          List<Photo> photoList = [];
-          store.state.photoRepo.photos.forEach((uuid, photo) {
-            if (photo.deleted == 0) {
-              photoList.add(photo);
-            }
-          });
-
-          return ReduxActions(
-            status: store.state.status,
-            taskList: taskList,
-            photoList: photoList,
-          );
-        },
-        builder: (context, ReduxActions redux) {
-          if (redux.status.status == StatusKey.AddingPhoto) {
-            return CreatePhotoWidget();
-          }
-
-          var padding = MediaQuery.of(context).padding;
-
-          return Column(children: [
-            CreateBarWidget(),
-            Expanded(
-              child: Container(
-                padding: EdgeInsets.fromLTRB(
-                    padding.left, 0, padding.right, padding.bottom),
-                child: ListView(
-                  children: buildList(redux),
-                ),
-              ),
-            ),
-          ]);
-        },
-      ),
+    );
+    return Scaffold(
+      appBar: appBar,
+      body: getViewResource().isWiderLayout(context)
+          ? buildDesktopLayout(context)
+          : buildMobileLayout(context),
     );
   }
 }

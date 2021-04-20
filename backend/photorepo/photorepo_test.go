@@ -55,8 +55,9 @@ func _testAdd(t *testing.T, photoRepo PhotoRepo) *Photo {
 	filename := "filename"
 	mime := "image/jpeg"
 	size := "2048000"
+	var direction int32 = 180
 	ts := time.Now().Unix()
-	createdPhoto, err := photoRepo.AddPhoto(uuid, filename, mime, size, reader, ts)
+	createdPhoto, err := photoRepo.AddPhoto(uuid, filename, mime, size, direction, reader, ts)
 	if err != nil {
 		log.Fatalf("Failed to add photo: %v\n", err)
 	}
@@ -67,6 +68,7 @@ func _testAdd(t *testing.T, photoRepo PhotoRepo) *Photo {
 	assert.Equal(t, createdPhoto.Filename, filename)
 	assert.Equal(t, createdPhoto.Mime, mime)
 	assert.Equal(t, createdPhoto.Size, size)
+	assert.Equal(t, createdPhoto.Direction, int32(180))
 	assert.Equal(t, createdPhoto.Deleted, int8(0))
 	assert.Equal(t, createdPhoto.CreatedAt, ts)
 	assert.Equal(t, createdPhoto.UpdatedAt, ts)
@@ -74,6 +76,29 @@ func _testAdd(t *testing.T, photoRepo PhotoRepo) *Photo {
 	assert.Greater(t, nownano+2000000000, createdPhoto.TS)
 
 	return createdPhoto
+}
+
+func _testUpdate(t *testing.T, photoRepo PhotoRepo, createdPhoto *Photo) *Photo {
+	ts := time.Now().Unix()
+	inPhoto := Photo{Filename: "new name", Direction: 180, UpdatedAt: ts}
+	updatedPhoto, err := photoRepo.UpdatePhoto(createdPhoto.UUID, inPhoto)
+	if err != nil {
+		log.Fatalf("Failed to delete: %v\n", err)
+	}
+
+	nownano := time.Now().UnixNano()
+	assert.Equal(t, updatedPhoto.UUID, createdPhoto.UUID)
+	assert.Equal(t, updatedPhoto.Filename, "new name")
+	assert.Equal(t, updatedPhoto.Size, createdPhoto.Size)
+	assert.Equal(t, updatedPhoto.Mime, createdPhoto.Mime)
+	assert.Equal(t, updatedPhoto.Direction, int32(180))
+	assert.Equal(t, updatedPhoto.Deleted, int8(0))
+	assert.Equal(t, updatedPhoto.CreatedAt, createdPhoto.CreatedAt)
+	assert.Equal(t, updatedPhoto.UpdatedAt, ts)
+	assert.Less(t, nownano-2000000000, updatedPhoto.TS)
+	assert.Greater(t, nownano+2000000000, updatedPhoto.TS)
+
+	return updatedPhoto
 }
 
 func _testGet(t *testing.T, photoRepo PhotoRepo, createdPhoto *Photo) {
@@ -184,13 +209,17 @@ func TestPhotoRepo(t *testing.T) {
 
 	createdPhoto := _testAdd(t, photoRepo)
 
-	_testGet(t, photoRepo, createdPhoto)
-	_testThumb(t, photoRepo, createdPhoto)
+	time.Sleep(time.Second * 1)
+	createdPhoto.Direction = 270
+	updatedPhoto := _testUpdate(t, photoRepo, createdPhoto)
 
-	_testMeta(t, photoRepo, createdPhoto)
+	_testGet(t, photoRepo, updatedPhoto)
+	_testThumb(t, photoRepo, updatedPhoto)
+
+	_testMeta(t, photoRepo, updatedPhoto)
 
 	time.Sleep(time.Second * 1)
-	deletedPhoto := _testDelete(t, photoRepo, createdPhoto)
+	deletedPhoto := _testDelete(t, photoRepo, updatedPhoto)
 
 	_testGetList(t, photoRepo, deletedPhoto)
 }

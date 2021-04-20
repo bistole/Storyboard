@@ -1,25 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:mockito/mockito.dart';
-import 'package:redux/redux.dart';
 import 'package:storyboard/channel/backend.dart';
+import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/configs/channel_manager.dart';
 import 'package:storyboard/configs/device_manager.dart';
 import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/sse.dart';
-import 'package:storyboard/redux/models/app.dart';
-import 'package:storyboard/redux/models/photo_repo.dart';
-import 'package:storyboard/redux/models/queue.dart';
 import 'package:storyboard/redux/models/setting.dart';
-import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task_repo.dart';
-import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/storage/storage.dart';
 import 'package:storyboard/views/config/config.dart';
 
-import '../channel/menu_test.dart';
+import '../common.dart';
 import '../redux/store_test.dart';
 
 class MockStorage extends Mock implements Storage {}
@@ -28,11 +24,57 @@ class MockChannelManager extends Mock implements ChannelManager {}
 
 class MockMethodChannel extends Mock implements MethodChannel {}
 
+class MockCommandChannel extends Mock implements CommandChannel {}
+
 class MockBackendChannel extends Mock implements BackendChannel {}
 
 class MockDeviceManager extends Mock implements DeviceManager {}
 
 class MockNetSSE extends Mock implements NetSSE {}
+
+class MockPathProviderPlatform
+    with MockPlatformInterfaceMixin
+    implements PathProviderPlatform {
+  @override
+  Future<String> getApplicationSupportPath() async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String> getApplicationDocumentsPath() {
+    return Future.value(".");
+  }
+
+  @override
+  Future<String> getDownloadsPath() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<String>> getExternalCachePaths() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String> getExternalStoragePath() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<String>> getExternalStoragePaths({StorageDirectory type}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String> getLibraryPath() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String> getTemporaryPath() {
+    throw UnimplementedError();
+  }
+}
 
 class MockApp extends StatelessWidget {
   @override
@@ -45,20 +87,17 @@ class MockApp extends StatelessWidget {
 }
 
 void main() {
+  setUp(() {
+    setFactoryLogger(MockLogger());
+  });
+
   buildStore(String serverKey) {
-    return Store<AppState>(
-      appReducer,
-      initialState: AppState(
-        status: Status.noParam(StatusKey.ListTask),
-        photoRepo: PhotoRepo(photos: {}, lastTS: 0),
-        taskRepo: TaskRepo(tasks: {}, lastTS: 0),
-        queue: Queue(),
-        setting: Setting(serverKey: serverKey),
-      ),
-    );
+    return getMockStore(setting: Setting(serverKey: serverKey));
   }
 
   test('initMethodChannels', () async {
+    PathProviderPlatform.instance = MockPathProviderPlatform();
+
     Factory f = getFactory();
     f.channelManager = MockChannelManager();
 

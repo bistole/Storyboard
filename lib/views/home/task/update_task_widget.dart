@@ -36,24 +36,27 @@ class UpdateTaskWidget extends StatelessWidget {
         );
       },
       builder: (context, ReduxActions redux) {
-        return new ListTile(
-          title: RawKeyboardListener(
-            child: TextField(
-              style: Theme.of(context).textTheme.headline2,
-              onSubmitted: (String value) {
-                redux.update(value);
-              },
-              controller: TextEditingController(text: task.title),
-              autofocus: true,
-              decoration: InputDecoration(hintText: 'Put task name here'),
+        return Row(
+          children: [
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: TextField(
+                  style: Theme.of(context).textTheme.headline2,
+                  onSubmitted: redux.update,
+                  focusNode: FocusNode(onKey: (node, event) {
+                    if (event.isKeyPressed(LogicalKeyboardKey.escape)) {
+                      redux.cancel();
+                    }
+                    return false;
+                  }),
+                  autofocus: true,
+                  controller: TextEditingController(text: task.title),
+                  decoration: InputDecoration(hintText: 'Put task name here'),
+                ),
+              ),
             ),
-            focusNode: FocusNode(),
-            onKey: (RawKeyEvent event) {
-              if (event.isKeyPressed(LogicalKeyboardKey.escape)) {
-                redux.cancel();
-              }
-            },
-          ),
+          ],
         );
       },
     );

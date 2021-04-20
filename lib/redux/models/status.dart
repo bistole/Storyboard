@@ -4,7 +4,9 @@ enum StatusKey {
   AddingPhoto,
   AddingTask,
   EditingTask,
+  EditingPhoto,
   ListTask,
+  ListPhoto,
 }
 
 @immutable
@@ -32,6 +34,16 @@ class Status {
       param2: param2 ?? this.param2,
     );
   }
+
+  bool get inTask =>
+      status == StatusKey.AddingTask ||
+      status == StatusKey.ListTask ||
+      status == StatusKey.EditingTask;
+
+  bool get inPhoto =>
+      status == StatusKey.AddingPhoto ||
+      status == StatusKey.ListPhoto ||
+      status == StatusKey.EditingPhoto;
 
   @override
   int get hashCode => status.hashCode ^ param1.hashCode ^ param2.hashCode;

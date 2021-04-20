@@ -10,8 +10,14 @@ import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task_repo.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
 
+import '../common.dart';
+
 main() {
   Store<AppState> store;
+
+  setUp(() {
+    setFactoryLogger(MockLogger());
+  });
 
   buildStore(Queue queue) {
     getFactory().store = store = Store<AppState>(
@@ -29,6 +35,7 @@ main() {
     buildStore(Queue(list: [], tick: 1));
 
     NetQueue netQueue = NetQueue(60);
+    netQueue.setLogger(MockLogger());
     netQueue.setStore(store);
     netQueue.start();
 

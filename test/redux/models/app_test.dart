@@ -20,6 +20,7 @@ void main() {
       filename: 'image.jpeg',
       mime: 'image/jpeg',
       size: '10000',
+      direction: 180,
       hasOrigin: PhotoStatus.None,
       hasThumb: PhotoStatus.Loading,
       deleted: 0,
@@ -70,6 +71,7 @@ void main() {
             'filename': 'file.jpeg',
             'mime': 'image/jpeg',
             'size': '3000',
+            'direction': 180,
             'hasOrigin': 'PhotoStatus.None',
             'hasThumb': 'PhotoStatus.Loading',
             'deleted': 0,
@@ -104,7 +106,7 @@ void main() {
       appState.toString(),
       "AppState{status: Status{status: StatusKey.ListTask, param1: null, param2: null}, " +
           "taskRepo: TaskRepo{tasks: {uuid: Task{uuid: uuid, title: new title, deleted: 0, updatedAt: 14000, createdAt: 12000}}, lastTS: 0}, " +
-          "photoRepo: PhotoRepo{photos: {uuid: Photo{uuid: uuid, filename: file.jpeg, mime: image/jpeg, size: 3000, hasOrigin: PhotoStatus.None, hasThumb: PhotoStatus.Loading, deleted: 0, updatedAt: 14000, createdAt: 12000}}, lastTS: 0}, " +
+          "photoRepo: PhotoRepo{photos: {uuid: Photo{uuid: uuid, filename: file.jpeg, mime: image/jpeg, size: 3000, direction: 180, hasOrigin: PhotoStatus.None, hasThumb: PhotoStatus.Loading, deleted: 0, updatedAt: 14000, createdAt: 12000}}, lastTS: 0}, " +
           "queue: Queue{list: [QueueItem{type: null, action: null, uuid: uuid}], tick: 12, now: QueueItem{type: null, action: null, uuid: uuid}}, " +
           "setting: Setting{clientID: client-id, serverKey: server-key, serverReachable: Reachable.Unknown}}",
     );
@@ -148,6 +150,7 @@ void main() {
             'filename': 'image.jpeg',
             'mime': 'image/jpeg',
             'size': '10000',
+            'direction': 180,
             'hasOrigin': 'PhotoStatus.None',
             'hasThumb': 'PhotoStatus.Loading',
             'deleted': 0,

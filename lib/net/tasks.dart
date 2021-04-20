@@ -13,7 +13,7 @@ import 'package:storyboard/redux/models/queue_item.dart';
 import 'package:storyboard/redux/models/task.dart';
 
 class NetTasks {
-  String _LOG_TAG = (NetTasks).toString();
+  String _logTag = (NetTasks).toString();
   Logger _logger;
   void setLogger(Logger logger) {
     _logger = logger;
@@ -56,19 +56,22 @@ class NetTasks {
   }
 
   Future<bool> netFetchTasks(Store<AppState> store, {uuid: String}) async {
-    _logger.info(_LOG_TAG, "netFetchTasks");
+    _logger.info(_logTag, "netFetchTasks");
     try {
       String prefix = getURLPrefix(store);
       if (prefix == null) return false;
 
       int ts = (store.state.photoRepo.lastTS + 1);
+      _logger.debug(_logTag, "req: null");
+
       final response = await _httpClient.get(
         prefix + "/tasks?ts=$ts&c=$countPerFetch",
         headers: {headerNameClientID: getClientID(store)},
       );
 
       if (response.statusCode == 200) {
-        _logger.info(_LOG_TAG, "netFetchTasks succ");
+        _logger.info(_logTag, "netFetchTasks succ");
+        _logger.debug(_logTag, "body: ${response.body}");
         Map<String, dynamic> object = jsonDecode(response.body);
         if (object['succ'] == true && object['tasks'] != null) {
           var taskMap = buildTaskMap(object['tasks']);
@@ -80,16 +83,20 @@ class NetTasks {
         }
         handleNetworkSucc(store);
         return true;
+      } else {
+        _logger.warn(
+            _logTag, "netFetchTasks failed: remote: ${response.statusCode}");
+        _logger.debug(_logTag, "body: ${response.body}");
       }
     } catch (e) {
-      _logger.warn(_LOG_TAG, "netFetchTasks failed: $e");
+      _logger.warn(_logTag, "netFetchTasks failed: $e");
       handleNetworkError(store, e);
     }
     return false;
   }
 
   Future<bool> netCreateTask(Store<AppState> store, {uuid: String}) async {
-    _logger.info(_LOG_TAG, "netCreateTask");
+    _logger.info(_logTag, "netCreateTask");
     try {
       String prefix = getURLPrefix(store);
       if (prefix == null) return false;
@@ -97,16 +104,20 @@ class NetTasks {
       Task task = store.state.taskRepo.tasks[uuid];
       if (task == null) return true;
 
+      var body = jsonEncode(task.toJson());
+      _logger.debug(_logTag, "req: $body");
+
       final response = await _httpClient.post(prefix + "/tasks",
           headers: {
             'Content-Type': 'application/json',
             headerNameClientID: getClientID(store)
           },
-          body: jsonEncode(task.toJson()),
+          body: body,
           encoding: Encoding.getByName("utf-8"));
 
       if (response.statusCode == 200) {
-        _logger.info(_LOG_TAG, "netCreateTask succ");
+        _logger.info(_logTag, "netCreateTask succ");
+        _logger.debug(_logTag, "body: ${response.body}");
         Map<String, dynamic> object = jsonDecode(response.body);
         if (object['succ'] == true && object['task'] != null) {
           var task = Task.fromJson(object['task']);
@@ -114,16 +125,20 @@ class NetTasks {
         }
         handleNetworkSucc(store);
         return true;
+      } else {
+        _logger.warn(
+            _logTag, "netCreateTask failed: remote: ${response.statusCode}");
+        _logger.debug(_logTag, "body: ${response.body}");
       }
     } catch (e) {
-      _logger.warn(_LOG_TAG, "netCreateTask failed: $e");
+      _logger.warn(_logTag, "netCreateTask failed: $e");
       handleNetworkError(store, e);
     }
     return false;
   }
 
   Future<bool> netUpdateTask(Store<AppState> store, {uuid: String}) async {
-    _logger.info(_LOG_TAG, "netUpdateTask");
+    _logger.info(_logTag, "netUpdateTask");
     try {
       String prefix = getURLPrefix(store);
       if (prefix == null) return false;
@@ -132,6 +147,8 @@ class NetTasks {
       if (task == null) return true;
 
       final body = jsonEncode(task.toJson());
+      _logger.debug(_logTag, "req: $body");
+
       final response = await _httpClient.post(prefix + "/tasks/" + task.uuid,
           headers: {
             'Content-Type': 'application/json',
@@ -141,7 +158,8 @@ class NetTasks {
           encoding: Encoding.getByName("utf-8"));
 
       if (response.statusCode == 200) {
-        _logger.info(_LOG_TAG, "netUpdateTask succ");
+        _logger.info(_logTag, "netUpdateTask succ");
+        _logger.debug(_logTag, "body: ${response.body}");
         Map<String, dynamic> object = jsonDecode(response.body);
         if (object['succ'] == true && object['task'] != null) {
           var task = Task.fromJson(object['task']);
@@ -149,22 +167,28 @@ class NetTasks {
         }
         handleNetworkSucc(store);
         return true;
+      } else {
+        _logger.warn(
+            _logTag, "netUpdateTask failed: remote: ${response.statusCode}");
+        _logger.debug(_logTag, "body: ${response.body}");
       }
     } catch (e) {
-      _logger.warn(_LOG_TAG, "netUpdateTask failed: $e");
+      _logger.warn(_logTag, "netUpdateTask failed: $e");
       handleNetworkError(store, e);
     }
     return false;
   }
 
   Future<bool> netDeleteTask(Store<AppState> store, {uuid: String}) async {
-    _logger.info(_LOG_TAG, "netDeleteTask");
+    _logger.info(_logTag, "netDeleteTask");
     try {
       String prefix = getURLPrefix(store);
       if (prefix == null) return false;
 
       Task task = store.state.taskRepo.tasks[uuid];
       if (task == null) return true;
+
+      _logger.debug(_logTag, "req: null");
 
       final responseStream = await _httpClient.send(
         http.Request("DELETE", Uri.parse(prefix + "/tasks/" + task.uuid))
@@ -175,7 +199,8 @@ class NetTasks {
       final body = await responseStream.stream.bytesToString();
 
       if (responseStream.statusCode == 200) {
-        _logger.info(_LOG_TAG, "netDeleteTask succ");
+        _logger.info(_logTag, "netDeleteTask succ");
+        _logger.debug(_logTag, "body: $body");
         Map<String, dynamic> object = jsonDecode(body);
         if (object['succ'] == true && object['task'] != null) {
           var task = Task.fromJson(object['task']);
@@ -183,9 +208,13 @@ class NetTasks {
         }
         handleNetworkSucc(store);
         return true;
+      } else {
+        _logger.warn(_logTag,
+            "netUpdateTask failed: remote: ${responseStream.statusCode}");
+        _logger.debug(_logTag, "body: $body");
       }
     } catch (e) {
-      _logger.warn(_LOG_TAG, "netDeleteTask failed: $e");
+      _logger.warn(_logTag, "netDeleteTask failed: $e");
       handleNetworkError(store, e);
     }
     return false;

@@ -5,7 +5,7 @@ import 'package:path/path.dart' as path;
 import 'package:storyboard/logger/logger.dart';
 
 class Storage {
-  String _LOG_TAG = (Storage).toString();
+  String _logTag = (Storage).toString();
   Logger _logger;
   void setLogger(Logger logger) {
     _logger = logger;
@@ -19,12 +19,12 @@ class Storage {
 
   String getPersistDataPath() {
     final statePath = path.join(dataHome, 'state.json');
-    _logger.debug(_LOG_TAG, "statePath: $statePath");
+    _logger.debug(_logTag, "statePath: $statePath");
     return statePath;
   }
 
   Future<void> initPhotoStorage() async {
-    _logger.info(_LOG_TAG, "initPhotoStorage");
+    _logger.info(_logTag, "initPhotoStorage");
     final photoDirectory = Directory(path.join(dataHome, 'photos'));
     if (!await photoDirectory.exists()) {
       await photoDirectory.create(recursive: true);
@@ -47,7 +47,7 @@ class Storage {
   }
 
   Future<void> deletePhotoAndThumbByUUID(String uuid) async {
-    _logger.debug(_LOG_TAG, "deletePhotoAndThumbByUUID: $uuid");
+    _logger.debug(_logTag, "deletePhotoAndThumbByUUID: $uuid");
     final photoPath = getPhotoPathByUUID(uuid);
     final thumbPath = getThumbnailPathByUUID(uuid);
 
@@ -60,19 +60,19 @@ class Storage {
   }
 
   Future<void> copyPhotoByUUID(String uuid, File src) async {
-    _logger.debug(_LOG_TAG, "copyPhotoByUUID: $uuid");
+    _logger.debug(_logTag, "copyPhotoByUUID: $uuid");
     String photoPath = getPhotoPathByUUID(uuid);
     src.copySync(photoPath);
   }
 
   Future<void> savePhotoByUUID(String uuid, Uint8List bytes) async {
-    _logger.debug(_LOG_TAG, "savePhotoByUUID: $uuid");
+    _logger.debug(_logTag, "savePhotoByUUID: $uuid");
     String photoPath = getPhotoPathByUUID(uuid);
     await File(photoPath).writeAsBytes(bytes);
   }
 
   Future<void> saveThumbailByUUID(String uuid, Uint8List bytes) async {
-    _logger.debug(_LOG_TAG, "saveThumbailByUUID: $uuid");
+    _logger.debug(_logTag, "saveThumbailByUUID: $uuid");
     var photoPath = getThumbnailPathByUUID(uuid);
     await File(photoPath).writeAsBytes(bytes);
   }

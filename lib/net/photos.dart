@@ -16,7 +16,7 @@ import 'package:storyboard/storage/storage.dart';
 var validMimeTypes = ["image/jpeg", "image/png", "image/gif"];
 
 class NetPhotos {
-  String _LOG_TAG = (NetPhotos).toString();
+  String _logTag = (NetPhotos).toString();
   Logger _logger;
   void setLogger(Logger logger) {
     _logger = logger;
@@ -63,24 +63,33 @@ class NetPhotos {
     );
     netQueue.registerQueueItemAction(
       QueueItemType.Photo,
+      QueueItemAction.Update,
+      netUpdatePhoto,
+    );
+    netQueue.registerQueueItemAction(
+      QueueItemType.Photo,
       QueueItemAction.Delete,
       netDeletePhoto,
     );
   }
 
   Future<bool> netFetchPhotos(Store<AppState> store, {uuid: String}) async {
-    _logger.info(_LOG_TAG, "netFetchPhotos");
+    _logger.info(_logTag, "netFetchPhotos");
     try {
       String prefix = getURLPrefix(store);
       if (prefix == null) return false;
 
       int ts = (store.state.photoRepo.lastTS + 1);
+      _logger.debug(_logTag, "req: null");
+
       final response = await _httpClient.get(
         prefix + "/photos?ts=$ts&c=$countPerFetch",
         headers: {headerNameClientID: getClientID(store)},
       );
+
       if (response.statusCode == 200) {
-        _logger.info(_LOG_TAG, "netFetchPhotos succ");
+        _logger.info(_logTag, "netFetchPhotos succ");
+        _logger.debug(_logTag, "body: ${response.body}");
         Map<String, dynamic> object = jsonDecode(response.body);
         if (object['succ'] == true && object['photos'] != null) {
           var photoMap = buildPhotoMap(object['photos']);
@@ -96,16 +105,20 @@ class NetPhotos {
         }
         handleNetworkSucc(store);
         return true;
+      } else {
+        _logger.warn(
+            _logTag, "netFetchPhotos failed: remote: ${response.statusCode}");
+        _logger.debug(_logTag, "body ${response.body}");
       }
     } catch (e) {
-      _logger.warn(_LOG_TAG, "netFetchPhotos failed: $e");
+      _logger.warn(_logTag, "netFetchPhotos failed: $e");
       handleNetworkError(store, e);
     }
     return false;
   }
 
   Future<bool> netUploadPhoto(Store<AppState> store, {uuid: String}) async {
-    _logger.info(_LOG_TAG, "netUploadPhoto");
+    _logger.info(_logTag, "netUploadPhoto");
     try {
       String prefix = getURLPrefix(store);
       if (prefix == null) return false;
@@ -113,10 +126,13 @@ class NetPhotos {
       Photo photo = store.state.photoRepo.photos[uuid];
       if (photo == null) return true;
 
+      _logger.debug(_logTag, "req: null");
+
       final response = await _httpClient.send(
         http.MultipartRequest("POST", Uri.parse(prefix + "/photos"))
           ..headers[headerNameClientID] = getClientID(store)
           ..fields['uuid'] = photo.uuid
+          ..fields['direction'] = photo.direction.toString()
           ..fields['createdAt'] = photo.createdAt.toString()
           ..files.add(
             await http.MultipartFile.fromPath(
@@ -131,7 +147,8 @@ class NetPhotos {
       final body = await response.stream.bytesToString();
 
       if (response.statusCode == 200) {
-        _logger.info(_LOG_TAG, "netUploadPhoto succ");
+        _logger.info(_logTag, "netUploadPhoto succ");
+        _logger.debug(_logTag, "body: $body");
         Map<String, dynamic> object = jsonDecode(body);
         if (object['succ'] == true && object['photo'] != null) {
           var photo = Photo.fromJson(object['photo']);
@@ -139,16 +156,62 @@ class NetPhotos {
         }
         handleNetworkSucc(store);
         return true;
+      } else {
+        _logger.warn(
+            _logTag, "netUploadPhoto failed: remote: ${response.statusCode}");
+        _logger.debug(_logTag, "body $body");
       }
     } catch (e) {
-      _logger.warn(_LOG_TAG, "netUploadPhoto failed: $e");
+      _logger.warn(_logTag, "netUploadPhoto failed: $e");
+      handleNetworkError(store, e);
+    }
+    return false;
+  }
+
+  Future<bool> netUpdatePhoto(Store<AppState> store, {uuid: String}) async {
+    _logger.info(_logTag, "netUpdatePhoto");
+    try {
+      String prefix = getURLPrefix(store);
+      if (prefix == null) return false;
+
+      Photo photo = store.state.photoRepo.photos[uuid];
+      if (photo == null) return true;
+
+      final body = jsonEncode(photo.toJson());
+      _logger.debug(_logTag, "req: $body");
+
+      final response = await _httpClient.post(prefix + "/photos/" + photo.uuid,
+          headers: {
+            'Content-Type': 'application/json',
+            headerNameClientID: getClientID(store)
+          },
+          body: body,
+          encoding: Encoding.getByName("utf-8"));
+
+      if (response.statusCode == 200) {
+        _logger.info(_logTag, "netUpdatePhoto succ");
+        _logger.debug(_logTag, "body: ${response.body}");
+        Map<String, dynamic> object = jsonDecode(response.body);
+        if (object['succ'] == true && object['photo'] != null) {
+          var photo = Photo.fromJson(object['photo']);
+          store.dispatch(UpdatePhotoAction(photo: photo));
+        }
+        handleNetworkSucc(store);
+        return true;
+      } else {
+        _logger.warn(
+            _logTag, "netUpdatePhoto failed: remote: ${response.statusCode}");
+        _logger.debug(_logTag, "body ${response.body}");
+      }
+    } catch (e) {
+      _logger.warn(_logTag, "netUpdatePhoto failed: $e");
       handleNetworkError(store, e);
     }
     return false;
   }
 
   Future<bool> netDownloadPhoto(Store<AppState> store, {uuid: String}) async {
-    _logger.info(_LOG_TAG, "netDownloadPhoto");
+    _logger.info(_logTag, "netDownloadPhoto");
     try {
       String prefix = getURLPrefix(store);
       if (prefix == null) return false;
@@ -157,13 +220,16 @@ class NetPhotos {
       if (photo == null) return true;
       if (photo.hasOrigin == PhotoStatus.Ready) return true;
 
+      _logger.debug(_logTag, "req: null");
+
       final response = await _httpClient.get(
         prefix + "/photos/" + uuid,
         headers: {headerNameClientID: getClientID(store)},
       );
 
       if (response.statusCode == 200) {
-        _logger.info(_LOG_TAG, "netDownloadPhoto succ");
+        _logger.info(_logTag, "netDownloadPhoto succ");
+        _logger.debug(_logTag, "body: ${response.body}");
         await _storage.savePhotoByUUID(uuid, response.bodyBytes);
         store.dispatch(DownloadPhotoAction(
           uuid: uuid,
@@ -171,9 +237,13 @@ class NetPhotos {
         ));
         handleNetworkSucc(store);
         return true;
+      } else {
+        _logger.warn(
+            _logTag, "netDownloadPhoto failed: remote: ${response.statusCode}");
+        _logger.debug(_logTag, "body ${response.body}");
       }
     } catch (e) {
-      _logger.warn(_LOG_TAG, "netDownloadPhoto failed: $e");
+      _logger.warn(_logTag, "netDownloadPhoto failed: $e");
       handleNetworkError(store, e);
     }
     return false;
@@ -181,7 +251,7 @@ class NetPhotos {
 
   Future<bool> netDownloadThumbnail(Store<AppState> store,
       {uuid: String}) async {
-    _logger.info(_LOG_TAG, "netDownloadThumbnail");
+    _logger.info(_logTag, "netDownloadThumbnail");
     try {
       String prefix = getURLPrefix(store);
       if (prefix == null) return false;
@@ -190,13 +260,16 @@ class NetPhotos {
       if (photo == null) return true;
       if (photo.hasThumb == PhotoStatus.Ready) return true;
 
+      _logger.debug(_logTag, "req: null");
+
       final response = await _httpClient.get(
         prefix + "/photos/" + uuid + '/thumbnail',
         headers: {headerNameClientID: getClientID(store)},
       );
 
       if (response.statusCode == 200) {
-        _logger.info(_LOG_TAG, "netDownloadThumbnail succ");
+        _logger.info(_logTag, "netDownloadThumbnail succ");
+        _logger.debug(_logTag, "body: ${response.body}");
         await _storage.saveThumbailByUUID(uuid, response.bodyBytes);
         store.dispatch(ThumbnailPhotoAction(
           uuid: uuid,
@@ -204,22 +277,28 @@ class NetPhotos {
         ));
         handleNetworkSucc(store);
         return true;
+      } else {
+        _logger.warn(_logTag,
+            "netDownloadThumbnail failed: remote: ${response.statusCode}");
+        _logger.debug(_logTag, "body ${response.body}");
       }
     } catch (e) {
-      _logger.warn(_LOG_TAG, "netDownloadThumbnail failed: $e");
+      _logger.warn(_logTag, "netDownloadThumbnail failed: $e");
       handleNetworkError(store, e);
     }
     return false;
   }
 
   Future<bool> netDeletePhoto(Store<AppState> store, {uuid: String}) async {
-    _logger.info(_LOG_TAG, "netDeletePhoto");
+    _logger.info(_logTag, "netDeletePhoto");
     try {
       String prefix = getURLPrefix(store);
       if (prefix == null) return false;
 
       Photo photo = store.state.photoRepo.photos[uuid];
       if (photo == null) return true;
+
+      _logger.debug(_logTag, "req: null");
 
       final responseStream = await _httpClient.send(
         http.Request("DELETE", Uri.parse(prefix + "/photos/" + photo.uuid))
@@ -230,7 +309,8 @@ class NetPhotos {
       final body = await responseStream.stream.bytesToString();
 
       if (responseStream.statusCode == 200) {
-        _logger.info(_LOG_TAG, "netDeletePhoto succ");
+        _logger.info(_logTag, "netDeletePhoto succ");
+        _logger.debug(_logTag, "body: $body");
         Map<String, dynamic> object = jsonDecode(body);
         if (object['succ'] == true && object['photo'] != null) {
           var photo = Photo.fromJson(object['photo']);
@@ -239,9 +319,13 @@ class NetPhotos {
         }
         handleNetworkSucc(store);
         return true;
+      } else {
+        _logger.warn(_logTag,
+            "netDeletePhoto failed: remote: ${responseStream.statusCode}");
+        _logger.debug(_logTag, "body: $body");
       }
     } catch (e) {
-      _logger.warn(_LOG_TAG, "netDeletePhoto failed: $e");
+      _logger.warn(_logTag, "netDeletePhoto failed: $e");
       handleNetworkError(store, e);
     }
     return false;

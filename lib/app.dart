@@ -8,7 +8,8 @@ import 'package:storyboard/views/auth/page.dart';
 import 'package:storyboard/views/home/page.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/views/logger/page.dart';
-import 'package:storyboard/views/photo/page.dart';
+import 'package:storyboard/views/photo/create_photo_page.dart';
+import 'package:storyboard/views/photo/photo_page.dart';
 
 class StoryBoardApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -19,25 +20,27 @@ class StoryBoardApp extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.max,
       children: [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Container(
-              child: Text(
-                "Hello, Storyboard",
-                textDirection: TextDirection.ltr,
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green,
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Container(
+                child: Text(
+                  "Hello, Storyboard",
+                  textDirection: TextDirection.ltr,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
                 ),
+                margin: EdgeInsets.symmetric(vertical: 16.0),
               ),
-              margin: EdgeInsets.symmetric(vertical: 16.0),
-            ),
-            CircularProgressIndicator(),
-          ],
-        )
+              CircularProgressIndicator(),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -52,7 +55,21 @@ class StoryBoardApp extends StatelessWidget {
       await FirebaseCrashlytics.instance
           .recordError(e, s, reason: 'when create store');
     }
-    return getFactory().store;
+    return Future.value(getFactory().store);
+  }
+
+  static MaterialPageRoute onGenerateRoute(RouteSettings settings) {
+    Map<String, WidgetBuilder> routes = {
+      HomePage.routeName: (_) => HomePage(),
+      PhotoPage.routeName: (_) =>
+          PhotoPage(settings.arguments as PhotoPageArguments),
+      CreatePhotoPage.routeName: (_) =>
+          CreatePhotoPage(settings.arguments as CreatePhotoPageArguments),
+      AuthPage.routeName: (_) => AuthPage(),
+      LoggerPage.routeName: (_) => LoggerPage(),
+    };
+    return MaterialPageRoute(
+        builder: routes[settings.name], settings: settings);
   }
 
   @override
@@ -68,11 +85,7 @@ class StoryBoardApp extends StatelessWidget {
           store: snapshot.data,
           child: MaterialApp(
             title: 'Storyboard',
-            routes: {
-              PhotoPage.routeName: (_) => PhotoPage(),
-              AuthPage.routeName: (_) => AuthPage(),
-              LoggerPage.routeName: (_) => LoggerPage(),
-            },
+            onGenerateRoute: onGenerateRoute,
             theme: ThemeData(
               primarySwatch: Colors.green,
               visualDensity: VisualDensity.adaptivePlatformDensity,

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
 
-class SBBottombar extends StatelessWidget {
+class SBFooterbar extends StatelessWidget {
   final List<SBToolbarButton> children;
-  SBBottombar(this.children);
+  SBFooterbar(this.children);
 
   @override
   Widget build(BuildContext context) {

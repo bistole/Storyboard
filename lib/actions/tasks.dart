@@ -8,7 +8,7 @@ import 'package:storyboard/redux/models/task.dart';
 import 'package:uuid/uuid.dart';
 
 class ActTasks {
-  String _LOG_TAG = (ActTasks).toString();
+  String _logTag = (ActTasks).toString();
   Logger _logger;
   void setLogger(Logger logger) {
     _logger = logger;
@@ -29,7 +29,7 @@ class ActTasks {
   }
 
   void actCreateTask(Store<AppState> store, String title) {
-    _logger.info(_LOG_TAG, "actCreateTask");
+    _logger.info(_logTag, "actCreateTask");
     String uuid = Uuid().v4();
     int ts = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     Task task = Task(
@@ -49,7 +49,7 @@ class ActTasks {
   }
 
   void actUpdateTask(Store<AppState> store, String uuid, String title) {
-    _logger.info(_LOG_TAG, "actUpdateTask");
+    _logger.info(_logTag, "actUpdateTask");
     Task task = store.state.taskRepo.tasks[uuid];
     int ts = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     Task newTask = task.copyWith(
@@ -65,7 +65,7 @@ class ActTasks {
   }
 
   void actDeleteTask(Store<AppState> store, String uuid) {
-    _logger.info(_LOG_TAG, "actDeleteTask");
+    _logger.info(_logTag, "actDeleteTask");
     Task task = store.state.taskRepo.tasks[uuid];
     int ts = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     Task newTask = task.copyWith(
