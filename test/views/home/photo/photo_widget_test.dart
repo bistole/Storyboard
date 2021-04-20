@@ -12,7 +12,6 @@ import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/channel/menu.dart';
 import 'package:storyboard/configs/device_manager.dart';
 import 'package:storyboard/configs/factory.dart';
-import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/photo_repo.dart';
@@ -23,15 +22,13 @@ import 'package:storyboard/views/home/photo/photo_widget.dart';
 
 import '../../../common.dart';
 
-class MockNetQueue extends Mock implements NetQueue {}
-
 class MockMenuChannel extends Mock implements MenuChannel {}
 
 class MockDeviceManager extends Mock implements DeviceManager {}
 
 void main() {
+  String homePath;
   Store<AppState> store;
-  MockNetQueue netQueue;
   DeviceManager dm;
 
   final uuid = '04deb797-7ca0-4cd3-b4ef-c1e01aeea130';
@@ -58,11 +55,10 @@ void main() {
     );
 
     Storage s = Storage();
-    String homePath = getHomePath("test_resources/home/");
-    s.setDataHome(homePath);
+    homePath = getHomePath("test_resources/home/") + "A003/";
     Directory(path.join(homePath, 'photos')).createSync(recursive: true);
+    s.setDataHome(homePath);
 
-    netQueue = MockNetQueue();
     dm = MockDeviceManager();
 
     getViewResource().deviceManager = dm;
@@ -71,8 +67,12 @@ void main() {
     getViewResource().storage.setLogger(MockLogger());
     getViewResource().actPhotos = ActPhotos();
     getViewResource().actPhotos.setLogger(MockLogger());
-    getViewResource().actPhotos.setNetQueue(netQueue);
+    getViewResource().actPhotos.setNetQueue(MockNetQueue());
     getViewResource().actPhotos.setStorage(s);
+  });
+
+  tearDown(() {
+    Directory(path.join(homePath, 'photos')).deleteSync(recursive: true);
   });
 
   group('Desktop', () {

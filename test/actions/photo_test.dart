@@ -1,12 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:storyboard/actions/photos.dart';
-import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/queue_item.dart';
 
 import '../common.dart';
-
-class MockNetQueue extends Mock implements NetQueue {}
 
 void main() {
   test('actFetchPhotos', () {

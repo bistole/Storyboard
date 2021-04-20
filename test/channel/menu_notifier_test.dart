@@ -26,6 +26,24 @@ void main() {
       expect(called, true);
     });
 
+    test('get value', () {
+      Logger logger = MockLogger();
+      Notifier mn = Notifier();
+      mn.setLogger(logger);
+
+      var called = 0;
+
+      mn.registerNotifier<String>('event_id');
+      mn.addListener<String>('event_id', () {
+        called++;
+      });
+
+      mn.notifyListeners<String>('event_id', param: 'out');
+
+      expect(called, 1);
+      expect(mn.getValue<String>('event_id'), 'out');
+    });
+
     test('err in callback', () {
       Logger logger = MockLogger();
       Notifier mn = Notifier();

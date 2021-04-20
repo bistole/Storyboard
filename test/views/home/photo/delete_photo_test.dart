@@ -6,7 +6,6 @@ import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/channel/menu.dart';
 import 'package:storyboard/configs/factory.dart';
-import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/photo_repo.dart';
@@ -19,15 +18,12 @@ import '../../../common.dart';
 
 Type typeof<T>() => T;
 
-class MockNetQueue extends Mock implements NetQueue {}
-
 class MockCommandChannel extends Mock implements CommandChannel {}
 
 class MockMenuChannel extends Mock implements MenuChannel {}
 
 void main() {
   Store<AppState> store;
-  MockNetQueue netQueue;
 
   final uuid = '04deb797-7ca0-4cd3-b4ef-c1e01aeea130';
   final photoJson = {
@@ -56,11 +52,10 @@ void main() {
       Storage s = Storage();
       s.dataHome = "project_home";
 
-      netQueue = MockNetQueue();
       getViewResource().storage = s;
       getViewResource().actPhotos = ActPhotos();
       getViewResource().actPhotos.setLogger(MockLogger());
-      getViewResource().actPhotos.setNetQueue(netQueue);
+      getViewResource().actPhotos.setNetQueue(MockNetQueue());
       getViewResource().actPhotos.setStorage(s);
       getViewResource().command = MockCommandChannel();
       getViewResource().menu = MockMenuChannel();

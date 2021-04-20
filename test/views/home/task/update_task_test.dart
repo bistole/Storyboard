@@ -1,7 +1,6 @@
 import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/configs/factory.dart';
-import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
@@ -16,15 +15,12 @@ import 'package:redux/redux.dart';
 
 import '../../../common.dart';
 
-class MockNetQueue extends Mock implements NetQueue {}
-
 class MockCommandChannel extends Mock implements CommandChannel {}
 
 Type typeof<T>() => T;
 
 void main() {
   Store<AppState> store;
-  MockNetQueue netQueue;
 
   final uuid = '04deb797-7ca0-4cd3-b4ef-c1e01aeea130';
   final taskJson = {
@@ -49,10 +45,9 @@ void main() {
           ),
         );
 
-        netQueue = MockNetQueue();
         getViewResource().actTasks = ActTasks();
         getViewResource().actTasks.setLogger(MockLogger());
-        getViewResource().actTasks.setNetQueue(netQueue);
+        getViewResource().actTasks.setNetQueue(MockNetQueue());
         getViewResource().command = MockCommandChannel();
       });
 

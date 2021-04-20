@@ -6,7 +6,6 @@ import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/channel/menu.dart';
 import 'package:storyboard/channel/notifier.dart';
 import 'package:storyboard/configs/device_manager.dart';
-import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/page.dart';
@@ -16,8 +15,6 @@ import '../../../common.dart';
 import '../../../helper/route_aware_widget.dart';
 
 class MockCommandChannel extends Mock implements CommandChannel {}
-
-class MockNetQueue extends Mock implements NetQueue {}
 
 class MockDeviceManager extends Mock implements DeviceManager {}
 

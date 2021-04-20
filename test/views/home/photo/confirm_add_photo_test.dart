@@ -21,9 +21,8 @@ import 'package:storyboard/views/photo/photo_scroller_widget.dart';
 
 import '../../../common.dart';
 
-class MockNetQueue extends Mock implements NetQueue {}
-
 void main() {
+  String homePath;
   NetQueue netQueue;
   Store<AppState> store;
 
@@ -33,9 +32,9 @@ void main() {
       getFactory().store = store = getMockStore();
 
       Storage s = Storage();
-      String homePath = getHomePath("test_resources/home/");
-      s.setDataHome(homePath);
+      homePath = getHomePath("test_resources/home/") + "A001/";
       Directory(path.join(homePath, 'photos')).createSync(recursive: true);
+      s.setDataHome(homePath);
 
       netQueue = MockNetQueue();
       getViewResource().storage = s;
@@ -47,7 +46,6 @@ void main() {
     });
 
     tearDown(() {
-      String homePath = getHomePath("test_resources/home/");
       Directory(path.join(homePath, 'photos')).deleteSync(recursive: true);
     });
 

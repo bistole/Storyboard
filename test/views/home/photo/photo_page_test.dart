@@ -1,14 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:mockito/mockito.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:redux/redux.dart';
 import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/configs/factory.dart';
-import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
@@ -20,11 +18,9 @@ import 'package:storyboard/views/photo/photo_scroller_widget.dart';
 
 import '../../../common.dart';
 
-class MockNetQueue extends Mock implements NetQueue {}
-
 void main() {
+  String homePath;
   Store<AppState> store;
-  MockNetQueue netQueue;
 
   final uuid = '04deb797-7ca0-4cd3-b4ef-c1e01aeea130';
   final photoJson = {
@@ -50,21 +46,19 @@ void main() {
     );
 
     Storage s = Storage();
-    String homePath = getHomePath("test_resources/home/");
-    s.setDataHome(homePath);
+    homePath = getHomePath("test_resources/home/") + "A002/";
     Directory(path.join(homePath, 'photos')).createSync(recursive: true);
+    s.setDataHome(homePath);
 
-    netQueue = MockNetQueue();
     getViewResource().storage = s;
     getViewResource().storage.setLogger(MockLogger());
     getViewResource().actPhotos = ActPhotos();
     getViewResource().actPhotos.setLogger(MockLogger());
-    getViewResource().actPhotos.setNetQueue(netQueue);
+    getViewResource().actPhotos.setNetQueue(MockNetQueue());
     getViewResource().actPhotos.setStorage(s);
   });
 
   tearDown(() {
-    String homePath = getHomePath("test_resources/home/");
     Directory(path.join(homePath, 'photos')).deleteSync(recursive: true);
   });
 
@@ -109,7 +103,6 @@ void main() {
         .first
         .widget;
 
-    String homePath = getHomePath("test_resources/home/");
     expect(scrollerWidget.path, path.join(homePath, 'photos', uuid));
   });
 }

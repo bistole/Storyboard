@@ -8,7 +8,6 @@
 import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/configs/factory.dart';
-import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
@@ -23,13 +22,10 @@ import 'package:mockito/mockito.dart';
 
 import '../../../common.dart';
 
-class MockNetQueue extends Mock implements NetQueue {}
-
 class MockCommandChannel extends Mock implements CommandChannel {}
 
 void main() {
   Store<AppState> store;
-  MockNetQueue netQueue;
 
   group(
     "add item",
@@ -40,10 +36,9 @@ void main() {
           status: Status.noParam(StatusKey.ListTask),
         );
 
-        netQueue = MockNetQueue();
         getViewResource().actTasks = ActTasks();
         getViewResource().actTasks.setLogger(MockLogger());
-        getViewResource().actTasks.setNetQueue(netQueue);
+        getViewResource().actTasks.setNetQueue(MockNetQueue());
         getViewResource().command = MockCommandChannel();
       });
 

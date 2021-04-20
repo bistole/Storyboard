@@ -258,6 +258,7 @@ void main() {
   group('netUploadPhoto', () {
     setUp(() {
       httpClient = MockHttpClient();
+      storage = MockStorage();
       actPhotos = MockActPhotos();
 
       netPhotos = NetPhotos();
@@ -383,6 +384,54 @@ void main() {
       expect(capStorage[0], 'uuid');
       expect(String.fromCharCodes(capStorage[1]), 'buffer');
       expect(store.state.photoRepo.photos['uuid'].hasThumb, PhotoStatus.Ready);
+    });
+  });
+
+  group('netUpdatePhoto', () {
+    setUp(() {
+      httpClient = MockHttpClient();
+      storage = MockStorage();
+      actPhotos = MockActPhotos();
+
+      netPhotos = NetPhotos();
+      netPhotos.setLogger(MockLogger());
+      netPhotos.setHttpClient(httpClient);
+      netPhotos.setActPhotos(actPhotos);
+      netPhotos.setStorage(storage);
+    });
+
+    test('update succ', () async {
+      buildStore({'uuid': getPhotoObject().copyWith(ts: 1606500000000)});
+
+      final responseBody = jsonEncode({
+        'succ': true,
+        'photo': getJsonPhotoObject(),
+      });
+
+      when(httpClient.post(
+        startsWith(mockURLPrefix),
+        headers: anyNamed('headers'),
+        body: anyNamed('body'),
+        encoding: Encoding.getByName('utf-8'),
+      )).thenAnswer((_) async {
+        return http.Response(responseBody, 200);
+      });
+
+      await netPhotos.netUpdatePhoto(store, uuid: 'uuid');
+
+      var captured = verify(httpClient.post(
+        captureAny,
+        headers: captureAnyNamed('headers'),
+        body: captureAnyNamed('body'),
+        encoding: Encoding.getByName('utf-8'),
+      )).captured;
+
+      expect(captured[0], mockURLPrefix + '/photos/uuid');
+      expect(captured[1]['Content-Type'], 'application/json');
+      expect(captured[2],
+          jsonEncode(getPhotoObject().copyWith(ts: 1606500000000).toJson()));
+
+      expect(store.state.photoRepo.photos['uuid'].ts, 1606506017000);
     });
   });
 

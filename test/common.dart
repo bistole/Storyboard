@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:redux/redux.dart';
 import 'package:storyboard/helper/image_helper.dart';
 import 'package:storyboard/logger/logger.dart';
+import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/photo_repo.dart';
@@ -28,6 +29,8 @@ import 'package:storyboard/views/photo/photo_page.dart';
 import 'helper/route_aware_widget.dart';
 
 class MockLogger extends Mock implements Logger {}
+
+class MockNetQueue extends Mock implements NetQueue {}
 
 class MockHttpClient extends Mock implements http.Client {}
 
