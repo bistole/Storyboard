@@ -41,6 +41,7 @@ class CreatePhotoPage extends StatefulWidget {
 }
 
 class _CreatePhotoPageState extends State<CreatePhotoPage> {
+  PhotoScrollerWidget scoller;
   int direction;
 
   @override
@@ -75,9 +76,11 @@ class _CreatePhotoPageState extends State<CreatePhotoPage> {
       ),
       SBToolbarButton(
         () {
-          getViewResource().notifier.notifyListeners(Constant.eventPhotoReset);
+          getViewResource()
+              .notifier
+              .notifyListeners<double>(Constant.eventPhotoScale, param: 1);
         },
-        text: "RESET",
+        text: "SCALE",
       ),
       SBToolbarButton(
         () => redux.createPhoto(widget.args.path),
@@ -96,7 +99,7 @@ class _CreatePhotoPageState extends State<CreatePhotoPage> {
     return Column(
       children: [
         Expanded(
-          child: PhotoScollerWidget(path: widget.args.path),
+          child: PhotoScrollerWidget(path: widget.args.path),
         ),
         buildAddingPhotoToolbar(redux),
       ],

@@ -72,7 +72,7 @@ void main() {
     );
     await tester.pumpWidget(w);
 
-    expect(find.text('RESET'), findsOneWidget);
+    expect(find.text('SCALE'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     expect(
         find.descendant(
@@ -94,10 +94,10 @@ void main() {
           matching: find.byType(PhotoView),
         ),
         findsOneWidget);
-    PhotoScollerWidget scrollerWidget = find
+    PhotoScrollerWidget scrollerWidget = find
         .descendant(
           of: find.byType(PhotoPage).first,
-          matching: find.byType(PhotoScollerWidget),
+          matching: find.byType(PhotoScrollerWidget),
         )
         .evaluate()
         .first

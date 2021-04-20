@@ -51,7 +51,7 @@ class _PhotoPageState extends State<PhotoPage> {
   Widget buildPhotoWiget(BuildContext context, ReduxActions redux) {
     var photoPath =
         getViewResource().storage.getPhotoPathByUUID(widget.args.uuid);
-    return PhotoScollerWidget(
+    return PhotoScrollerWidget(
       path: photoPath,
       direction: redux.photo.direction,
     );
@@ -98,9 +98,11 @@ class _PhotoPageState extends State<PhotoPage> {
       ),
       SBToolbarButton(
         () {
-          getViewResource().notifier.notifyListeners(Constant.eventPhotoReset);
+          getViewResource()
+              .notifier
+              .notifyListeners<double>(Constant.eventPhotoScale, param: 1);
         },
-        text: "RESET",
+        text: "SCALE",
       ),
     ]);
   }

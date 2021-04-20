@@ -64,13 +64,13 @@ void main() {
       expect(find.byType(SBToolbarButton), findsNWidgets(5));
       expect(find.text("OK"), findsOneWidget);
       expect(find.text("CANCEL"), findsOneWidget);
-      expect(find.byType(PhotoScollerWidget), findsOneWidget);
+      expect(find.byType(PhotoScrollerWidget), findsOneWidget);
 
-      PhotoScollerWidget scrollerWidget = find
-          .byType(PhotoScollerWidget)
+      PhotoScrollerWidget scrollerWidget = find
+          .byType(PhotoScrollerWidget)
           .evaluate()
           .single
-          .widget as PhotoScollerWidget;
+          .widget as PhotoScrollerWidget;
       expect(scrollerWidget.path, resourcePath);
 
       // click 'OK'

@@ -119,14 +119,16 @@ void main() {
       await tester.pumpWidget(w);
       await tester.pumpAndSettle();
 
-      expect(find.text('RESET'), findsOneWidget);
-      await tester.tap(find.text('RESET'));
+      expect(find.text('SCALE'), findsOneWidget);
+      await tester.tap(find.text('SCALE'));
       await tester.pumpAndSettle();
 
-      var captured =
-          verify(getViewResource().notifier.notifyListeners(captureAny))
-              .captured;
-      expect(captured[0] as String, Constant.eventPhotoReset);
+      var captured = verify(getViewResource().notifier.notifyListeners<double>(
+              captureAny,
+              param: captureAnyNamed('param')))
+          .captured;
+      expect(captured[0] as String, Constant.eventPhotoScale);
+      expect(captured[1] as double, 1.0);
     });
   });
 }

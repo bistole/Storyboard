@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Constant {
-  static var eventPhotoReset = "PHOTO:RESET";
+  static var eventPhotoScale = "PHOTO:SCALE";
   static var eventPhotoRotate = "PHOTO:ROTATE";
 
   static var directionPortrait = 0;

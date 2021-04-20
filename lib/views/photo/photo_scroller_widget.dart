@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
@@ -9,17 +10,21 @@ import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/config/constants.dart';
 import 'package:storyboard/views/photo/origin_photo_widget.dart';
 
-class PhotoScollerWidget extends StatefulWidget {
+class PhotoScrollerWidget extends StatefulWidget {
   final String path;
   final int direction;
+  final ValueNotifier<Size> imageSize;
+  final ValueNotifier<double> imageScale;
 
-  PhotoScollerWidget({@required this.path, this.direction = 0});
+  PhotoScrollerWidget({@required this.path, this.direction = 0})
+      : imageSize = ValueNotifier<Size>(null),
+        imageScale = ValueNotifier<double>(1);
 
   @override
-  _PhotoScollerWidgetState createState() => _PhotoScollerWidgetState();
+  _PhotoScrollerWidgetState createState() => _PhotoScrollerWidgetState();
 }
 
-class _PhotoScollerWidgetState extends State<PhotoScollerWidget>
+class _PhotoScrollerWidgetState extends State<PhotoScrollerWidget>
     with TickerProviderStateMixin {
   ui.Image image;
   ui.Image currentImage;
@@ -29,8 +34,11 @@ class _PhotoScollerWidgetState extends State<PhotoScollerWidget>
   AnimationController animateController;
   PhotoViewController viewController;
 
-  doReset() {
-    viewController.scale = 1;
+  doScale() {
+    var value =
+        getViewResource().notifier.getValue<double>(Constant.eventPhotoScale);
+    viewController.scale = value;
+    widget.imageScale.value = value;
   }
 
   doRotate() async {
@@ -49,17 +57,22 @@ class _PhotoScollerWidgetState extends State<PhotoScollerWidget>
     });
   }
 
+  void viewListener(PhotoViewControllerValue value) {
+    widget.imageScale.value = value.scale;
+  }
+
   @override
   void initState() {
     image = null;
     direction = widget.direction;
     nextDirection = widget.direction;
-    viewController = PhotoViewController();
+    viewController = PhotoViewController()
+      ..outputStateStream.listen((event) {});
     animateController = AnimationController(
         value: 0.0, vsync: this, duration: Constant.durationRotateAnimation);
 
-    getViewResource().notifier.registerNotifier(Constant.eventPhotoReset);
-    getViewResource().notifier.addListener(Constant.eventPhotoReset, doReset);
+    getViewResource().notifier.registerNotifier(Constant.eventPhotoScale);
+    getViewResource().notifier.addListener(Constant.eventPhotoScale, doScale);
 
     getViewResource().notifier.registerNotifier<int>(Constant.eventPhotoRotate);
     getViewResource().notifier.addListener(Constant.eventPhotoRotate, doRotate);
@@ -73,6 +86,10 @@ class _PhotoScollerWidgetState extends State<PhotoScollerWidget>
       setState(() {
         image = newImage;
         currentImage = newCurrImage;
+        widget.imageSize.value = Size(
+          currentImage.width.toDouble(),
+          currentImage.height.toDouble(),
+        );
       });
     });
   }
@@ -84,7 +101,7 @@ class _PhotoScollerWidgetState extends State<PhotoScollerWidget>
 
     getViewResource()
         .notifier
-        .removeListener(Constant.eventPhotoReset, doReset);
+        .removeListener(Constant.eventPhotoScale, doScale);
     getViewResource()
         .notifier
         .removeListener(Constant.eventPhotoRotate, doRotate);
@@ -129,6 +146,10 @@ class _PhotoScollerWidgetState extends State<PhotoScollerWidget>
             if (direction != nextDirection) {
               currentImage = nextImage;
               direction = nextDirection;
+              widget.imageSize.value = Size(
+                currentImage.width.toDouble(),
+                currentImage.height.toDouble(),
+              );
             }
           });
         }
