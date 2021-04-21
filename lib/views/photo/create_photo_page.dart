@@ -8,6 +8,7 @@ import 'package:storyboard/views/common/footerbar.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/config/constants.dart';
+import 'package:storyboard/views/photo/photo_scroller_controller.dart';
 import 'package:storyboard/views/photo/photo_scroller_widget.dart';
 
 class ReduxActions {
@@ -41,16 +42,42 @@ class CreatePhotoPage extends StatefulWidget {
 }
 
 class _CreatePhotoPageState extends State<CreatePhotoPage> {
-  PhotoScrollerWidget scoller;
+  static const containerKey = 'CREATE-PHOTO-CONTAINER';
+
+  PhotoScrollerWidget scroller;
+  PhotoScrollerController scrollerController;
+
+  Size imageSize;
+  double imageScale;
   int direction;
 
   @override
   initState() {
     direction = 0;
+    imageSize = null;
+    imageScale = 1.0;
+
+    scrollerController = getPhotoScrollerControllerFactory().createController()
+      ..outputStream.listen((event) {
+        setState(() {
+          imageSize = event.imageSize;
+          imageScale = event.imageScale;
+        });
+      });
     super.initState();
   }
 
+  @override
+  void dispose() {
+    scrollerController.dispose();
+    super.dispose();
+  }
+
   Widget buildAddingPhotoToolbar(ReduxActions redux) {
+    var helper = scrollerController.helper;
+    var zoomState =
+        helper.getCurrentZoomState(containerKey, imageSize, imageScale);
+    var zoomDesc = helper.getZoomDescription(zoomState, imageScale);
     return SBFooterbar([
       SBToolbarButton(
         () {
@@ -76,11 +103,22 @@ class _CreatePhotoPageState extends State<CreatePhotoPage> {
       ),
       SBToolbarButton(
         () {
+          var helper = scrollerController.helper;
+          var zoomCurrentState =
+              helper.getCurrentZoomState(containerKey, imageSize, imageScale);
+          var zoomNextState = helper.getNextZoomState(zoomCurrentState);
+          // do next
+          double scale = 1.0;
+          if (zoomNextState == Constant.zoomFitWidth) {
+            scale = helper.getZoomFitWidthScale(containerKey, imageSize);
+          } else if (zoomNextState == Constant.zoomFitHeight) {
+            scale = helper.getZoomFitHeightScale(containerKey, imageSize);
+          }
           getViewResource()
               .notifier
-              .notifyListeners<double>(Constant.eventPhotoScale, param: 1);
+              .notifyListeners<double>(Constant.eventPhotoScale, param: scale);
         },
-        text: "SCALE",
+        text: zoomDesc,
       ),
       SBToolbarButton(
         () => redux.createPhoto(widget.args.path),
@@ -96,10 +134,15 @@ class _CreatePhotoPageState extends State<CreatePhotoPage> {
   }
 
   Widget buildWhenAddingPhoto(context, ReduxActions redux) {
+    scroller = PhotoScrollerWidget(
+      path: widget.args.path,
+      controller: scrollerController,
+    );
     return Column(
       children: [
         Expanded(
-          child: PhotoScrollerWidget(path: widget.args.path),
+          key: getViewResource().getGlobalKeyByName(containerKey),
+          child: scroller,
         ),
         buildAddingPhotoToolbar(redux),
       ],

@@ -16,7 +16,8 @@ import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/photo/photo_page.dart';
 import 'package:storyboard/views/photo/photo_scroller_widget.dart';
 
-import '../../../common.dart';
+import '../../common.dart';
+import 'common.dart';
 
 void main() {
   String homePath;
@@ -56,6 +57,8 @@ void main() {
     getViewResource().actPhotos.setLogger(MockLogger());
     getViewResource().actPhotos.setNetQueue(MockNetQueue());
     getViewResource().actPhotos.setStorage(s);
+
+    setUpPhotoScrollerControllerFactory();
   });
 
   tearDown(() {
@@ -72,7 +75,7 @@ void main() {
     );
     await tester.pumpWidget(w);
 
-    expect(find.text('SCALE'), findsOneWidget);
+    expect(find.text('100%'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     expect(
         find.descendant(

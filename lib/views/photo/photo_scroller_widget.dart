@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
@@ -9,16 +10,15 @@ import 'package:storyboard/helper/image_helper.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/config/constants.dart';
 import 'package:storyboard/views/photo/origin_photo_widget.dart';
+import 'package:storyboard/views/photo/photo_scroller_controller.dart';
 
 class PhotoScrollerWidget extends StatefulWidget {
   final String path;
   final int direction;
-  final ValueNotifier<Size> imageSize;
-  final ValueNotifier<double> imageScale;
+  final PhotoScrollerController controller;
 
-  PhotoScrollerWidget({@required this.path, this.direction = 0})
-      : imageSize = ValueNotifier<Size>(null),
-        imageScale = ValueNotifier<double>(1);
+  PhotoScrollerWidget(
+      {@required this.path, this.direction = 0, this.controller});
 
   @override
   _PhotoScrollerWidgetState createState() => _PhotoScrollerWidgetState();
@@ -34,11 +34,19 @@ class _PhotoScrollerWidgetState extends State<PhotoScrollerWidget>
   AnimationController animateController;
   PhotoViewController viewController;
 
+  updateOutputController({double imageScale, Size imageSize}) {
+    if (widget.controller != null) {
+      widget.controller.value = PhotoScrollerControllerState(
+        imageScale: imageScale ?? widget.controller.value.imageScale,
+        imageSize: imageSize ?? widget.controller.value.imageSize,
+      );
+    }
+  }
+
   doScale() {
     var value =
         getViewResource().notifier.getValue<double>(Constant.eventPhotoScale);
     viewController.scale = value;
-    widget.imageScale.value = value;
   }
 
   doRotate() async {
@@ -58,7 +66,7 @@ class _PhotoScrollerWidgetState extends State<PhotoScrollerWidget>
   }
 
   void viewListener(PhotoViewControllerValue value) {
-    widget.imageScale.value = value.scale;
+    updateOutputController(imageScale: value.scale);
   }
 
   @override
@@ -67,7 +75,7 @@ class _PhotoScrollerWidgetState extends State<PhotoScrollerWidget>
     direction = widget.direction;
     nextDirection = widget.direction;
     viewController = PhotoViewController()
-      ..outputStateStream.listen((event) {});
+      ..outputStateStream.listen(viewListener);
     animateController = AnimationController(
         value: 0.0, vsync: this, duration: Constant.durationRotateAnimation);
 
@@ -86,9 +94,11 @@ class _PhotoScrollerWidgetState extends State<PhotoScrollerWidget>
       setState(() {
         image = newImage;
         currentImage = newCurrImage;
-        widget.imageSize.value = Size(
-          currentImage.width.toDouble(),
-          currentImage.height.toDouble(),
+        updateOutputController(
+          imageSize: Size(
+            currentImage.width.toDouble(),
+            currentImage.height.toDouble(),
+          ),
         );
       });
     });
@@ -146,9 +156,11 @@ class _PhotoScrollerWidgetState extends State<PhotoScrollerWidget>
             if (direction != nextDirection) {
               currentImage = nextImage;
               direction = nextDirection;
-              widget.imageSize.value = Size(
-                currentImage.width.toDouble(),
-                currentImage.height.toDouble(),
+              updateOutputController(
+                imageSize: Size(
+                  currentImage.width.toDouble(),
+                  currentImage.height.toDouble(),
+                ),
               );
             }
           });
