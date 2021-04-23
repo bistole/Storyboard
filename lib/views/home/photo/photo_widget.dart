@@ -8,6 +8,7 @@ import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/views/config/config.dart';
+import 'package:storyboard/views/config/styles.dart';
 import 'package:storyboard/views/photo/photo_page.dart';
 
 class ReduxActions {
@@ -67,12 +68,12 @@ class PhotoWidgetState extends State<PhotoWidget> {
       child: GestureDetector(
         onTap: () => redux.delete(),
         child: Container(
-          color: Colors.red.withOpacity(0.5),
+          color: Styles.swiftPanelBackColor,
           child: Align(
             alignment: Alignment.center,
             child: Icon(
               Icons.delete,
-              color: Colors.white,
+              color: Styles.buttonTextColor,
             ),
           ),
         ),
@@ -123,8 +124,8 @@ class PhotoWidgetState extends State<PhotoWidget> {
   Widget wrapWidget(ReduxActions redux, List<Widget> children) {
     Widget container = Container(
       decoration: BoxDecoration(
-        color: Colors.grey[100],
-        border: Border.all(width: 1, color: Colors.green),
+        color: Styles.photoBackColor,
+        border: Border.all(width: 1, color: Styles.borderColor),
         borderRadius: BorderRadius.all(Radius.circular(4)),
       ),
       padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
@@ -179,7 +180,7 @@ class PhotoWidgetState extends State<PhotoWidget> {
           child: Icon(
             Icons.cloud_upload,
             size: 16,
-            color: Colors.orange[700],
+            color: Styles.unsyncedColor,
           ),
         ),
       );

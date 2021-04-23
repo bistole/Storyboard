@@ -3,6 +3,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
+import 'package:storyboard/views/config/styles.dart';
 import 'package:storyboard/views/home/task/create_task_widget.dart';
 import 'package:storyboard/views/home/task/task_toolbar_widget.dart';
 import 'package:storyboard/views/home/task/task_widget.dart';
@@ -62,7 +63,7 @@ class TaskListWidget extends StatelessWidget {
       builder: (context, ReduxActions redux) {
         return Container(
           decoration: BoxDecoration(
-            color: Colors.grey[100],
+            color: Styles.taskBackColor,
           ),
           child: Column(children: [
             TaskToolbarWidget(),

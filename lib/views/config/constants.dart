@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class Constant {
   static const eventPhotoScale = "PHOTO:SCALE";
   static const eventPhotoRotate = "PHOTO:ROTATE";
@@ -13,8 +11,6 @@ class Constant {
   static const zoomFitWidth = 'SCALE_TO_WIDTH';
   static const zoomFitHeight = 'SCALE_TO_HEIGHT';
   static const zoomFree = 'SCALE_FREE';
-
-  static final photoBackgroundColor = Colors.grey[100];
 
   static final durationRotateAnimation = Duration(milliseconds: 200);
 }

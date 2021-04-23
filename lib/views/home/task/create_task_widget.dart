@@ -5,6 +5,7 @@ import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/views/config/config.dart';
+import 'package:storyboard/views/config/styles.dart';
 
 class ReduxActions {
   final void Function(String) create;
@@ -37,7 +38,7 @@ class CreateTaskWidget extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 child: TextField(
-                  style: Theme.of(context).textTheme.headline2,
+                  style: Styles.colorTitleTextStyle,
                   onSubmitted: redux.create,
                   focusNode: FocusNode(onKey: (node, event) {
                     if (event.isKeyPressed(LogicalKeyboardKey.escape)) {

@@ -3,6 +3,7 @@ import 'package:storyboard/views/auth/log_entrance.dart';
 import 'package:storyboard/views/auth/server_picker.dart';
 import 'package:storyboard/views/auth/server_qrcode.dart';
 import 'package:storyboard/views/auth/version_widget.dart';
+import 'package:storyboard/views/config/styles.dart';
 
 class ServerWidget extends StatelessWidget {
   @override
@@ -13,9 +14,9 @@ class ServerWidget extends StatelessWidget {
         child: Column(
           children: [
             ServerQRCode(),
-            Divider(color: Colors.grey),
+            Styles.divider,
             ServerPicker(),
-            Divider(color: Colors.grey),
+            Styles.divider,
             LogEntrance(),
             VersionWidget(),
           ],

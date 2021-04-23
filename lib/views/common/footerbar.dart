@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
+import 'package:storyboard/views/config/styles.dart';
 
 class SBFooterbar extends StatelessWidget {
   final List<SBToolbarButton> children;
@@ -9,7 +10,7 @@ class SBFooterbar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.5),
+        color: Styles.toolbarBackColor,
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).padding.bottom,

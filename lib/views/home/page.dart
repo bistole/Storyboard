@@ -3,6 +3,7 @@ import 'package:storyboard/views/common/app_icons.dart';
 import 'package:storyboard/views/common/panel_popup_route.dart';
 import 'package:storyboard/views/common/server_status.dart';
 import 'package:storyboard/views/config/config.dart';
+import 'package:storyboard/views/config/styles.dart';
 import 'package:storyboard/views/home/category_panel.dart';
 import 'package:storyboard/views/home/detail_page_widget.dart';
 
@@ -49,7 +50,7 @@ class HomePage extends StatelessWidget {
   Widget buildMenuButton(context, Function onTap) {
     return TextButton.icon(
       onPressed: onTap,
-      icon: Icon(AppIcons.menu, color: Colors.white),
+      icon: Icon(AppIcons.menu, color: Styles.buttonTextColor),
       label: Text(""),
     );
   }

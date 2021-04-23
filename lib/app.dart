@@ -4,6 +4,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/views/auth/page.dart';
+import 'package:storyboard/views/config/styles.dart';
 
 import 'package:storyboard/views/home/page.dart';
 import 'package:storyboard/redux/models/app.dart';
@@ -29,11 +30,7 @@ class StoryBoardApp extends StatelessWidget {
                 child: Text(
                   "Hello, Storyboard",
                   textDirection: TextDirection.ltr,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
-                  ),
+                  style: Styles.welcomeTextStyle,
                 ),
                 margin: EdgeInsets.symmetric(vertical: 16.0),
               ),
@@ -87,23 +84,14 @@ class StoryBoardApp extends StatelessWidget {
             title: 'Storyboard',
             onGenerateRoute: onGenerateRoute,
             theme: ThemeData(
-              primarySwatch: Colors.green,
+              primarySwatch: Styles.primaryColor,
               visualDensity: VisualDensity.adaptivePlatformDensity,
-              textTheme: TextTheme(
-                headline2: TextStyle(
-                  fontSize: 18.0,
-                ),
-                headline3: TextStyle(
-                  fontSize: 14.0,
-                  color: Colors.grey,
-                ),
-              ),
               textButtonTheme: TextButtonThemeData(
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.resolveWith(
                     (Set<MaterialState> states) {
                       if (states.contains(MaterialState.pressed)) {
-                        return Theme.of(context).colorScheme.primary;
+                        return Theme.of(context).primaryColorDark;
                       }
                       return null; // Use the component's default.
                     },

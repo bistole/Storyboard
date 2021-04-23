@@ -9,6 +9,7 @@ import 'package:photo_view/photo_view.dart';
 import 'package:storyboard/helper/image_helper.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/config/constants.dart';
+import 'package:storyboard/views/config/styles.dart';
 import 'package:storyboard/views/photo/origin_photo_widget.dart';
 import 'package:storyboard/views/photo/photo_scroller_controller.dart';
 
@@ -120,9 +121,9 @@ class _PhotoScrollerWidgetState extends State<PhotoScrollerWidget>
 
   Widget buildViewer(Size childSize) {
     return Container(
-      decoration: BoxDecoration(color: Constant.photoBackgroundColor),
+      decoration: BoxDecoration(color: Styles.photoBackColor),
       child: PhotoView.customChild(
-        backgroundDecoration: BoxDecoration(color: Colors.transparent),
+        backgroundDecoration: BoxDecoration(color: Styles.transparentColor),
         initialScale: viewController.scale,
         childSize: childSize,
         child: OriginPhotoWidget(
@@ -168,14 +169,14 @@ class _PhotoScrollerWidgetState extends State<PhotoScrollerWidget>
       });
 
     return Container(
-      decoration: BoxDecoration(color: Constant.photoBackgroundColor),
+      decoration: BoxDecoration(color: Styles.photoBackColor),
       child: RotationTransition(
         turns: turns,
         child: ScaleTransition(
           scale: scale,
           child: PhotoView.customChild(
             initialScale: viewController.scale,
-            backgroundDecoration: BoxDecoration(color: Colors.transparent),
+            backgroundDecoration: BoxDecoration(color: Styles.transparentColor),
             childSize: childSize,
             child: OriginPhotoWidget(
               image: nextImage,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
+import 'package:storyboard/views/config/styles.dart';
 
 class SBToolbar extends StatelessWidget {
   final List<SBToolbarButton> children;
@@ -10,9 +11,9 @@ class SBToolbar extends StatelessWidget {
     return Container(
       height: 40,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Styles.toolbarBackColor,
         border: Border(
-          bottom: BorderSide(color: Colors.grey[300], width: 2),
+          bottom: BorderSide(color: Styles.toolbarBorderColor, width: 2),
         ),
       ),
       padding: EdgeInsets.only(

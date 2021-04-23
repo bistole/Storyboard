@@ -6,6 +6,7 @@ import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
 import 'package:storyboard/views/config/config.dart';
+import 'package:storyboard/views/config/styles.dart';
 
 class ReduxActions {
   final void Function() delete;
@@ -49,22 +50,17 @@ class TaskWidget extends StatelessWidget {
       // wait for sync
       return Row(children: [
         Expanded(
-          child: Text(fmt.format(date),
-              style: Theme.of(context).textTheme.headline3),
+          child: Text(fmt.format(date), style: Styles.normalBodyText),
         ),
         Align(
-          child: Icon(
-            Icons.cloud_upload,
-            size: 16,
-            color: Colors.orange[700],
-          ),
+          child:
+              Icon(Icons.cloud_upload, size: 16, color: Styles.unsyncedColor),
         ),
       ]);
     } else {
       return Align(
         alignment: Alignment.centerLeft,
-        child: Text(fmt.format(date),
-            style: Theme.of(context).textTheme.headline3),
+        child: Text(fmt.format(date), style: Styles.normalBodyText),
       );
     }
   }
@@ -73,7 +69,7 @@ class TaskWidget extends StatelessWidget {
     return Expanded(
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.grey[100],
+          color: Styles.taskBackColor,
           borderRadius: BorderRadius.all(Radius.circular(4)),
         ),
         margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -81,8 +77,7 @@ class TaskWidget extends StatelessWidget {
           children: [
             Align(
               alignment: Alignment.centerLeft,
-              child: Text(task.title,
-                  style: Theme.of(context).textTheme.headline2),
+              child: Text(task.title, style: Styles.colorTitleTextStyle),
             ),
             buildTimeAndSync(context),
           ],

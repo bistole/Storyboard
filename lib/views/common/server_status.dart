@@ -5,6 +5,7 @@ import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/setting.dart';
 import 'package:storyboard/views/auth/page.dart';
 import 'package:storyboard/views/common/app_icons.dart';
+import 'package:storyboard/views/config/styles.dart';
 
 class ReduxActions {
   final Reachable reachable;
@@ -19,8 +20,9 @@ class ServerStatus extends StatelessWidget {
         return ReduxActions(reachable: store.state.setting.serverReachable);
       },
       builder: (BuildContext context, ReduxActions redux) {
-        var color =
-            redux.reachable == Reachable.Yes ? Colors.white : Colors.red;
+        var color = redux.reachable == Reachable.Yes
+            ? Styles.buttonTextColor
+            : Styles.errColor;
         return TextButton.icon(
           onPressed: () {
             Navigator.of(context).pushNamed(

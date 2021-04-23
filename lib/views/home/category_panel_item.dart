@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:storyboard/views/config/styles.dart';
 
 class CategoryPanelItem extends StatelessWidget {
   final bool selected;
@@ -11,8 +12,6 @@ class CategoryPanelItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color bkColor =
-        this.selected ? Theme.of(context).primaryColor : Colors.white;
     return InkWell(
       onTap: () {
         if (this.onTap != null) {
@@ -23,12 +22,21 @@ class CategoryPanelItem extends StatelessWidget {
         height: 32,
         width: double.infinity,
         decoration: BoxDecoration(
-            color: bkColor,
-            border: Border(bottom: BorderSide(width: 1, color: Colors.grey))),
+          color: this.selected
+              ? Styles.menuPanelSelectedBackColor
+              : Styles.menuPanelBackColor,
+          border: Border(
+            bottom: BorderSide(width: 1, color: Styles.toolbarBorderColor),
+          ),
+        ),
         padding: EdgeInsets.fromLTRB(padding.left + 8, 4, 8, 4),
         child: Text(
           this.text,
-          style: Theme.of(context).textTheme.headline2,
+          style: Styles.titleTextStyle.copyWith(
+            color: this.selected
+                ? Styles.menuPanelSelectedColor
+                : Styles.menuPanelColor,
+          ),
         ),
       ),
     );
