@@ -101,9 +101,14 @@ class HomePage extends StatelessWidget {
     );
     return Scaffold(
       appBar: appBar,
-      body: getViewResource().isWiderLayout(context)
-          ? buildDesktopLayout(context)
-          : buildMobileLayout(context),
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: getViewResource().isWiderLayout(context)
+            ? buildDesktopLayout(context)
+            : buildMobileLayout(context),
+      ),
     );
   }
 }

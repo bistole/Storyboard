@@ -47,7 +47,16 @@ class Styles {
   static const lessBodyText = TextStyle(fontSize: 14.0, color: Colors.grey);
   static const normalBodyText = TextStyle(fontSize: 14.0, color: Colors.black);
   static const boldBodyText = TextStyle(
-      fontSize: 14.0, fontWeight: FontWeight.bold, color: primaryColor);
+    fontSize: 14.0,
+    fontWeight: FontWeight.bold,
+    color: primaryColor,
+  );
+  static const urlBodyText = TextStyle(
+    fontSize: 14.0,
+    color: Color(0xFF616161), // grey 700
+    decoration: TextDecoration.underline,
+  );
+
   static const errBodyText = TextStyle(fontSize: 14.0, color: errColor);
 
   static const divider = Divider(color: borderColor);

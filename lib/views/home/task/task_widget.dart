@@ -7,6 +7,7 @@ import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/config/styles.dart';
+import 'package:storyboard/views/home/task/task_helper.dart';
 
 class ReduxActions {
   final void Function() delete;
@@ -50,7 +51,7 @@ class TaskWidget extends StatelessWidget {
       // wait for sync
       return Row(children: [
         Expanded(
-          child: Text(fmt.format(date), style: Styles.normalBodyText),
+          child: Text(fmt.format(date), style: Styles.lessBodyText),
         ),
         Align(
           child:
@@ -60,7 +61,7 @@ class TaskWidget extends StatelessWidget {
     } else {
       return Align(
         alignment: Alignment.centerLeft,
-        child: Text(fmt.format(date), style: Styles.normalBodyText),
+        child: Text(fmt.format(date), style: Styles.lessBodyText),
       );
     }
   }
@@ -77,7 +78,19 @@ class TaskWidget extends StatelessWidget {
           children: [
             Align(
               alignment: Alignment.centerLeft,
-              child: Text(task.title, style: Styles.colorTitleTextStyle),
+              child: RichText(
+                key: getViewResource()
+                    .getGlobalKeyByName("TASK-LIST:" + task.uuid),
+                text: TextSpan(
+                  style: Styles.normalBodyText,
+                  children: getTaskHelper().buildTextSpanRegex(
+                    Styles.normalBodyText,
+                    task.title,
+                    interactive: true,
+                    cursor: true,
+                  ),
+                ),
+              ),
             ),
             buildTimeAndSync(context),
           ],

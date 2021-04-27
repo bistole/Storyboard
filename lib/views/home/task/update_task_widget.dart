@@ -7,6 +7,7 @@ import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/task.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/config/styles.dart';
+import 'package:storyboard/views/home/task/task_editor_controller.dart';
 
 class ReduxActions {
   final void Function(String) update;
@@ -15,20 +16,65 @@ class ReduxActions {
   ReduxActions({this.update, this.cancel});
 }
 
-class UpdateTaskWidget extends StatelessWidget {
+class UpdateTaskWidget extends StatefulWidget {
   final Task task;
 
   UpdateTaskWidget({this.task});
 
   @override
+  _UpdateTaskWidgetState createState() => _UpdateTaskWidgetState();
+}
+
+class _UpdateTaskWidgetState extends State<UpdateTaskWidget> {
+  bool updated;
+  ReduxActions redux;
+  TaskEditorController controller;
+  FocusNode focusNode;
+
+  void focusNodeCallback() {
+    if (updated) return;
+    if (!focusNode.hasFocus) {
+      redux.update(controller.text);
+      updated = true;
+    }
+  }
+
+  @override
+  void initState() {
+    updated = false;
+    controller = TaskEditorController(text: widget.task.title);
+    focusNode = FocusNode(
+      onKey: (node, event) {
+        if (event.isKeyPressed(LogicalKeyboardKey.escape)) {
+          redux.cancel();
+        }
+        return false;
+      },
+    );
+
+    focusNode.addListener(focusNodeCallback);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    focusNode.removeListener(focusNodeCallback);
+    focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return StoreConnector<AppState, ReduxActions>(
       converter: (store) {
-        return ReduxActions(
+        return redux = ReduxActions(
           update: (String value) {
             store.dispatch(new ChangeStatusAction(status: StatusKey.ListTask));
-            if (value.length > 0 && value != task.title) {
-              getViewResource().actTasks.actUpdateTask(store, task.uuid, value);
+            if (value.length > 0 && value != widget.task.title) {
+              getViewResource()
+                  .actTasks
+                  .actUpdateTask(store, widget.task.uuid, value);
             }
           },
           cancel: () {
@@ -43,16 +89,11 @@ class UpdateTaskWidget extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 child: TextField(
-                  style: Styles.colorTitleTextStyle,
-                  onSubmitted: redux.update,
-                  focusNode: FocusNode(onKey: (node, event) {
-                    if (event.isKeyPressed(LogicalKeyboardKey.escape)) {
-                      redux.cancel();
-                    }
-                    return false;
-                  }),
+                  style: Styles.normalBodyText,
+                  focusNode: focusNode,
                   autofocus: true,
-                  controller: TextEditingController(text: task.title),
+                  maxLines: null,
+                  controller: controller,
                   decoration: InputDecoration(hintText: 'Put task name here'),
                 ),
               ),

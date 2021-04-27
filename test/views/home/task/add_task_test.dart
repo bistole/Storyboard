@@ -4,7 +4,7 @@
 // utility that Flutter provides. For example, you can send tap and scroll
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
-
+import 'package:flutter/services.dart';
 import 'package:storyboard/actions/tasks.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/configs/factory.dart';
@@ -67,6 +67,7 @@ void main() {
         int ts = DateTime.now().millisecondsSinceEpoch ~/ 1000 + 1;
         int tsBefore = ts - 6;
         Task task = store.state.taskRepo.tasks.values.first;
+
         expect(store.state.taskRepo.tasks[task.uuid], isNotNull);
         expect(task.title, 'Add new list');
         expect(task.deleted, 0);
@@ -81,7 +82,48 @@ void main() {
         // verify the UI is correct
         expect(find.byType(TextField), findsNothing);
         expect(find.text('ADD TASK'), findsOneWidget);
-        expect(find.text('Add new list'), findsOneWidget);
+
+        var gKey =
+            getViewResource().getGlobalKeyByName("TASK-LIST:" + task.uuid);
+        RichText rt2 = find.byKey(gKey).evaluate().first.widget as RichText;
+        expect(rt2.text.toPlainText(), 'Add new list');
+      });
+
+      testWidgets('add item cancel', (WidgetTester tester) async {
+        // home page
+        var widget = buildTestableWidget(HomePage(title: 'title'), store);
+        await tester.pumpWidget(widget);
+
+        // Add Button here
+        expect(find.byType(SBToolbarButton), findsNWidgets(1));
+        expect(find.text('ADD TASK'), findsOneWidget);
+
+        // Tap 'ADD' button
+        await tester.tap(find.text('ADD TASK'));
+        await tester.pump();
+
+        // Find TextField
+        expect(find.byType(TextField), findsOneWidget);
+
+        // Input one item and submit
+        await tester.enterText(find.byType(TextField), 'Add new list');
+
+        // wait
+        await tester.idle();
+        await tester.tap(find.byType(TextField));
+        await tester.pumpAndSettle();
+
+        // press 'escape'
+        await simulateKeyDownEvent(LogicalKeyboardKey.escape);
+        await simulateKeyUpEvent(LogicalKeyboardKey.escape);
+        await tester.pumpAndSettle();
+
+        expect(store.state.taskRepo.tasks.length, 0);
+        expect(store.state.status.status, StatusKey.ListTask);
+
+        // verify the UI is correct
+        expect(find.byType(TextField), findsNothing);
+        expect(find.text('ADD TASK'), findsOneWidget);
       });
     },
   );

@@ -57,7 +57,9 @@ void main() {
         await tester.pumpWidget(widget);
 
         // find one task
-        expect(find.text('will delete title'), findsOneWidget);
+        var gKey = getViewResource().getGlobalKeyByName("TASK-LIST:" + uuid);
+        RichText rt = find.byKey(gKey).evaluate().first.widget as RichText;
+        expect(rt.text.toPlainText(), 'will delete title');
 
         // find popmenu button
         var popbtnFinder = find.byType(typeof<PopupMenuButton<String>>());
@@ -86,7 +88,7 @@ void main() {
         expect(store.state.taskRepo.tasks[uuid].deleted, 1);
 
         // verify the UI is correct
-        expect(find.text('will delete title'), findsNothing);
+        expect(find.byKey(gKey), findsNothing);
       });
     },
   );
