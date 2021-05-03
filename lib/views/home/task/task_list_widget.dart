@@ -63,13 +63,13 @@ class TaskListWidget extends StatelessWidget {
       builder: (context, ReduxActions redux) {
         return Container(
           decoration: BoxDecoration(
-            color: Styles.taskBackColor,
+            color: Styles.taskBoardBackColor,
           ),
           child: Column(children: [
             TaskToolbarWidget(),
             Expanded(
               child: Container(
-                padding: padding,
+                margin: padding,
                 child: ListView(
                   children: buildList(redux),
                 ),

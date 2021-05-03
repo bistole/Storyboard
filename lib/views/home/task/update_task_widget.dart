@@ -26,40 +26,43 @@ class UpdateTaskWidget extends StatefulWidget {
 }
 
 class _UpdateTaskWidgetState extends State<UpdateTaskWidget> {
-  bool updated;
+  bool executed;
   ReduxActions redux;
   TaskEditorController controller;
   FocusNode focusNode;
 
-  void focusNodeCallback() {
-    if (updated) return;
+  focusChanged() {
     if (!focusNode.hasFocus) {
-      redux.update(controller.text);
-      updated = true;
+      redux.cancel();
     }
   }
 
   @override
   void initState() {
-    updated = false;
+    executed = false;
     controller = TaskEditorController(text: widget.task.title);
     focusNode = FocusNode(
       onKey: (node, event) {
         if (event.isKeyPressed(LogicalKeyboardKey.escape)) {
-          redux.cancel();
+          setState(() {
+            executed = true;
+            redux.cancel();
+          });
         }
         return false;
       },
     );
-
-    focusNode.addListener(focusNodeCallback);
+    focusNode.addListener(focusChanged);
     super.initState();
   }
 
   @override
   void dispose() {
+    if (!executed) {
+      redux.update(controller.text);
+    }
     controller.dispose();
-    focusNode.removeListener(focusNodeCallback);
+    focusNode.removeListener(focusChanged);
     focusNode.dispose();
     super.dispose();
   }
@@ -70,7 +73,6 @@ class _UpdateTaskWidgetState extends State<UpdateTaskWidget> {
       converter: (store) {
         return redux = ReduxActions(
           update: (String value) {
-            store.dispatch(new ChangeStatusAction(status: StatusKey.ListTask));
             if (value.length > 0 && value != widget.task.title) {
               getViewResource()
                   .actTasks
@@ -87,14 +89,22 @@ class _UpdateTaskWidgetState extends State<UpdateTaskWidget> {
           children: [
             Expanded(
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 16),
+                margin: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 child: TextField(
                   style: Styles.normalBodyText,
                   focusNode: focusNode,
                   autofocus: true,
                   maxLines: null,
                   controller: controller,
-                  decoration: InputDecoration(hintText: 'Put task name here'),
+                  decoration: InputDecoration(
+                    hintText: 'Put task name here',
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Styles.borderColor,
+                        width: 1,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),

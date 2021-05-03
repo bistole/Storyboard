@@ -58,29 +58,13 @@ void main() {
         await tester.pumpWidget(widget);
 
         // find one task
-        var gKey = getViewResource().getGlobalKeyByName("TASK-LIST:" + uuid);
+        var gKey =
+            getViewResource().getGlobalKeyByName("TASK-LIST-TEXT:" + uuid);
         RichText rt = find.byKey(gKey).evaluate().first.widget as RichText;
         expect(rt.text.toPlainText(), 'original Title');
 
-        // find popmenu button
-        var popbtnFinder = find.byType(typeof<PopupMenuButton<String>>());
-        expect(popbtnFinder, findsOneWidget);
-
-        // tap the button
-        await tester.tap(popbtnFinder);
-        await tester.pumpAndSettle();
-
-        // find two buttons
-        var itmFinder = find.byType(typeof<PopupMenuItem<String>>());
-        expect(itmFinder, findsNWidgets(2));
-
-        // tap change
-        var changeItmElem = tester.element(itmFinder.last);
-        expect(
-          (changeItmElem.widget as PopupMenuItem<String>).value,
-          "change",
-        );
-        await tester.tap(itmFinder.last);
+        // tap the rich text
+        await tester.tap(find.byKey(gKey));
         await tester.pumpAndSettle();
 
         // Find TextField
@@ -89,7 +73,7 @@ void main() {
         // Input one item and submit
         await tester.enterText(find.byType(TextField), 'Add updated list');
         await tester.testTextInput.receiveAction(TextInputAction.done);
-        await tester.pump();
+        await tester.pumpAndSettle();
 
         // Verify the redux state is correct
         expect(store.state.status.status, StatusKey.ListTask);
@@ -109,29 +93,13 @@ void main() {
         await tester.pumpWidget(widget);
 
         // find one task
-        var gKey = getViewResource().getGlobalKeyByName("TASK-LIST:" + uuid);
+        var gKey =
+            getViewResource().getGlobalKeyByName("TASK-LIST-TEXT:" + uuid);
         RichText rt = find.byKey(gKey).evaluate().first.widget as RichText;
         expect(rt.text.toPlainText(), 'original Title');
 
-        // find popmenu button
-        var popbtnFinder = find.byType(typeof<PopupMenuButton<String>>());
-        expect(popbtnFinder, findsOneWidget);
-
-        // tap the button
-        await tester.tap(popbtnFinder);
-        await tester.pumpAndSettle();
-
-        // find two buttons
-        var itmFinder = find.byType(typeof<PopupMenuItem<String>>());
-        expect(itmFinder, findsNWidgets(2));
-
-        // tap change
-        var changeItmElem = tester.element(itmFinder.last);
-        expect(
-          (changeItmElem.widget as PopupMenuItem<String>).value,
-          "change",
-        );
-        await tester.tap(itmFinder.last);
+        // tap the rich text
+        await tester.tap(find.byKey(gKey));
         await tester.pumpAndSettle();
 
         // Find TextField

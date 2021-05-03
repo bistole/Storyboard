@@ -10,116 +10,213 @@ import 'package:storyboard/views/config/styles.dart';
 import 'package:storyboard/views/home/task/task_helper.dart';
 
 class ReduxActions {
+  StatusKey status;
   final void Function() delete;
   final void Function() update;
-  ReduxActions({this.delete, this.update});
+  ReduxActions({this.status, this.delete, this.update});
 }
 
-class TaskWidget extends StatelessWidget {
+class TaskWidget extends StatefulWidget {
   final Task task;
 
   TaskWidget({this.task});
 
-  Widget buildPopupMenu(ReduxActions redux) {
-    return PopupMenuButton(
-      onSelected: (value) {
-        if (value == 'delete') {
-          redux.delete();
-        } else {
-          redux.update();
-        }
-      },
-      icon: Icon(Icons.more_horiz),
-      itemBuilder: (_) => <PopupMenuItem<String>>[
-        new PopupMenuItem<String>(
-          child: Text('Delete'),
-          value: 'delete',
-        ),
-        new PopupMenuItem<String>(
-          child: Text('Change'),
-          value: 'change',
-        ),
-      ],
-    );
+  @override
+  TaskWidgetState createState() => TaskWidgetState();
+}
+
+class TaskWidgetState extends State<TaskWidget> {
+  ReduxActions redux;
+  bool isMenuShown = false;
+
+  @override
+  void initState() {
+    isMenuShown = false;
+    super.initState();
   }
 
-  Widget buildTimeAndSync(context) {
-    var fmt = new DateFormat('yyyy/MM/dd hh:mm a');
-    var date = DateTime.fromMillisecondsSinceEpoch(task.updatedAt * 1000);
+  void showMenu() {
+    if (isMenuShown) return;
+    setState(() {
+      isMenuShown = true;
+    });
+  }
 
-    if (task.ts == 0) {
+  void hideMenu() {
+    if (!isMenuShown) return;
+    setState(() {
+      isMenuShown = false;
+    });
+  }
+
+  void editTask(ReduxActions redux) {
+    redux.update();
+  }
+
+  Widget buildTimeAndSync() {
+    var fmt = new DateFormat('yyyy/MM/dd hh:mm a');
+    var date =
+        DateTime.fromMillisecondsSinceEpoch(widget.task.updatedAt * 1000);
+
+    if (widget.task.ts == 0) {
       // wait for sync
-      return Row(children: [
-        Expanded(
+      return Container(
+        margin: EdgeInsets.only(top: 4),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(fmt.format(date), style: Styles.lessBodyText),
+            ),
+            Align(
+              child: Icon(Icons.cloud_upload,
+                  size: 16, color: Styles.unsyncedColor),
+            ),
+          ],
+        ),
+      );
+    } else {
+      return Container(
+        margin: EdgeInsets.only(top: 4),
+        child: Align(
+          alignment: Alignment.centerLeft,
           child: Text(fmt.format(date), style: Styles.lessBodyText),
         ),
-        Align(
-          child:
-              Icon(Icons.cloud_upload, size: 16, color: Styles.unsyncedColor),
-        ),
-      ]);
-    } else {
-      return Align(
-        alignment: Alignment.centerLeft,
-        child: Text(fmt.format(date), style: Styles.lessBodyText),
       );
     }
   }
 
-  Widget buildTask(context) {
-    return Expanded(
-      child: Container(
-        decoration: BoxDecoration(
-          color: Styles.taskBackColor,
-          borderRadius: BorderRadius.all(Radius.circular(4)),
-        ),
-        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Column(
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: RichText(
-                key: getViewResource()
-                    .getGlobalKeyByName("TASK-LIST:" + task.uuid),
-                text: TextSpan(
-                  style: Styles.normalBodyText,
-                  children: getTaskHelper().buildTextSpanRegex(
-                    Styles.normalBodyText,
-                    task.title,
-                    interactive: true,
-                    cursor: true,
-                  ),
-                ),
-              ),
-            ),
-            buildTimeAndSync(context),
-          ],
+  Widget buildRichText() {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: RichText(
+        key: getViewResource()
+            .getGlobalKeyByName("TASK-LIST-TEXT:" + widget.task.uuid),
+        text: TextSpan(
+          style: Styles.normalBodyText,
+          children: getTaskHelper().buildTextSpanRegex(
+            Styles.normalBodyText,
+            widget.task.title,
+            interactive: true,
+            cursor: true,
+          ),
         ),
       ),
     );
+  }
+
+  Widget buildDeleteWidget(ReduxActions redux) {
+    return AnimatedPositioned(
+      width: 48,
+      right: isMenuShown ? 0 : -48,
+      top: 0,
+      bottom: 0,
+      curve: Curves.ease,
+      duration: Duration(milliseconds: 300),
+      child: GestureDetector(
+        onTap: () => redux.delete(),
+        child: Container(
+          color: Styles.swiftPanelBackColor,
+          child: Align(
+            alignment: Alignment.center,
+            child: Icon(
+              Icons.delete,
+              color: Styles.buttonTextColor,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget wrapWidgetWithGestureDetector(ReduxActions redux, Widget child) {
+    if (getViewResource().deviceManager.isDesktop()) {
+      return MouseRegion(
+        onEnter: (event) => showMenu(),
+        onExit: (event) => hideMenu(),
+        onHover: (event) => showMenu(),
+        child: GestureDetector(
+          key: getViewResource()
+              .getGlobalKeyByName("TASK-LIST:" + widget.task.uuid),
+          onTap: () {
+            editTask(redux);
+          },
+          child: child,
+        ),
+      );
+    } else {
+      return GestureDetector(
+        key: getViewResource()
+            .getGlobalKeyByName("TASK-LIST:" + widget.task.uuid),
+        onTap: () {
+          if (isMenuShown) {
+            hideMenu();
+          } else {
+            editTask(redux);
+          }
+        },
+        onPanUpdate: (details) {
+          if (details.delta.dx < 0) {
+            showMenu();
+          } else {
+            hideMenu();
+          }
+        },
+        onLongPress: () {
+          showMenu();
+        },
+        child: child,
+      );
+    }
+  }
+
+  Widget buildTask(BuildContext context, ReduxActions redux) {
+    var container = Stack(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Styles.taskBackColor,
+            borderRadius: BorderRadius.all(Radius.circular(4)),
+            border: Border.all(color: Styles.taskBackColor, width: 8),
+          ),
+          child: Column(
+            children: [
+              buildRichText(),
+              buildTimeAndSync(),
+            ],
+          ),
+        ),
+        buildDeleteWidget(redux),
+      ],
+    );
+    if (redux.status == StatusKey.ListTask) {
+      return wrapWidgetWithGestureDetector(redux, container);
+    }
+    return container;
   }
 
   @override
   Widget build(BuildContext context) {
     return StoreConnector<AppState, ReduxActions>(
       converter: (store) {
-        return ReduxActions(
+        return redux = ReduxActions(
+          status: store.state.status.status,
           delete: () {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
-            getViewResource().actTasks.actDeleteTask(store, task.uuid);
+            getViewResource().actTasks.actDeleteTask(store, widget.task.uuid);
           },
           update: () {
             // start to update
             store.dispatch(ChangeStatusWithUUIDAction(
-                status: StatusKey.EditingTask, uuid: task.uuid));
+                status: StatusKey.EditingTask, uuid: widget.task.uuid));
           },
         );
       },
       builder: (context, ReduxActions redux) {
         return Row(
           children: [
-            this.buildTask(context),
-            this.buildPopupMenu(redux),
+            Expanded(
+              child: this.buildTask(context, redux),
+            )
           ],
         );
       },

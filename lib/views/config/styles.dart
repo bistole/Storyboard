@@ -21,7 +21,9 @@ class Styles {
   static const swiftPanelBackColor = Color(0x7FF44336); // red with 0.5 alpha
 
   static const photoBackColor = Color(0xFFF5F5F5); // grey 100
-  static const taskBackColor = Color(0xFFF5F5F5); // grey 100
+
+  static const taskBoardBackColor = Color(0xFFF5F5F5); // grey 100
+  static const taskBackColor = Colors.white; // grey 100
 
   static const selectedColor = Colors.white;
   static const selectedBackColor = primaryColor;

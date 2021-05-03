@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
+import 'package:storyboard/views/home/task/task_widget.dart';
 
 import '../../../common.dart';
 
@@ -57,29 +58,25 @@ void main() {
         await tester.pumpWidget(widget);
 
         // find one task
-        var gKey = getViewResource().getGlobalKeyByName("TASK-LIST:" + uuid);
+        var gKey =
+            getViewResource().getGlobalKeyByName("TASK-LIST-TEXT:" + uuid);
         RichText rt = find.byKey(gKey).evaluate().first.widget as RichText;
         expect(rt.text.toPlainText(), 'will delete title');
 
-        // find popmenu button
-        var popbtnFinder = find.byType(typeof<PopupMenuButton<String>>());
-        expect(popbtnFinder, findsOneWidget);
+        // find delete icon
+        expect(find.byIcon(Icons.delete), findsOneWidget);
 
-        // tap the button
-        await tester.tap(popbtnFinder);
+        // hover
+        final gesture = await tester.createGesture();
+        await gesture.addPointer(location: Offset.zero);
+        addTearDown(gesture.removePointer);
+        await tester.pump();
+
+        await gesture.moveTo(tester.getCenter(find.byType(TaskWidget)));
         await tester.pumpAndSettle();
 
-        // find two buttons
-        var itmFinder = find.byType(typeof<PopupMenuItem<String>>());
-        expect(itmFinder, findsNWidgets(2));
-
-        // tap change
-        var changeItmElem = tester.element(itmFinder.first);
-        expect(
-          (changeItmElem.widget as PopupMenuItem<String>).value,
-          "delete",
-        );
-        await tester.tap(itmFinder.first);
+        // tap to delete
+        await tester.tap(find.byIcon(Icons.delete));
         await tester.pumpAndSettle();
 
         // Verify the redux state is correct

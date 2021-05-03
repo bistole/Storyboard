@@ -61,7 +61,7 @@ void main() {
         // Input one item and submit
         await tester.enterText(find.byType(TextField), 'Add new list');
         await tester.testTextInput.receiveAction(TextInputAction.done);
-        await tester.pump();
+        await tester.pumpAndSettle();
 
         expect(store.state.taskRepo.tasks.length, 1);
         int ts = DateTime.now().millisecondsSinceEpoch ~/ 1000 + 1;
@@ -84,7 +84,8 @@ void main() {
         expect(find.text('ADD TASK'), findsOneWidget);
 
         var gKey =
-            getViewResource().getGlobalKeyByName("TASK-LIST:" + task.uuid);
+            getViewResource().getGlobalKeyByName("TASK-LIST-TEXT:" + task.uuid);
+        expect(find.byKey(gKey), findsOneWidget);
         RichText rt2 = find.byKey(gKey).evaluate().first.widget as RichText;
         expect(rt2.text.toPlainText(), 'Add new list');
       });

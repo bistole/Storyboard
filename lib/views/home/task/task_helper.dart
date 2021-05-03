@@ -13,11 +13,15 @@ class TaskHelper {
 
   List<InlineSpan> buildTextSpanRegex(TextStyle style, String s,
       {bool interactive = false, bool cursor = false}) {
+    final TextStyle urlStyle =
+        style != null ? style.merge(Styles.urlBodyText) : Styles.urlBodyText;
+
     List<InlineSpan> result = [];
     int offset = 0;
     for (RegExpMatch iter in regex.allMatches(s)) {
       if (iter.start > offset) {
         result.add(TextSpan(
+          style: style,
           text: s.substring(offset, iter.start),
         ));
       }
@@ -30,11 +34,11 @@ class TaskHelper {
                     await launch(url);
                   }
                 },
-              style: Styles.urlBodyText,
+              style: urlStyle,
               text: url,
             )
           : TextSpan(
-              style: Styles.urlBodyText,
+              style: urlStyle,
               text: url,
             );
 
@@ -50,7 +54,7 @@ class TaskHelper {
       result.add(widget);
       offset = iter.end;
     }
-    result.add(TextSpan(text: s.substring(offset)));
+    result.add(TextSpan(style: style, text: s.substring(offset)));
     return result;
   }
 }

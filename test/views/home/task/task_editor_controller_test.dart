@@ -37,6 +37,34 @@ void main() {
         expect(ts.children[2].toPlainText(), 'ext');
       });
 
+      test('composing, special style', () {
+        TaskEditorController tec = TaskEditorController();
+
+        tec.value = TextEditingValue(
+          text: 'simple text',
+          selection: TextSelection.collapsed(offset: -1),
+          composing: TextRange(start: 5, end: 8),
+        );
+
+        TextSpan ts = tec.buildTextSpan(
+          context: null,
+          withComposing: true,
+          style: TextStyle(decoration: TextDecoration.underline),
+        );
+
+        expect(ts.children.length, 3);
+        expect(ts.children[0].toPlainText(), 'simpl');
+        expect(
+            ts.children[0].style.decoration.contains(TextDecoration.underline),
+            true);
+        expect(ts.children[1].toPlainText(), 'e t');
+        expect(
+            ts.children[1].style.decoration
+                .contains(TextDecoration.lineThrough),
+            true);
+        expect(ts.children[2].toPlainText(), 'ext');
+      });
+
       test('no composing, has url', () {
         TaskEditorController tec = TaskEditorController();
 
