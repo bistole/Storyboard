@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 enum StatusKey {
   AddingPhoto,
-  AddingTask,
-  EditingTask,
+  AddingNote,
+  EditingNote,
   EditingPhoto,
-  ListTask,
+  ListNote,
   ListPhoto,
 }
 
@@ -35,10 +35,10 @@ class Status {
     );
   }
 
-  bool get inTask =>
-      status == StatusKey.AddingTask ||
-      status == StatusKey.ListTask ||
-      status == StatusKey.EditingTask;
+  bool get inNote =>
+      status == StatusKey.AddingNote ||
+      status == StatusKey.ListNote ||
+      status == StatusKey.EditingNote;
 
   bool get inPhoto =>
       status == StatusKey.AddingPhoto ||

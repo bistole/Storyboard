@@ -49,9 +49,9 @@ class CategoryPanel extends StatelessWidget {
           child: Column(
             children: [
               CategoryPanelItem(
-                () => redux.changeStatus(StatusKey.ListTask),
-                text: "Tasks",
-                selected: redux.status.inTask,
+                () => redux.changeStatus(StatusKey.ListNote),
+                text: "Notes",
+                selected: redux.status.inNote,
                 padding: EdgeInsets.only(left: this.padding.left),
               ),
               CategoryPanelItem(

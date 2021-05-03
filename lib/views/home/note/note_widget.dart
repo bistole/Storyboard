@@ -4,10 +4,10 @@ import 'package:intl/intl.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task.dart';
+import 'package:storyboard/redux/models/note.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/config/styles.dart';
-import 'package:storyboard/views/home/task/task_helper.dart';
+import 'package:storyboard/views/home/note/note_helper.dart';
 
 class ReduxActions {
   StatusKey status;
@@ -16,16 +16,16 @@ class ReduxActions {
   ReduxActions({this.status, this.delete, this.update});
 }
 
-class TaskWidget extends StatefulWidget {
-  final Task task;
+class NoteWidget extends StatefulWidget {
+  final Note note;
 
-  TaskWidget({this.task});
+  NoteWidget({this.note});
 
   @override
-  TaskWidgetState createState() => TaskWidgetState();
+  NoteWidgetState createState() => NoteWidgetState();
 }
 
-class TaskWidgetState extends State<TaskWidget> {
+class NoteWidgetState extends State<NoteWidget> {
   ReduxActions redux;
   bool isMenuShown = false;
 
@@ -49,16 +49,16 @@ class TaskWidgetState extends State<TaskWidget> {
     });
   }
 
-  void editTask(ReduxActions redux) {
+  void editNote(ReduxActions redux) {
     redux.update();
   }
 
   Widget buildTimeAndSync() {
     var fmt = new DateFormat('yyyy/MM/dd hh:mm a');
     var date =
-        DateTime.fromMillisecondsSinceEpoch(widget.task.updatedAt * 1000);
+        DateTime.fromMillisecondsSinceEpoch(widget.note.updatedAt * 1000);
 
-    if (widget.task.ts == 0) {
+    if (widget.note.ts == 0) {
       // wait for sync
       return Container(
         margin: EdgeInsets.only(top: 4),
@@ -90,12 +90,12 @@ class TaskWidgetState extends State<TaskWidget> {
       alignment: Alignment.centerLeft,
       child: RichText(
         key: getViewResource()
-            .getGlobalKeyByName("TASK-LIST-TEXT:" + widget.task.uuid),
+            .getGlobalKeyByName("NOTE-LIST-TEXT:" + widget.note.uuid),
         text: TextSpan(
           style: Styles.normalBodyText,
-          children: getTaskHelper().buildTextSpanRegex(
+          children: getNoteHelper().buildTextSpanRegex(
             Styles.normalBodyText,
-            widget.task.title,
+            widget.note.title,
             interactive: true,
             cursor: true,
           ),
@@ -136,9 +136,9 @@ class TaskWidgetState extends State<TaskWidget> {
         onHover: (event) => showMenu(),
         child: GestureDetector(
           key: getViewResource()
-              .getGlobalKeyByName("TASK-LIST:" + widget.task.uuid),
+              .getGlobalKeyByName("NOTE-LIST:" + widget.note.uuid),
           onTap: () {
-            editTask(redux);
+            editNote(redux);
           },
           child: child,
         ),
@@ -146,12 +146,12 @@ class TaskWidgetState extends State<TaskWidget> {
     } else {
       return GestureDetector(
         key: getViewResource()
-            .getGlobalKeyByName("TASK-LIST:" + widget.task.uuid),
+            .getGlobalKeyByName("NOTE-LIST:" + widget.note.uuid),
         onTap: () {
           if (isMenuShown) {
             hideMenu();
           } else {
-            editTask(redux);
+            editNote(redux);
           }
         },
         onPanUpdate: (details) {
@@ -169,14 +169,14 @@ class TaskWidgetState extends State<TaskWidget> {
     }
   }
 
-  Widget buildTask(BuildContext context, ReduxActions redux) {
+  Widget buildNote(BuildContext context, ReduxActions redux) {
     var container = Stack(
       children: [
         Container(
           decoration: BoxDecoration(
-            color: Styles.taskBackColor,
+            color: Styles.noteBackColor,
             borderRadius: BorderRadius.all(Radius.circular(4)),
-            border: Border.all(color: Styles.taskBackColor, width: 8),
+            border: Border.all(color: Styles.noteBackColor, width: 8),
           ),
           child: Column(
             children: [
@@ -188,7 +188,7 @@ class TaskWidgetState extends State<TaskWidget> {
         buildDeleteWidget(redux),
       ],
     );
-    if (redux.status == StatusKey.ListTask) {
+    if (redux.status == StatusKey.ListNote) {
       return wrapWidgetWithGestureDetector(redux, container);
     }
     return container;
@@ -201,13 +201,13 @@ class TaskWidgetState extends State<TaskWidget> {
         return redux = ReduxActions(
           status: store.state.status.status,
           delete: () {
-            store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
-            getViewResource().actTasks.actDeleteTask(store, widget.task.uuid);
+            store.dispatch(ChangeStatusAction(status: StatusKey.ListNote));
+            getViewResource().actNotes.actDeleteNote(store, widget.note.uuid);
           },
           update: () {
             // start to update
             store.dispatch(ChangeStatusWithUUIDAction(
-                status: StatusKey.EditingTask, uuid: widget.task.uuid));
+                status: StatusKey.EditingNote, uuid: widget.note.uuid));
           },
         );
       },
@@ -215,7 +215,7 @@ class TaskWidgetState extends State<TaskWidget> {
         return Row(
           children: [
             Expanded(
-              child: this.buildTask(context, redux),
+              child: this.buildNote(context, redux),
             )
           ],
         );

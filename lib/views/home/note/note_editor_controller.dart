@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:storyboard/views/home/task/task_helper.dart';
+import 'package:storyboard/views/home/note/note_helper.dart';
 
-class TaskEditorController extends TextEditingController {
-  TaskEditorController({String text}) : super(text: text);
+class NoteEditorController extends TextEditingController {
+  NoteEditorController({String text}) : super(text: text);
 
   @override
   TextSpan buildTextSpan({
@@ -17,7 +17,7 @@ class TaskEditorController extends TextEditingController {
     if (!value.isComposingRangeValid || !withComposing) {
       return TextSpan(
         style: style,
-        children: getTaskHelper().buildTextSpanRegex(style, value.text),
+        children: getNoteHelper().buildTextSpanRegex(style, value.text),
       );
     }
 
@@ -26,7 +26,7 @@ class TaskEditorController extends TextEditingController {
         : TextStyle(decoration: TextDecoration.lineThrough);
 
     return TextSpan(style: style, children: <TextSpan>[
-      ...getTaskHelper().buildTextSpanRegex(
+      ...getNoteHelper().buildTextSpanRegex(
         style,
         value.composing.textBefore(value.text),
       ),
@@ -34,7 +34,7 @@ class TaskEditorController extends TextEditingController {
         style: composingStyle,
         text: value.composing.textInside(value.text),
       ),
-      ...getTaskHelper().buildTextSpanRegex(
+      ...getNoteHelper().buildTextSpanRegex(
         style,
         value.composing.textAfter(value.text),
       ),

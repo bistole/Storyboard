@@ -4,11 +4,11 @@ import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/queue_item.dart';
-import 'package:storyboard/redux/models/task.dart';
+import 'package:storyboard/redux/models/note.dart';
 import 'package:uuid/uuid.dart';
 
-class ActTasks {
-  String _logTag = (ActTasks).toString();
+class ActNotes {
+  String _logTag = (ActNotes).toString();
   Logger _logger;
   void setLogger(Logger logger) {
     _logger = logger;
@@ -20,19 +20,19 @@ class ActTasks {
     _netQueue = netQueue;
   }
 
-  void actFetchTasks() {
+  void actFetchNotes() {
     _netQueue.addQueueItem(
-      QueueItemType.Task,
+      QueueItemType.Note,
       QueueItemAction.List,
       null,
     );
   }
 
-  void actCreateTask(Store<AppState> store, String title) {
-    _logger.info(_logTag, "actCreateTask");
+  void actCreateNote(Store<AppState> store, String title) {
+    _logger.info(_logTag, "actCreateNote");
     String uuid = Uuid().v4();
     int ts = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    Task task = Task(
+    Note note = Note(
       uuid: uuid,
       title: title,
       deleted: 0,
@@ -40,41 +40,41 @@ class ActTasks {
       updatedAt: ts,
       ts: 0,
     );
-    store.dispatch(CreateTaskAction(task: task));
+    store.dispatch(CreateNoteAction(note: note));
     _netQueue.addQueueItem(
-      QueueItemType.Task,
+      QueueItemType.Note,
       QueueItemAction.Create,
       uuid,
     );
   }
 
-  void actUpdateTask(Store<AppState> store, String uuid, String title) {
-    _logger.info(_logTag, "actUpdateTask");
-    Task task = store.state.taskRepo.tasks[uuid];
+  void actUpdateNote(Store<AppState> store, String uuid, String title) {
+    _logger.info(_logTag, "actUpdateNote");
+    Note note = store.state.noteRepo.notes[uuid];
     int ts = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    Task newTask = task.copyWith(
+    Note newNote = note.copyWith(
       title: title,
       updatedAt: ts,
     );
-    store.dispatch(UpdateTaskAction(task: newTask));
+    store.dispatch(UpdateNoteAction(note: newNote));
     _netQueue.addQueueItem(
-      QueueItemType.Task,
+      QueueItemType.Note,
       QueueItemAction.Update,
       uuid,
     );
   }
 
-  void actDeleteTask(Store<AppState> store, String uuid) {
-    _logger.info(_logTag, "actDeleteTask");
-    Task task = store.state.taskRepo.tasks[uuid];
+  void actDeleteNote(Store<AppState> store, String uuid) {
+    _logger.info(_logTag, "actDeleteNote");
+    Note note = store.state.noteRepo.notes[uuid];
     int ts = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    Task newTask = task.copyWith(
+    Note newNote = note.copyWith(
       deleted: 1,
       updatedAt: ts,
     );
-    store.dispatch(UpdateTaskAction(task: newTask));
+    store.dispatch(UpdateNoteAction(note: newNote));
     _netQueue.addQueueItem(
-      QueueItemType.Task,
+      QueueItemType.Note,
       QueueItemAction.Delete,
       uuid,
     );

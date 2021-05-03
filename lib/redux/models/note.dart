@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 @immutable
-class Task {
+class Note {
   final String uuid;
   final String title;
   final int deleted;
@@ -9,7 +9,7 @@ class Task {
   final int createdAt;
   final int ts;
 
-  Task({
+  Note({
     this.uuid,
     this.title,
     this.deleted,
@@ -18,7 +18,7 @@ class Task {
     this.ts,
   });
 
-  Task copyWith({
+  Note copyWith({
     String uuid,
     String title,
     int deleted,
@@ -26,7 +26,7 @@ class Task {
     int createdAt,
     int ts,
   }) {
-    return Task(
+    return Note(
       uuid: uuid ?? this.uuid,
       title: title ?? this.title,
       deleted: deleted ?? this.deleted,
@@ -48,7 +48,7 @@ class Task {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Task &&
+      (other is Note &&
           uuid == other.uuid &&
           title == other.title &&
           deleted == other.deleted &&
@@ -58,11 +58,11 @@ class Task {
 
   @override
   String toString() {
-    return "Task{uuid: $uuid, title: $title, deleted: $deleted, updatedAt: $updatedAt, createdAt: $createdAt}";
+    return "Note{uuid: $uuid, title: $title, deleted: $deleted, updatedAt: $updatedAt, createdAt: $createdAt}";
   }
 
-  factory Task.fromJson(Map<String, dynamic> json) {
-    return Task(
+  factory Note.fromJson(Map<String, dynamic> json) {
+    return Note(
       uuid: json['uuid'],
       title: json['title'],
       deleted: json['deleted'],
@@ -84,13 +84,13 @@ class Task {
   }
 }
 
-Map<String, Task> buildTaskMap(List<dynamic> json) {
-  var map = <String, Task>{};
+Map<String, Note> buildNoteMap(List<dynamic> json) {
+  var map = <String, Note>{};
   json.forEach((element) {
     var uuid = element['uuid'];
     if (!(uuid is String)) return;
 
-    map[uuid] = Task(
+    map[uuid] = Note(
       uuid: element['uuid'],
       title: element['title'],
       deleted: element['deleted'],

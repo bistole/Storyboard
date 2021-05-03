@@ -7,11 +7,11 @@ import 'package:storyboard/configs/device_manager.dart';
 import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task.dart';
-import 'package:storyboard/redux/models/task_repo.dart';
+import 'package:storyboard/redux/models/note.dart';
+import 'package:storyboard/redux/models/note_repo.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/page.dart';
-import 'package:storyboard/views/home/task/task_widget.dart';
+import 'package:storyboard/views/home/note/note_widget.dart';
 
 import '../../../common.dart';
 
@@ -21,7 +21,7 @@ void main() {
   Store<AppState> store;
 
   final uuid = '04deb797-7ca0-4cd3-b4ef-c1e01aeea130';
-  final taskJson = {
+  final noteJson = {
     'uuid': uuid,
     'title': 'original Title',
     'deleted': 0,
@@ -30,13 +30,13 @@ void main() {
     '_ts': 1606406017000,
   };
 
-  group('TaskWidget', () {
+  group('NoteWidget', () {
     setUp(() {
       setFactoryLogger(MockLogger());
       getFactory().store = store = getMockStore(
-        status: Status.noParam(StatusKey.ListTask),
-        tr: TaskRepo(
-          tasks: <String, Task>{uuid: Task.fromJson(taskJson)},
+        status: Status.noParam(StatusKey.ListNote),
+        nr: NoteRepo(
+          notes: <String, Note>{uuid: Note.fromJson(noteJson)},
           lastTS: 0,
         ),
       );
@@ -55,9 +55,9 @@ void main() {
         var widget = buildTestableWidget(HomePage(title: 'title'), store);
         await tester.pumpWidget(widget);
 
-        // find one task
+        // find one note
         var gKey =
-            getViewResource().getGlobalKeyByName("TASK-LIST-TEXT:" + uuid);
+            getViewResource().getGlobalKeyByName("NOTE-LIST-TEXT:" + uuid);
         RichText rt = find.byKey(gKey).evaluate().first.widget as RichText;
         expect(rt.text.toPlainText(), 'original Title');
 
@@ -76,7 +76,7 @@ void main() {
         addTearDown(gesture.removePointer);
         await tester.pump();
 
-        await gesture.moveTo(tester.getCenter(find.byType(TaskWidget)));
+        await gesture.moveTo(tester.getCenter(find.byType(NoteWidget)));
         await tester.pumpAndSettle();
 
         // hover out
@@ -96,9 +96,9 @@ void main() {
         var widget = buildTestableWidget(HomePage(title: 'title'), store);
         await tester.pumpWidget(widget);
 
-        // find one task
+        // find one note
         var gKey =
-            getViewResource().getGlobalKeyByName("TASK-LIST-TEXT:" + uuid);
+            getViewResource().getGlobalKeyByName("NOTE-LIST-TEXT:" + uuid);
         RichText rt = find.byKey(gKey).evaluate().first.widget as RichText;
         expect(rt.text.toPlainText(), 'original Title');
 
@@ -113,12 +113,12 @@ void main() {
         // show menu by long press
         (gesture.evaluate().first.widget as GestureDetector).onLongPress();
 
-        var state1 = tester.state<TaskWidgetState>(find.byType(TaskWidget));
+        var state1 = tester.state<NoteWidgetState>(find.byType(NoteWidget));
         expect(state1.isMenuShown, true);
 
         // tap to hide menu
         (gesture.evaluate().first.widget as GestureDetector).onTap();
-        var state2 = tester.state<TaskWidgetState>(find.byType(TaskWidget));
+        var state2 = tester.state<NoteWidgetState>(find.byType(NoteWidget));
         expect(state2.isMenuShown, false);
 
         // swipe left to show
@@ -127,7 +127,7 @@ void main() {
           globalPosition: Offset.zero,
           delta: Offset(-20, 0),
         ));
-        var state3 = tester.state<TaskWidgetState>(find.byType(TaskWidget));
+        var state3 = tester.state<NoteWidgetState>(find.byType(NoteWidget));
         expect(state3.isMenuShown, true);
 
         // swipe right to hide
@@ -136,7 +136,7 @@ void main() {
           globalPosition: Offset.zero,
           delta: Offset(20, 0),
         ));
-        var state4 = tester.state<TaskWidgetState>(find.byType(TaskWidget));
+        var state4 = tester.state<NoteWidgetState>(find.byType(NoteWidget));
         expect(state4.isMenuShown, false);
       });
     });

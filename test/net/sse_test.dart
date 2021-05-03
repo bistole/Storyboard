@@ -12,7 +12,7 @@ import 'package:storyboard/redux/models/photo_repo.dart';
 import 'package:storyboard/redux/models/queue.dart';
 import 'package:storyboard/redux/models/setting.dart';
 import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task_repo.dart';
+import 'package:storyboard/redux/models/note_repo.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
 
 import '../common.dart';
@@ -32,9 +32,9 @@ void main() {
     store = Store<AppState>(
       appReducer,
       initialState: AppState(
-        status: Status.noParam(StatusKey.ListTask),
+        status: Status.noParam(StatusKey.ListNote),
         photoRepo: PhotoRepo(photos: {}, lastTS: 0),
-        taskRepo: TaskRepo(tasks: {}, lastTS: 0),
+        noteRepo: NoteRepo(notes: {}, lastTS: 0),
         queue: Queue(),
         setting: Setting(serverKey: mockServerKey),
       ),

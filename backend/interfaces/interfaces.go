@@ -8,8 +8,8 @@ import (
 	"net/http"
 )
 
-// Task is data object of Task
-type Task struct {
+// Note is data object of Note
+type Note struct {
 	UUID    string `json:"uuid"`
 	Title   string `json:"title"`
 	Deleted int8   `json:"deleted"`
@@ -66,13 +66,13 @@ type DatabaseService interface {
 	Close()
 }
 
-// TaskRepo is interface of task package
-type TaskRepo interface {
-	CreateTask(Task) (*Task, error)
-	UpdateTask(string, Task) (*Task, error)
-	DeleteTask(string, int64) (*Task, error)
-	GetTaskByUUID(string) (*Task, error)
-	GetTasksByTS(ts int64, limit int, offset int) ([]Task, error)
+// NoteRepo is interface of note package
+type NoteRepo interface {
+	CreateNote(Note) (*Note, error)
+	UpdateNote(string, Note) (*Note, error)
+	DeleteNote(string, int64) (*Note, error)
+	GetNoteByUUID(string) (*Note, error)
+	GetNotesByTS(ts int64, limit int, offset int) ([]Note, error)
 }
 
 // PhotoRepo is interface of photo package

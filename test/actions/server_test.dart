@@ -17,7 +17,7 @@ class MockNetSSE extends Mock implements NetSSE {}
 void main() {
   buildStore(String serverKey) {
     return getMockStore(
-      status: Status.noParam(StatusKey.ListTask),
+      status: Status.noParam(StatusKey.ListNote),
       setting: Setting(serverKey: serverKey),
     );
   }

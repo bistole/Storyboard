@@ -1,35 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:storyboard/views/home/task/task_editor_controller.dart';
+import 'package:storyboard/views/home/note/note_editor_controller.dart';
 
 void main() {
-  group('TaskEditorController', () {
+  group('NoteEditorController', () {
     group('#buildTextSpan', () {
       test('no composing, no url', () {
-        TaskEditorController tec = TaskEditorController();
+        NoteEditorController nec = NoteEditorController();
 
-        tec.value = TextEditingValue(
+        nec.value = TextEditingValue(
           text: 'simple text',
           selection: TextSelection.collapsed(offset: -1),
           composing: TextRange.empty,
         );
 
-        TextSpan ts = tec.buildTextSpan(context: null, withComposing: false);
+        TextSpan ts = nec.buildTextSpan(context: null, withComposing: false);
 
         expect(ts.children.length, 1);
         expect(ts.children[0].toPlainText(), 'simple text');
       });
 
       test('composing, no url', () {
-        TaskEditorController tec = TaskEditorController();
+        NoteEditorController nec = NoteEditorController();
 
-        tec.value = TextEditingValue(
+        nec.value = TextEditingValue(
           text: 'simple text',
           selection: TextSelection.collapsed(offset: -1),
           composing: TextRange(start: 5, end: 8),
         );
 
-        TextSpan ts = tec.buildTextSpan(context: null, withComposing: true);
+        TextSpan ts = nec.buildTextSpan(context: null, withComposing: true);
 
         expect(ts.children.length, 3);
         expect(ts.children[0].toPlainText(), 'simpl');
@@ -38,15 +38,15 @@ void main() {
       });
 
       test('composing, special style', () {
-        TaskEditorController tec = TaskEditorController();
+        NoteEditorController nec = NoteEditorController();
 
-        tec.value = TextEditingValue(
+        nec.value = TextEditingValue(
           text: 'simple text',
           selection: TextSelection.collapsed(offset: -1),
           composing: TextRange(start: 5, end: 8),
         );
 
-        TextSpan ts = tec.buildTextSpan(
+        TextSpan ts = nec.buildTextSpan(
           context: null,
           withComposing: true,
           style: TextStyle(decoration: TextDecoration.underline),
@@ -66,15 +66,15 @@ void main() {
       });
 
       test('no composing, has url', () {
-        TaskEditorController tec = TaskEditorController();
+        NoteEditorController nec = NoteEditorController();
 
-        tec.value = TextEditingValue(
+        nec.value = TextEditingValue(
           text: 'simple http://www.google.com/ url',
           selection: TextSelection.collapsed(offset: -1),
           composing: TextRange.empty,
         );
 
-        TextSpan ts = tec.buildTextSpan(context: null, withComposing: false);
+        TextSpan ts = nec.buildTextSpan(context: null, withComposing: false);
 
         expect(ts.children.length, 3);
         expect(ts.children[0].toPlainText(), 'simple ');

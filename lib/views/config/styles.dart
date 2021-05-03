@@ -22,8 +22,8 @@ class Styles {
 
   static const photoBackColor = Color(0xFFF5F5F5); // grey 100
 
-  static const taskBoardBackColor = Color(0xFFF5F5F5); // grey 100
-  static const taskBackColor = Colors.white; // grey 100
+  static const noteBoardBackColor = Color(0xFFF5F5F5); // grey 100
+  static const noteBackColor = Colors.white; // grey 100
 
   static const selectedColor = Colors.white;
   static const selectedBackColor = primaryColor;

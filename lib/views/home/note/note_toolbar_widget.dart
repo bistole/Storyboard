@@ -16,27 +16,27 @@ class ReduxActions {
   });
 }
 
-const String TASK_TOOLBAR = "TASK_TOOLBAR";
+const String NOTE_TOOLBAR = "NOTE_TOOLBAR";
 
-class TaskToolbarWidget extends StatelessWidget {
+class NoteToolbarWidget extends StatelessWidget {
   @override
   Widget build(Object context) {
     return StoreConnector<AppState, ReduxActions>(
       converter: (store) {
         return ReduxActions(
           create: () {
-            store.dispatch(ChangeStatusAction(status: StatusKey.AddingTask));
+            store.dispatch(ChangeStatusAction(status: StatusKey.AddingNote));
           },
           status: store.state.status,
         );
       },
       builder: (context, ReduxActions redux) {
         return SBToolbar(
-          redux.status.status != StatusKey.AddingTask
+          redux.status.status != StatusKey.AddingNote
               ? [
                   SBToolbarButton(
                     redux.create,
-                    text: "ADD TASK",
+                    text: "ADD NOTE",
                     icon: Icon(AppIcons.tasks),
                   ),
                 ]

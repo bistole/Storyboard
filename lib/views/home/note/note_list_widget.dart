@@ -2,42 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task.dart';
+import 'package:storyboard/redux/models/note.dart';
 import 'package:storyboard/views/config/styles.dart';
-import 'package:storyboard/views/home/task/create_task_widget.dart';
-import 'package:storyboard/views/home/task/task_toolbar_widget.dart';
-import 'package:storyboard/views/home/task/task_widget.dart';
-import 'package:storyboard/views/home/task/update_task_widget.dart';
+import 'package:storyboard/views/home/note/create_note_widget.dart';
+import 'package:storyboard/views/home/note/note_toolbar_widget.dart';
+import 'package:storyboard/views/home/note/note_widget.dart';
+import 'package:storyboard/views/home/note/update_note_widget.dart';
 
 class ReduxActions {
-  final List<Task> taskList;
+  final List<Note> noteList;
   final Status status;
-  ReduxActions({this.status, this.taskList});
+  ReduxActions({this.status, this.noteList});
 }
 
-class TaskListWidget extends StatelessWidget {
+class NoteListWidget extends StatelessWidget {
   final EdgeInsets padding;
-  TaskListWidget({this.padding = EdgeInsets.zero});
+  NoteListWidget({this.padding = EdgeInsets.zero});
 
   List<Widget> buildList(ReduxActions redux) {
     var children = <Widget>[];
 
-    if (redux.status.status == StatusKey.AddingTask) {
-      Widget w = CreateTaskWidget();
+    if (redux.status.status == StatusKey.AddingNote) {
+      Widget w = CreateNoteWidget();
       children.add(w);
     }
 
-    var updatedTaskList = List<Task>.from(redux.taskList);
-    updatedTaskList.sort((Task a, Task b) {
+    var updatedNoteList = List<Note>.from(redux.noteList);
+    updatedNoteList.sort((Note a, Note b) {
       return a.updatedAt == b.updatedAt
           ? 0
           : (a.updatedAt < b.updatedAt ? 1 : -1);
     });
-    updatedTaskList.forEach((task) {
-      Widget w = redux.status.status == StatusKey.EditingTask &&
-              redux.status.param1 == task.uuid
-          ? UpdateTaskWidget(task: task)
-          : TaskWidget(task: task);
+    updatedNoteList.forEach((note) {
+      Widget w = redux.status.status == StatusKey.EditingNote &&
+              redux.status.param1 == note.uuid
+          ? UpdateNoteWidget(note: note)
+          : NoteWidget(note: note);
       children.add(w);
     });
 
@@ -48,25 +48,25 @@ class TaskListWidget extends StatelessWidget {
   Widget build(Object context) {
     return StoreConnector<AppState, ReduxActions>(
       converter: (store) {
-        List<Task> taskList = [];
-        store.state.taskRepo.tasks.forEach((uuid, task) {
-          if (task.deleted == 0) {
-            taskList.add(task);
+        List<Note> noteList = [];
+        store.state.noteRepo.notes.forEach((uuid, note) {
+          if (note.deleted == 0) {
+            noteList.add(note);
           }
         });
 
         return ReduxActions(
           status: store.state.status,
-          taskList: taskList,
+          noteList: noteList,
         );
       },
       builder: (context, ReduxActions redux) {
         return Container(
           decoration: BoxDecoration(
-            color: Styles.taskBoardBackColor,
+            color: Styles.noteBoardBackColor,
           ),
           child: Column(children: [
-            TaskToolbarWidget(),
+            NoteToolbarWidget(),
             Expanded(
               child: Container(
                 margin: padding,

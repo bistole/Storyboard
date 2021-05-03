@@ -6,7 +6,7 @@ import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/config/styles.dart';
-import 'package:storyboard/views/home/task/task_editor_controller.dart';
+import 'package:storyboard/views/home/note/note_editor_controller.dart';
 
 class ReduxActions {
   final void Function(String) create;
@@ -15,15 +15,15 @@ class ReduxActions {
   ReduxActions({this.create, this.cancel});
 }
 
-class CreateTaskWidget extends StatefulWidget {
+class CreateNoteWidget extends StatefulWidget {
   @override
-  _CreateTaskWidgetState createState() => _CreateTaskWidgetState();
+  _CreateNoteWidgetState createState() => _CreateNoteWidgetState();
 }
 
-class _CreateTaskWidgetState extends State<CreateTaskWidget> {
+class _CreateNoteWidgetState extends State<CreateNoteWidget> {
   bool executed;
   ReduxActions redux;
-  TaskEditorController controller;
+  NoteEditorController controller;
   FocusNode focusNode;
 
   focusChanged() {
@@ -35,7 +35,7 @@ class _CreateTaskWidgetState extends State<CreateTaskWidget> {
   @override
   void initState() {
     executed = false;
-    controller = TaskEditorController(text: "");
+    controller = NoteEditorController(text: "");
     focusNode = FocusNode(
       onKey: (node, event) {
         if (event.isKeyPressed(LogicalKeyboardKey.escape)) {
@@ -68,13 +68,13 @@ class _CreateTaskWidgetState extends State<CreateTaskWidget> {
       converter: (store) {
         return redux = ReduxActions(
           create: (String title) {
-            store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
+            store.dispatch(ChangeStatusAction(status: StatusKey.ListNote));
             if (title.length > 0) {
-              getViewResource().actTasks.actCreateTask(store, title);
+              getViewResource().actNotes.actCreateNote(store, title);
             }
           },
           cancel: () {
-            store.dispatch(ChangeStatusAction(status: StatusKey.ListTask));
+            store.dispatch(ChangeStatusAction(status: StatusKey.ListNote));
           },
         );
       },
@@ -91,7 +91,7 @@ class _CreateTaskWidgetState extends State<CreateTaskWidget> {
                   maxLines: null,
                   autofocus: true,
                   decoration: InputDecoration(
-                    hintText: 'Put task name here',
+                    hintText: 'Put note name here',
                     border: OutlineInputBorder(
                       borderSide: BorderSide(
                         color: Styles.borderColor,

@@ -4,10 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task.dart';
+import 'package:storyboard/redux/models/note.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/config/styles.dart';
-import 'package:storyboard/views/home/task/task_editor_controller.dart';
+import 'package:storyboard/views/home/note/note_editor_controller.dart';
 
 class ReduxActions {
   final void Function(String) update;
@@ -16,19 +16,19 @@ class ReduxActions {
   ReduxActions({this.update, this.cancel});
 }
 
-class UpdateTaskWidget extends StatefulWidget {
-  final Task task;
+class UpdateNoteWidget extends StatefulWidget {
+  final Note note;
 
-  UpdateTaskWidget({this.task});
+  UpdateNoteWidget({this.note});
 
   @override
-  _UpdateTaskWidgetState createState() => _UpdateTaskWidgetState();
+  _UpdateNoteWidgetState createState() => _UpdateNoteWidgetState();
 }
 
-class _UpdateTaskWidgetState extends State<UpdateTaskWidget> {
+class _UpdateNoteWidgetState extends State<UpdateNoteWidget> {
   bool executed;
   ReduxActions redux;
-  TaskEditorController controller;
+  NoteEditorController controller;
   FocusNode focusNode;
 
   focusChanged() {
@@ -40,7 +40,7 @@ class _UpdateTaskWidgetState extends State<UpdateTaskWidget> {
   @override
   void initState() {
     executed = false;
-    controller = TaskEditorController(text: widget.task.title);
+    controller = NoteEditorController(text: widget.note.title);
     focusNode = FocusNode(
       onKey: (node, event) {
         if (event.isKeyPressed(LogicalKeyboardKey.escape)) {
@@ -73,14 +73,14 @@ class _UpdateTaskWidgetState extends State<UpdateTaskWidget> {
       converter: (store) {
         return redux = ReduxActions(
           update: (String value) {
-            if (value.length > 0 && value != widget.task.title) {
+            if (value.length > 0 && value != widget.note.title) {
               getViewResource()
-                  .actTasks
-                  .actUpdateTask(store, widget.task.uuid, value);
+                  .actNotes
+                  .actUpdateNote(store, widget.note.uuid, value);
             }
           },
           cancel: () {
-            store.dispatch(new ChangeStatusAction(status: StatusKey.ListTask));
+            store.dispatch(new ChangeStatusAction(status: StatusKey.ListNote));
           },
         );
       },
@@ -97,7 +97,7 @@ class _UpdateTaskWidgetState extends State<UpdateTaskWidget> {
                   maxLines: null,
                   controller: controller,
                   decoration: InputDecoration(
-                    hintText: 'Put task name here',
+                    hintText: 'Put note name here',
                     border: OutlineInputBorder(
                       borderSide: BorderSide(
                         color: Styles.borderColor,

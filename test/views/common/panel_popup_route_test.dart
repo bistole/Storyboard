@@ -48,18 +48,18 @@ void main() {
       await tester.tap(find.byType(TextButton));
       await tester.pumpAndSettle();
 
-      expect(find.text('Tasks'), findsOneWidget);
+      expect(find.text('Notes'), findsOneWidget);
       expect(find.text('Photos'), findsOneWidget);
 
       var gds = find.ancestor(
-          of: find.text("Tasks"), matching: find.byType(GestureDetector));
+          of: find.text("Notes"), matching: find.byType(GestureDetector));
       expect(gds, findsNWidgets(3));
 
       // cancel
       await tester.tap(gds.at(1));
       await tester.pumpAndSettle();
 
-      expect(find.text('Tasks'), findsNothing);
+      expect(find.text('Notes'), findsNothing);
     });
 
     testWidgets('show popup and cancel', (WidgetTester tester) async {
@@ -71,16 +71,16 @@ void main() {
       await tester.tap(find.byType(TextButton));
       await tester.pumpAndSettle();
 
-      expect(find.text('Tasks'), findsOneWidget);
+      expect(find.text('Notes'), findsOneWidget);
 
       var gds = find.ancestor(
-          of: find.text("Tasks"), matching: find.byType(GestureDetector));
+          of: find.text("Notes"), matching: find.byType(GestureDetector));
 
       // cancel
       await tester.tap(gds.at(2));
       await tester.pumpAndSettle();
 
-      expect(find.text('Tasks'), findsNothing);
+      expect(find.text('Notes'), findsNothing);
     });
   });
 }

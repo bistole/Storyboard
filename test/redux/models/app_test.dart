@@ -6,12 +6,12 @@ import 'package:storyboard/redux/models/queue.dart';
 import 'package:storyboard/redux/models/queue_item.dart';
 import 'package:storyboard/redux/models/setting.dart';
 import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task.dart';
-import 'package:storyboard/redux/models/task_repo.dart';
+import 'package:storyboard/redux/models/note.dart';
+import 'package:storyboard/redux/models/note_repo.dart';
 
 void main() {
   getListStatus() {
-    return Status(status: StatusKey.ListTask);
+    return Status(status: StatusKey.ListNote);
   }
 
   getPhoto() {
@@ -30,8 +30,8 @@ void main() {
     );
   }
 
-  getTask() {
-    return Task(
+  getNote() {
+    return Note(
       uuid: 'uuid',
       title: 'title',
       deleted: 0,
@@ -43,7 +43,7 @@ void main() {
 
   getCreateQueue() {
     return QueueItem(
-      type: QueueItemType.Task,
+      type: QueueItemType.Note,
       action: QueueItemAction.Create,
       uuid: 'uuid',
     );
@@ -51,8 +51,8 @@ void main() {
 
   test("appState fromJson", () {
     var appState = AppState.fromJson({
-      'tasks': {
-        'tasks': {
+      'notes': {
+        'notes': {
           'uuid': {
             'uuid': 'uuid',
             'title': 'new title',
@@ -104,8 +104,8 @@ void main() {
     });
     expect(
       appState.toString(),
-      "AppState{status: Status{status: StatusKey.ListTask, param1: null, param2: null}, " +
-          "taskRepo: TaskRepo{tasks: {uuid: Task{uuid: uuid, title: new title, deleted: 0, updatedAt: 14000, createdAt: 12000}}, lastTS: 0}, " +
+      "AppState{status: Status{status: StatusKey.ListNote, param1: null, param2: null}, " +
+          "noteRepo: NoteRepo{notes: {uuid: Note{uuid: uuid, title: new title, deleted: 0, updatedAt: 14000, createdAt: 12000}}, lastTS: 0}, " +
           "photoRepo: PhotoRepo{photos: {uuid: Photo{uuid: uuid, filename: file.jpeg, mime: image/jpeg, size: 3000, direction: 180, hasOrigin: PhotoStatus.None, hasThumb: PhotoStatus.Loading, deleted: 0, updatedAt: 14000, createdAt: 12000}}, lastTS: 0}, " +
           "queue: Queue{list: [QueueItem{type: null, action: null, uuid: uuid}], tick: 12, now: QueueItem{type: null, action: null, uuid: uuid}}, " +
           "setting: Setting{clientID: client-id, serverKey: server-key, serverReachable: Reachable.Unknown}}",
@@ -116,7 +116,7 @@ void main() {
     AppState app = AppState(
       status: getListStatus(),
       photoRepo: PhotoRepo(photos: {'uuid': getPhoto()}, lastTS: 0),
-      taskRepo: TaskRepo(tasks: {'uuid': getTask()}, lastTS: 0),
+      noteRepo: NoteRepo(notes: {'uuid': getNote()}, lastTS: 0),
       queue: Queue(
         tick: 12,
         now: getCreateQueue(),
@@ -130,8 +130,8 @@ void main() {
     );
 
     expect(app.toJson(), {
-      'tasks': {
-        'tasks': {
+      'notes': {
+        'notes': {
           'uuid': {
             'uuid': 'uuid',
             'title': 'title',
@@ -164,13 +164,13 @@ void main() {
       'queue': {
         'tick': 12,
         'now': {
-          'type': 'QueueItemType.Task',
+          'type': 'QueueItemType.Note',
           'action': 'QueueItemAction.Create',
           'uuid': 'uuid'
         },
         'list': [
           {
-            'type': 'QueueItemType.Task',
+            'type': 'QueueItemType.Note',
             'action': 'QueueItemAction.Create',
             'uuid': 'uuid'
           }
@@ -186,7 +186,7 @@ void main() {
   test('copyWith', () {
     AppState app = AppState(
       photoRepo: PhotoRepo(photos: {}, lastTS: 0),
-      taskRepo: TaskRepo(tasks: {}, lastTS: 0),
+      noteRepo: NoteRepo(notes: {}, lastTS: 0),
       status: getListStatus(),
       queue: Queue(
         tick: 1,

@@ -17,7 +17,7 @@ import 'package:storyboard/redux/models/photo_repo.dart';
 import 'package:storyboard/redux/models/queue.dart';
 import 'package:storyboard/redux/models/setting.dart';
 import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task_repo.dart';
+import 'package:storyboard/redux/models/note_repo.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/views/auth/page.dart';
 import 'package:storyboard/views/config/constants.dart';
@@ -90,7 +90,7 @@ String getHomePath(String relativePath) {
 Store<AppState> getMockStore({
   Status status,
   PhotoRepo pr,
-  TaskRepo tr,
+  NoteRepo nr,
   Queue q,
   Setting setting,
 }) {
@@ -100,7 +100,7 @@ Store<AppState> getMockStore({
       status: status != null ? status : Status.noParam(StatusKey.ListPhoto),
       photoRepo:
           pr != null ? pr : PhotoRepo(photos: <String, Photo>{}, lastTS: 0),
-      taskRepo: tr != null ? tr : TaskRepo(tasks: {}, lastTS: 0),
+      noteRepo: nr != null ? nr : NoteRepo(notes: {}, lastTS: 0),
       queue: q != null ? q : Queue(),
       setting: setting != null
           ? setting

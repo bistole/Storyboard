@@ -1,16 +1,14 @@
-import 'dart:math';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:storyboard/views/config/styles.dart';
-import 'package:storyboard/views/home/task/task_helper.dart';
+import 'package:storyboard/views/home/note/note_helper.dart';
 
 void main() {
-  group('TaskHelper', () {
+  group('NoteHelper', () {
     test('no url', () {
       var text = 'just normal test';
-      var helper = getTaskHelper();
+      var helper = getNoteHelper();
       var result = helper.buildTextSpanRegex(TextStyle(), text);
 
       expect(result.length, 1);
@@ -20,7 +18,7 @@ void main() {
 
     test('url with interactive', () {
       var text = 'have https://www.google.com/ how are you';
-      var helper = getTaskHelper();
+      var helper = getNoteHelper();
       var result = helper.buildTextSpanRegex(
         TextStyle(),
         text,
@@ -42,7 +40,7 @@ void main() {
 
     test('url with cursor', () {
       var text = 'have https://www.google.com/ how are you';
-      var helper = getTaskHelper();
+      var helper = getNoteHelper();
       var result = helper.buildTextSpanRegex(
         TextStyle(),
         text,

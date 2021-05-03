@@ -88,8 +88,8 @@ func (d Database) _getUserVersion() int64 {
 }
 
 func (d Database) _initFromBegin() {
-	// create task table
-	_, err := d.connDB.Exec("CREATE TABLE IF NOT EXISTS `tasks` (" +
+	// create note table
+	_, err := d.connDB.Exec("CREATE TABLE IF NOT EXISTS `notes` (" +
 		"`id` INTEGER PRIMARY KEY AUTOINCREMENT," +
 		"`uuid` VARCHAR(36) NOT NULL UNIQUE," +
 		"`title` TEXT NOT NULL," +
@@ -100,9 +100,9 @@ func (d Database) _initFromBegin() {
 		")")
 	processError("_initFromBegin", err)
 
-	// create task ts index
-	_, err = d.connDB.Exec("CREATE INDEX IF NOT EXISTS `index_tasks_ts` " +
-		" ON `tasks` ( `_ts` )")
+	// create note ts index
+	_, err = d.connDB.Exec("CREATE INDEX IF NOT EXISTS `index_notes_ts` " +
+		" ON `notes` ( `_ts` )")
 	processError("_initFromBegin", err)
 
 	// create photo table

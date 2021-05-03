@@ -10,7 +10,7 @@ import 'package:redux/redux.dart';
 
 import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/actions/server.dart';
-import 'package:storyboard/actions/tasks.dart';
+import 'package:storyboard/actions/notes.dart';
 import 'package:storyboard/channel/backend.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/channel/menu.dart';
@@ -24,7 +24,7 @@ import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/photos.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/net/sse.dart';
-import 'package:storyboard/net/tasks.dart';
+import 'package:storyboard/net/notes.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/store.dart';
@@ -42,11 +42,11 @@ class Factory {
 
   ActServer actServer;
   ActPhotos actPhotos;
-  ActTasks actTasks;
+  ActNotes actNotes;
 
   NetAuth netAuth;
   NetPhotos netPhotos;
-  NetTasks netTasks;
+  NetNotes netNotes;
   NetSSE netSSE;
   NetQueue netQueue;
 
@@ -66,11 +66,11 @@ class Factory {
 
     actServer = ActServer();
     actPhotos = ActPhotos();
-    actTasks = ActTasks();
+    actNotes = ActNotes();
 
     netAuth = NetAuth();
     netPhotos = NetPhotos();
-    netTasks = NetTasks();
+    netNotes = NetNotes();
     netSSE = NetSSE();
     netQueue = NetQueue(60);
 
@@ -84,8 +84,8 @@ class Factory {
     actPhotos.setNetQueue(netQueue);
     actPhotos.setStorage(storage);
 
-    actTasks.setLogger(logger);
-    actTasks.setNetQueue(netQueue);
+    actNotes.setLogger(logger);
+    actNotes.setNetQueue(netQueue);
 
     netQueue.setLogger(logger);
 
@@ -98,14 +98,14 @@ class Factory {
     netPhotos.setStorage(storage);
     netPhotos.registerToQueue(netQueue);
 
-    netTasks.setLogger(logger);
-    netTasks.setHttpClient(http.Client());
-    netTasks.setActTasks(actTasks);
-    netTasks.registerToQueue(netQueue);
+    netNotes.setLogger(logger);
+    netNotes.setHttpClient(http.Client());
+    netNotes.setActNotes(actNotes);
+    netNotes.registerToQueue(netQueue);
 
     netSSE.setLogger(logger);
     netSSE.setGetHttpClient(() => http.Client());
-    netSSE.registerUpdateFunc(notifyTypeTask, actTasks.actFetchTasks);
+    netSSE.registerUpdateFunc(notifyTypeNote, actNotes.actFetchNotes);
     netSSE.registerUpdateFunc(notifyTypePhoto, actPhotos.actFetchPhotos);
 
     channelManager.setLogger(logger);
@@ -114,7 +114,7 @@ class Factory {
     getViewResource().deviceManager = deviceManager;
     getViewResource().storage = storage;
     getViewResource().actPhotos = actPhotos;
-    getViewResource().actTasks = actTasks;
+    getViewResource().actNotes = actNotes;
     getViewResource().actServer = actServer;
     getViewResource().logger = logger;
     getViewResource().notifier = notifier;

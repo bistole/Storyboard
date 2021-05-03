@@ -231,7 +231,7 @@ func (p PhotoRepo) _updatePhoto(photo Photo) error {
 	if affectRow > 0 {
 		return nil
 	}
-	return fmt.Errorf("Failed to update task")
+	return fmt.Errorf("Failed to update note")
 }
 
 func (p PhotoRepo) _deletePhoto(UUID string, updatedAt int64) error {

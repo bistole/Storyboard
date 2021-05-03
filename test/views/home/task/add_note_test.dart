@@ -5,12 +5,12 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 import 'package:flutter/services.dart';
-import 'package:storyboard/actions/tasks.dart';
+import 'package:storyboard/actions/notes.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task.dart';
+import 'package:storyboard/redux/models/note.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/page.dart';
@@ -33,12 +33,12 @@ void main() {
       setUp(() {
         setFactoryLogger(MockLogger());
         getFactory().store = store = getMockStore(
-          status: Status.noParam(StatusKey.ListTask),
+          status: Status.noParam(StatusKey.ListNote),
         );
 
-        getViewResource().actTasks = ActTasks();
-        getViewResource().actTasks.setLogger(MockLogger());
-        getViewResource().actTasks.setNetQueue(MockNetQueue());
+        getViewResource().actNotes = ActNotes();
+        getViewResource().actNotes.setLogger(MockLogger());
+        getViewResource().actNotes.setNetQueue(MockNetQueue());
         getViewResource().command = MockCommandChannel();
       });
 
@@ -49,10 +49,10 @@ void main() {
 
         // Add Button here
         expect(find.byType(SBToolbarButton), findsNWidgets(1));
-        expect(find.text('ADD TASK'), findsOneWidget);
+        expect(find.text('ADD NOTE'), findsOneWidget);
 
         // Tap 'ADD' button
-        await tester.tap(find.text('ADD TASK'));
+        await tester.tap(find.text('ADD NOTE'));
         await tester.pump();
 
         // Find TextField
@@ -63,28 +63,28 @@ void main() {
         await tester.testTextInput.receiveAction(TextInputAction.done);
         await tester.pumpAndSettle();
 
-        expect(store.state.taskRepo.tasks.length, 1);
+        expect(store.state.noteRepo.notes.length, 1);
         int ts = DateTime.now().millisecondsSinceEpoch ~/ 1000 + 1;
         int tsBefore = ts - 6;
-        Task task = store.state.taskRepo.tasks.values.first;
+        Note note = store.state.noteRepo.notes.values.first;
 
-        expect(store.state.taskRepo.tasks[task.uuid], isNotNull);
-        expect(task.title, 'Add new list');
-        expect(task.deleted, 0);
-        expect(task.updatedAt, lessThan(ts));
-        expect(task.updatedAt, greaterThan(tsBefore));
-        expect(task.createdAt, task.updatedAt);
-        expect(task.ts, 0);
+        expect(store.state.noteRepo.notes[note.uuid], isNotNull);
+        expect(note.title, 'Add new list');
+        expect(note.deleted, 0);
+        expect(note.updatedAt, lessThan(ts));
+        expect(note.updatedAt, greaterThan(tsBefore));
+        expect(note.createdAt, note.updatedAt);
+        expect(note.ts, 0);
 
         // Verify the redux state is correct
-        expect(store.state.status.status, StatusKey.ListTask);
+        expect(store.state.status.status, StatusKey.ListNote);
 
         // verify the UI is correct
         expect(find.byType(TextField), findsNothing);
-        expect(find.text('ADD TASK'), findsOneWidget);
+        expect(find.text('ADD NOTE'), findsOneWidget);
 
         var gKey =
-            getViewResource().getGlobalKeyByName("TASK-LIST-TEXT:" + task.uuid);
+            getViewResource().getGlobalKeyByName("NOTE-LIST-TEXT:" + note.uuid);
         expect(find.byKey(gKey), findsOneWidget);
         RichText rt2 = find.byKey(gKey).evaluate().first.widget as RichText;
         expect(rt2.text.toPlainText(), 'Add new list');
@@ -97,10 +97,10 @@ void main() {
 
         // Add Button here
         expect(find.byType(SBToolbarButton), findsNWidgets(1));
-        expect(find.text('ADD TASK'), findsOneWidget);
+        expect(find.text('ADD NOTE'), findsOneWidget);
 
         // Tap 'ADD' button
-        await tester.tap(find.text('ADD TASK'));
+        await tester.tap(find.text('ADD NOTE'));
         await tester.pump();
 
         // Find TextField
@@ -119,12 +119,12 @@ void main() {
         await simulateKeyUpEvent(LogicalKeyboardKey.escape);
         await tester.pumpAndSettle();
 
-        expect(store.state.taskRepo.tasks.length, 0);
-        expect(store.state.status.status, StatusKey.ListTask);
+        expect(store.state.noteRepo.notes.length, 0);
+        expect(store.state.status.status, StatusKey.ListNote);
 
         // verify the UI is correct
         expect(find.byType(TextField), findsNothing);
-        expect(find.text('ADD TASK'), findsOneWidget);
+        expect(find.text('ADD NOTE'), findsOneWidget);
       });
     },
   );

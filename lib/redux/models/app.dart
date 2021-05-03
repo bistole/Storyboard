@@ -1,37 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:storyboard/redux/models/setting.dart';
 
-import 'package:storyboard/redux/models/task_repo.dart';
+import 'package:storyboard/redux/models/note_repo.dart';
 import 'package:storyboard/redux/models/photo_repo.dart';
 import 'package:storyboard/redux/models/queue.dart';
 import 'package:storyboard/redux/models/status.dart';
+import 'package:uuid/uuid.dart';
 
 @immutable
 class AppState {
   final Status status;
-  final TaskRepo taskRepo;
+  final NoteRepo noteRepo;
   final PhotoRepo photoRepo;
   final Queue queue;
   final Setting setting;
 
   AppState({
     this.status,
-    this.taskRepo,
+    this.noteRepo,
     this.photoRepo,
     this.queue,
     this.setting,
   });
 
+  factory AppState.initState() {
+    return AppState(
+      status: Status.noParam(StatusKey.ListNote),
+      noteRepo: NoteRepo(notes: {}, lastTS: 0),
+      photoRepo: PhotoRepo(photos: {}, lastTS: 0),
+      queue: Queue(),
+      setting: Setting(
+        clientID: Uuid().v4(),
+        serverKey: null,
+        serverReachable: Reachable.Unknown,
+      ),
+    );
+  }
+
   AppState copyWith({
     Status status,
-    TaskRepo taskRepo,
+    NoteRepo noteRepo,
     PhotoRepo photoRepo,
     Queue queue,
     Setting setting,
   }) {
     return AppState(
       status: status ?? this.status,
-      taskRepo: taskRepo ?? this.taskRepo,
+      noteRepo: noteRepo ?? this.noteRepo,
       photoRepo: photoRepo ?? this.photoRepo,
       queue: queue ?? this.queue,
       setting: setting ?? this.setting,
@@ -41,7 +56,7 @@ class AppState {
   @override
   int get hashCode =>
       status.hashCode ^
-      taskRepo.hashCode ^
+      noteRepo.hashCode ^
       photoRepo.hashCode ^
       queue.hashCode ^
       setting.hashCode;
@@ -51,20 +66,20 @@ class AppState {
       identical(this, other) ||
       (other is AppState &&
           status == other.status &&
-          taskRepo == other.taskRepo &&
+          noteRepo == other.noteRepo &&
           photoRepo == other.photoRepo &&
           queue == other.queue &&
           setting == other.setting);
 
   @override
   String toString() {
-    return 'AppState{status: $status, taskRepo: $taskRepo, photoRepo: $photoRepo, queue: $queue, setting: $setting}';
+    return 'AppState{status: $status, noteRepo: $noteRepo, photoRepo: $photoRepo, queue: $queue, setting: $setting}';
   }
 
   static AppState fromJson(dynamic json) {
-    TaskRepo taskRepo;
-    if (json is Map && json['tasks'] is Map) {
-      taskRepo = TaskRepo.fromJson(json['tasks']);
+    NoteRepo noteRepo;
+    if (json is Map && json['notes'] is Map) {
+      noteRepo = NoteRepo.fromJson(json['notes']);
     }
 
     PhotoRepo photoRepo;
@@ -83,8 +98,8 @@ class AppState {
     }
 
     return AppState(
-      status: Status.noParam(StatusKey.ListTask),
-      taskRepo: taskRepo ?? TaskRepo(tasks: {}, lastTS: 0),
+      status: Status.noParam(StatusKey.ListNote),
+      noteRepo: noteRepo ?? NoteRepo(notes: {}, lastTS: 0),
       photoRepo: photoRepo ?? PhotoRepo(photos: {}, lastTS: 0),
       queue: queue,
       setting: setting,
@@ -93,7 +108,7 @@ class AppState {
 
   dynamic toJson() {
     return {
-      "tasks": taskRepo.toJson(),
+      "notes": noteRepo.toJson(),
       "photos": photoRepo.toJson(),
       'queue': queue.toJson(),
       'setting': setting.toJson(),

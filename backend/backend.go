@@ -11,16 +11,16 @@ import (
 	"storyboard/backend/config"
 	"storyboard/backend/database"
 	"storyboard/backend/interfaces"
+	"storyboard/backend/noterepo"
 	"storyboard/backend/photorepo"
 	"storyboard/backend/server"
-	"storyboard/backend/taskrepo"
 	"storyboard/backend/wrapper"
 )
 
 var inited bool = false
 var c interfaces.ConfigService
 var db interfaces.DatabaseService
-var taskRepo interfaces.TaskRepo
+var noteRepo interfaces.NoteRepo
 var photoRepo interfaces.PhotoRepo
 var ss interfaces.RESTService
 
@@ -44,14 +44,14 @@ func Backend_Start(app *C.char) {
 	db = database.NewDatabaseService(c)
 	db.Init()
 
-	// task & photo repo
-	taskRepo = taskrepo.NewTaskRepo(db)
+	// note & photo repo
+	noteRepo = noterepo.NewNoteRepo(db)
 	photoRepo = photorepo.NewPhotoRepo(db)
 
 	// server
 	httpProxy := *wrapper.NewHTTPWrapper()
 	netProxy := *wrapper.NewNetWrapper()
-	ss = server.NewRESTServer(netProxy, httpProxy, c, taskRepo, photoRepo)
+	ss = server.NewRESTServer(netProxy, httpProxy, c, noteRepo, photoRepo)
 	go ss.Start()
 }
 
@@ -64,7 +64,7 @@ func Backend_Stop() {
 		ss = nil
 	}
 
-	taskRepo = nil
+	noteRepo = nil
 	photoRepo = nil
 
 	// database

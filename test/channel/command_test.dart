@@ -20,7 +20,7 @@ void main() {
 
   setUp(() {
     setFactoryLogger(MockLogger());
-    store = getMockStore(status: Status.noParam(StatusKey.ListTask));
+    store = getMockStore(status: Status.noParam(StatusKey.ListNote));
   });
 
   test('importPhoto', () async {

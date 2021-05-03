@@ -1,10 +1,10 @@
-import 'package:storyboard/actions/tasks.dart';
+import 'package:storyboard/actions/notes.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task.dart';
-import 'package:storyboard/redux/models/task_repo.dart';
+import 'package:storyboard/redux/models/note.dart';
+import 'package:storyboard/redux/models/note_repo.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/page.dart';
 
@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
-import 'package:storyboard/views/home/task/task_widget.dart';
+import 'package:storyboard/views/home/note/note_widget.dart';
 
 import '../../../common.dart';
 
@@ -24,7 +24,7 @@ void main() {
   Store<AppState> store;
 
   final uuid = '04deb797-7ca0-4cd3-b4ef-c1e01aeea130';
-  final taskJson = {
+  final noteJson = {
     'uuid': uuid,
     'title': 'will delete title',
     'deleted': 0,
@@ -39,16 +39,16 @@ void main() {
       setUp(() {
         setFactoryLogger(MockLogger());
         getFactory().store = store = getMockStore(
-          status: Status.noParam(StatusKey.ListTask),
-          tr: TaskRepo(
-            tasks: <String, Task>{uuid: Task.fromJson(taskJson)},
+          status: Status.noParam(StatusKey.ListNote),
+          nr: NoteRepo(
+            notes: <String, Note>{uuid: Note.fromJson(noteJson)},
             lastTS: 0,
           ),
         );
 
-        getViewResource().actTasks = ActTasks();
-        getViewResource().actTasks.setLogger(MockLogger());
-        getViewResource().actTasks.setNetQueue(MockNetQueue());
+        getViewResource().actNotes = ActNotes();
+        getViewResource().actNotes.setLogger(MockLogger());
+        getViewResource().actNotes.setNetQueue(MockNetQueue());
         getViewResource().command = MockCommandChannel();
       });
 
@@ -57,9 +57,9 @@ void main() {
         var widget = buildTestableWidget(HomePage(title: 'title'), store);
         await tester.pumpWidget(widget);
 
-        // find one task
+        // find one note
         var gKey =
-            getViewResource().getGlobalKeyByName("TASK-LIST-TEXT:" + uuid);
+            getViewResource().getGlobalKeyByName("NOTE-LIST-TEXT:" + uuid);
         RichText rt = find.byKey(gKey).evaluate().first.widget as RichText;
         expect(rt.text.toPlainText(), 'will delete title');
 
@@ -72,7 +72,7 @@ void main() {
         addTearDown(gesture.removePointer);
         await tester.pump();
 
-        await gesture.moveTo(tester.getCenter(find.byType(TaskWidget)));
+        await gesture.moveTo(tester.getCenter(find.byType(NoteWidget)));
         await tester.pumpAndSettle();
 
         // tap to delete
@@ -80,9 +80,9 @@ void main() {
         await tester.pumpAndSettle();
 
         // Verify the redux state is correct
-        expect(store.state.status.status, StatusKey.ListTask);
-        expect(store.state.taskRepo.tasks.length, 1);
-        expect(store.state.taskRepo.tasks[uuid].deleted, 1);
+        expect(store.state.status.status, StatusKey.ListNote);
+        expect(store.state.noteRepo.notes.length, 1);
+        expect(store.state.noteRepo.notes[uuid].deleted, 1);
 
         // verify the UI is correct
         expect(find.byKey(gKey), findsNothing);
