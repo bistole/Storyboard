@@ -64,10 +64,9 @@ class NetNotes {
       int ts = (store.state.photoRepo.lastTS + 1);
       _logger.debug(_logTag, "req: null");
 
-      final response = await _httpClient.get(
-        prefix + "/notes?ts=$ts&c=$countPerFetch",
-        headers: {headerNameClientID: getClientID(store)},
-      );
+      final uri = Uri.parse(prefix + "/notes?ts=$ts&c=$countPerFetch");
+      final response = await _httpClient
+          .get(uri, headers: {headerNameClientID: getClientID(store)});
 
       if (response.statusCode == 200) {
         _logger.info(_logTag, "netFetchNotes succ");
@@ -107,7 +106,8 @@ class NetNotes {
       var body = jsonEncode(note.toJson());
       _logger.debug(_logTag, "req: $body");
 
-      final response = await _httpClient.post(prefix + "/notes",
+      final uri = Uri.parse(prefix + "/notes");
+      final response = await _httpClient.post(uri,
           headers: {
             'Content-Type': 'application/json',
             headerNameClientID: getClientID(store)
@@ -149,7 +149,8 @@ class NetNotes {
       final body = jsonEncode(note.toJson());
       _logger.debug(_logTag, "req: $body");
 
-      final response = await _httpClient.post(prefix + "/notes/" + note.uuid,
+      final uri = Uri.parse(prefix + "/notes/" + note.uuid);
+      final response = await _httpClient.post(uri,
           headers: {
             'Content-Type': 'application/json',
             headerNameClientID: getClientID(store)

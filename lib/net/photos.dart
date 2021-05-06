@@ -82,10 +82,9 @@ class NetPhotos {
       int ts = (store.state.photoRepo.lastTS + 1);
       _logger.debug(_logTag, "req: null");
 
-      final response = await _httpClient.get(
-        prefix + "/photos?ts=$ts&c=$countPerFetch",
-        headers: {headerNameClientID: getClientID(store)},
-      );
+      final uri = Uri.parse(prefix + "/photos?ts=$ts&c=$countPerFetch");
+      final response = await _httpClient
+          .get(uri, headers: {headerNameClientID: getClientID(store)});
 
       if (response.statusCode == 200) {
         _logger.info(_logTag, "netFetchPhotos succ");
@@ -180,7 +179,8 @@ class NetPhotos {
       final body = jsonEncode(photo.toJson());
       _logger.debug(_logTag, "req: $body");
 
-      final response = await _httpClient.post(prefix + "/photos/" + photo.uuid,
+      final uri = Uri.parse(prefix + "/photos/" + photo.uuid);
+      final response = await _httpClient.post(uri,
           headers: {
             'Content-Type': 'application/json',
             headerNameClientID: getClientID(store)
@@ -222,10 +222,9 @@ class NetPhotos {
 
       _logger.debug(_logTag, "req: null");
 
-      final response = await _httpClient.get(
-        prefix + "/photos/" + uuid,
-        headers: {headerNameClientID: getClientID(store)},
-      );
+      final uri = Uri.parse(prefix + "/photos/" + uuid);
+      final response = await _httpClient
+          .get(uri, headers: {headerNameClientID: getClientID(store)});
 
       if (response.statusCode == 200) {
         _logger.info(_logTag, "netDownloadPhoto succ");
@@ -262,10 +261,9 @@ class NetPhotos {
 
       _logger.debug(_logTag, "req: null");
 
-      final response = await _httpClient.get(
-        prefix + "/photos/" + uuid + '/thumbnail',
-        headers: {headerNameClientID: getClientID(store)},
-      );
+      final uri = Uri.parse(prefix + "/photos/" + uuid + '/thumbnail');
+      final response = await _httpClient
+          .get(uri, headers: {headerNameClientID: getClientID(store)});
 
       if (response.statusCode == 200) {
         _logger.info(_logTag, "netDownloadThumbnail succ");

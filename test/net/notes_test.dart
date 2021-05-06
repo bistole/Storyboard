@@ -83,9 +83,10 @@ void main() {
         'succ': true,
         'notes': [getJsonNoteObject()],
       });
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed("headers")))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed("headers"),
+      )).thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
@@ -95,7 +96,7 @@ void main() {
           verify(httpClient.get(captureAny, headers: anyNamed("headers")))
               .captured
               .first;
-      expect(captured, mockURLPrefix + '/notes?ts=1&c=100');
+      expect((captured as Uri).toString(), mockURLPrefix + '/notes?ts=1&c=100');
 
       expect(store.state.noteRepo.notes, {'uuid': getNoteObject()});
     });
@@ -114,9 +115,10 @@ void main() {
         'notes': [getJsonNoteObject()],
       });
 
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed("headers")))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed("headers"),
+      )).thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
@@ -126,7 +128,7 @@ void main() {
           verify(httpClient.get(captureAny, headers: anyNamed("headers")))
               .captured
               .first;
-      expect(captured, mockURLPrefix + '/notes?ts=1&c=100');
+      expect((captured as Uri).toString(), mockURLPrefix + '/notes?ts=1&c=100');
 
       expect(store.state.noteRepo.notes, {
         'uuid': getNoteObject(),
@@ -143,9 +145,10 @@ void main() {
         ],
       });
 
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed("headers")))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed("headers"),
+      )).thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
@@ -155,7 +158,7 @@ void main() {
           verify(httpClient.get(captureAny, headers: anyNamed("headers")))
               .captured
               .first;
-      expect(captured, mockURLPrefix + '/notes?ts=1&c=100');
+      expect((captured as Uri).toString(), mockURLPrefix + '/notes?ts=1&c=100');
 
       expect(store.state.noteRepo.notes, {});
     });
@@ -169,9 +172,10 @@ void main() {
         'succ': true,
         'notes': [getJsonNoteObject()],
       });
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed("headers")))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed("headers"),
+      )).thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
@@ -181,7 +185,7 @@ void main() {
           verify(httpClient.get(captureAny, headers: anyNamed("headers")))
               .captured
               .first;
-      expect(captured, mockURLPrefix + '/notes?ts=1&c=2');
+      expect((captured as Uri).toString(), mockURLPrefix + '/notes?ts=1&c=2');
 
       verifyNever(actNotes.actFetchNotes());
 
@@ -200,9 +204,10 @@ void main() {
           getJsonNoteObject()..addAll({'uuid': 'uuid2'}),
         ],
       });
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed("headers")))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed("headers"),
+      )).thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
@@ -212,7 +217,7 @@ void main() {
           verify(httpClient.get(captureAny, headers: anyNamed("headers")))
               .captured
               .first;
-      expect(captured, mockURLPrefix + '/notes?ts=1&c=2');
+      expect((captured as Uri).toString(), mockURLPrefix + '/notes?ts=1&c=2');
 
       verify(actNotes.actFetchNotes()).called(1);
 
@@ -240,7 +245,7 @@ void main() {
       });
 
       when(httpClient.post(
-        startsWith(mockURLPrefix),
+        argThat(isA<Uri>()),
         headers: anyNamed('headers'),
         body: anyNamed('body'),
         encoding: Encoding.getByName('utf-8'),
@@ -257,7 +262,7 @@ void main() {
         encoding: Encoding.getByName('utf-8'),
       )).captured;
 
-      expect(captured[0], mockURLPrefix + '/notes');
+      expect((captured[0] as Uri).toString(), mockURLPrefix + '/notes');
       expect(captured[1]['Content-Type'], 'application/json');
       expect(captured[2], jsonEncode(getNoteObject().copyWith(ts: 0).toJson()));
 
@@ -284,7 +289,7 @@ void main() {
       });
 
       when(httpClient.post(
-        startsWith(mockURLPrefix),
+        argThat(isA<Uri>()),
         headers: anyNamed('headers'),
         body: anyNamed('body'),
         encoding: Encoding.getByName('utf-8'),
@@ -301,7 +306,7 @@ void main() {
         encoding: Encoding.getByName('utf-8'),
       )).captured;
 
-      expect(captured[0], mockURLPrefix + '/notes/uuid');
+      expect((captured[0] as Uri).toString(), mockURLPrefix + '/notes/uuid');
       expect(captured[1]['Content-Type'], 'application/json');
       expect(captured[2],
           jsonEncode(getNoteObject().copyWith(ts: 1606500000000).toJson()));

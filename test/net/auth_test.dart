@@ -52,15 +52,21 @@ void main() {
         'pong': true,
       });
 
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed('headers')))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed('headers'),
+      )).thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
       await netAuth.netPing(store);
 
       expect(store.state.setting.serverReachable, Reachable.Yes);
+
+      var captured =
+          verify(httpClient.get(captureAny, headers: anyNamed('headers')))
+              .captured;
+      expect((captured[0] as Uri).origin, startsWith(mockURLPrefix));
     });
 
     test('timeout', () async {
@@ -76,9 +82,10 @@ void main() {
         'pong': true,
       });
 
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed('headers')))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed('headers'),
+      )).thenAnswer((_) async {
         await Future.delayed(Duration(seconds: 5));
         return http.Response(responseBody, 200);
       });
@@ -86,6 +93,11 @@ void main() {
       await netAuth.netPing(store);
 
       expect(store.state.setting.serverReachable, Reachable.No);
+
+      var captured =
+          verify(httpClient.get(captureAny, headers: anyNamed('headers')))
+              .captured;
+      expect((captured[0] as Uri).origin, startsWith(mockURLPrefix));
     });
 
     test('have exception', () async {
@@ -97,13 +109,19 @@ void main() {
       netAuth.setLogger(MockLogger());
       netAuth.setHttpClient(httpClient);
 
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed('headers')))
-          .thenThrow(new Exception("unknown error"));
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed('headers'),
+      )).thenThrow(new Exception("unknown error"));
 
       await netAuth.netPing(store);
 
       expect(store.state.setting.serverReachable, Reachable.Unknown);
+
+      var captured =
+          verify(httpClient.get(captureAny, headers: anyNamed('headers')))
+              .captured;
+      expect((captured[0] as Uri).origin, startsWith(mockURLPrefix));
     });
   });
 }
