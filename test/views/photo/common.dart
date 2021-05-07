@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:mockito/mockito.dart';
 import 'package:storyboard/views/config/constants.dart';
@@ -35,6 +36,23 @@ class FakePhotoScrollerHelper extends Fake implements PhotoScrollerHelper {
   @override
   String getCurrentZoomState(String gKey, Size imageSize, double imageScale) {
     return Constant.zoomOrigin;
+  }
+
+  @override
+  double getNextScale(String containerKey, Size imageSize, double imageScale) {
+    times++;
+    return times % 2 == 0
+        ? getZoomFitWidthScale(containerKey, imageSize)
+        : getZoomFitHeightScale(containerKey, imageSize);
+  }
+
+  @override
+  Widget zoomBtn(
+    BuildContext context,
+    String zoomDesc,
+    VoidCallback onPressed,
+  ) {
+    return TextButton(onPressed: onPressed, child: Text(zoomDesc));
   }
 }
 

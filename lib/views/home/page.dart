@@ -9,6 +9,7 @@ import 'package:storyboard/views/home/detail_page_widget.dart';
 
 class HomePage extends StatelessWidget {
   static const routeName = '/';
+  static const globalKey = 'HomePage';
   HomePage({Key key, this.title}) : super(key: key);
 
   final String title;
@@ -100,6 +101,7 @@ class HomePage extends StatelessWidget {
       ),
     );
     return Scaffold(
+      key: getViewResource().getGlobalKeyByName(globalKey),
       appBar: appBar,
       body: GestureDetector(
         onTap: () {

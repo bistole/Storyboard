@@ -13,6 +13,7 @@ class Commands : NSObject {
     let COMMANDS = "/COMMANDS";
     let CMD_OPEN_DIALOG = "CMD:OPEN_DIALOG";
     let CMD_TAKE_PHOTO = "CMD:TAKE_PHOTO";
+    let CMD_IMPORT_PHOTO = "CMD:IMPORT_PHOTO";
     let CMD_TAKE_QRCODE = "CMD:TAKE_QRCODE";
     
     var delegate: FlutterAppDelegate?
@@ -30,6 +31,16 @@ class Commands : NSObject {
                 photoCaptureVC.setDelegate(delegate: self)
                 naviVC.pushViewController(photoCaptureVC, animated: true)
             }
+            break;
+        case self.CMD_IMPORT_PHOTO:
+            self.result = result
+            let picker = UIImagePickerController()
+            picker.delegate = self
+            picker.mediaTypes = ["public.image"]
+            picker.sourceType = .photoLibrary
+
+            let naviVC = self.delegate?.window?.rootViewController as! UINavigationController
+            naviVC.present(picker, animated: true, completion: nil)
             break;
         case self.CMD_TAKE_QRCODE:
             self.result = result
@@ -52,18 +63,8 @@ class Commands : NSObject {
         methodChannel = FlutterMethodChannel.init(name: channelName, binaryMessenger: bm)
         methodChannel?.setMethodCallHandler(self.methodInvoked(call:result:));
     }
-
-}
-
-extension Commands : PhotoCaptureDelegate {
-    func photoCaptureFailed() {
-        let naviVC = delegate?.window?.rootViewController as! UINavigationController
-        naviVC.popViewController(animated: true)
-    }
     
-    func photoCaptureSucceed(image: UIImage) {
-        let naviVC = delegate?.window?.rootViewController as! UINavigationController
-        naviVC.popViewController(animated: true)
+    func saveImageAndReturn(image : UIImage) {
         do {
             let df = DateFormatter()
             df.locale = Locale(identifier: "en_US")
@@ -84,6 +85,19 @@ extension Commands : PhotoCaptureDelegate {
     }
 }
 
+extension Commands : PhotoCaptureDelegate {
+    func photoCaptureFailed() {
+        let naviVC = delegate?.window?.rootViewController as! UINavigationController
+        naviVC.popViewController(animated: true)
+    }
+    
+    func photoCaptureSucceed(image: UIImage) {
+        let naviVC = delegate?.window?.rootViewController as! UINavigationController
+        naviVC.popViewController(animated: true)
+        saveImageAndReturn(image: image)
+    }
+}
+
 extension Commands : QRCaptureDelegate {
     func QRCaptureFailed() {
         let naviVC = delegate?.window?.rootViewController as! UINavigationController
@@ -94,5 +108,20 @@ extension Commands : QRCaptureDelegate {
         let naviVC = delegate?.window?.rootViewController as! UINavigationController
         naviVC.popViewController(animated: true)
         result?(code)
+    }
+}
+
+extension Commands : UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        let naviVC = delegate?.window?.rootViewController as! UINavigationController
+        naviVC.dismiss(animated: true)
+    }
+
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        guard let image = info[.originalImage] as? UIImage else { return }
+        let naviVC = delegate?.window?.rootViewController as! UINavigationController
+        naviVC.dismiss(animated: true, completion:{ [self] in
+            self.saveImageAndReturn(image: image)
+        })
     }
 }

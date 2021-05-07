@@ -7,8 +7,6 @@ import androidx.annotation.NonNull
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.analytics.ktx.logEvent
-import com.google.firebase.crashlytics.internal.common.CrashlyticsCore
-import com.google.firebase.crashlytics.internal.model.CrashlyticsReport
 import com.google.firebase.ktx.Firebase
 import com.laterhorse.storyboard.channels.BackendEventChannel
 import com.laterhorse.storyboard.channels.CommandChannel
@@ -29,15 +27,20 @@ class MainActivity: FlutterActivity() {
     lateinit var backendEventsChannel: BackendEventChannel
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        firebaseAnalytics = Firebase.analytics;
+        firebaseAnalytics = Firebase.analytics
         super.onCreate(savedInstanceState)
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        commandChannel.onRequestPermissionsResult(this@MainActivity, requestCode, grantResults)
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
-        Log.d(LOG_TAG, "configureFlutterEngine");
-        GeneratedPluginRegistrant.registerWith(flutterEngine);
+        Log.d(LOG_TAG, "configureFlutterEngine")
+        GeneratedPluginRegistrant.registerWith(flutterEngine)
         this.flutterEngine?.run {
-            commandChannel = CommandChannel();
+            commandChannel = CommandChannel()
             commandChannel.registerEngine(this@MainActivity, this)
 
             backendEventsChannel = BackendEventChannel()
@@ -48,7 +51,7 @@ class MainActivity: FlutterActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        commandChannel.onActivityResult(requestCode, resultCode, data);
+        commandChannel.onActivityResult(this@MainActivity, requestCode, resultCode, data)
         super.onActivityResult(requestCode, resultCode, data)
     }
 }

@@ -73,7 +73,37 @@ class _CreatePhotoPageState extends State<CreatePhotoPage> {
     super.dispose();
   }
 
-  Widget buildAddingPhotoToolbar(ReduxActions redux) {
+  Widget okBtn(BuildContext context, ReduxActions redux) {
+    if (getViewResource().isWiderLayout(context)) {
+      return SBToolbarButton(
+        () => redux.createPhoto(widget.args.path),
+        icon: Icon(AppIcons.ok),
+        text: "OK",
+      );
+    } else {
+      return SBToolbarButton(
+        () => redux.createPhoto(widget.args.path),
+        icon: Icon(AppIcons.ok),
+      );
+    }
+  }
+
+  Widget cancelBtn(BuildContext context, ReduxActions redux) {
+    if (getViewResource().isWiderLayout(context)) {
+      return SBToolbarButton(
+        redux.cancel,
+        icon: Icon(AppIcons.cancel),
+        text: "CANCEL",
+      );
+    } else {
+      return SBToolbarButton(
+        redux.cancel,
+        icon: Icon(AppIcons.cancel),
+      );
+    }
+  }
+
+  Widget buildAddingPhotoToolbar(BuildContext context, ReduxActions redux) {
     var helper = scrollerController.helper;
     var zoomState =
         helper.getCurrentZoomState(containerKey, imageSize, imageScale);
@@ -101,39 +131,19 @@ class _CreatePhotoPageState extends State<CreatePhotoPage> {
         },
         icon: Icon(AppIcons.angle_right),
       ),
-      SBToolbarButton(
-        () {
-          var helper = scrollerController.helper;
-          var zoomCurrentState =
-              helper.getCurrentZoomState(containerKey, imageSize, imageScale);
-          var zoomNextState = helper.getNextZoomState(zoomCurrentState);
-          // do next
-          double scale = 1.0;
-          if (zoomNextState == Constant.zoomFitWidth) {
-            scale = helper.getZoomFitWidthScale(containerKey, imageSize);
-          } else if (zoomNextState == Constant.zoomFitHeight) {
-            scale = helper.getZoomFitHeightScale(containerKey, imageSize);
-          }
-          getViewResource()
-              .notifier
-              .notifyListeners<double>(Constant.eventPhotoScale, param: scale);
-        },
-        text: zoomDesc,
-      ),
-      SBToolbarButton(
-        () => redux.createPhoto(widget.args.path),
-        icon: Icon(AppIcons.ok),
-        text: "OK",
-      ),
-      SBToolbarButton(
-        redux.cancel,
-        icon: Icon(AppIcons.cancel),
-        text: "CANCEL",
-      ),
+      scrollerController.helper.zoomBtn(context, zoomDesc, () {
+        double scale = scrollerController.helper
+            .getNextScale(containerKey, imageSize, imageScale);
+        getViewResource()
+            .notifier
+            .notifyListeners<double>(Constant.eventPhotoScale, param: scale);
+      }),
+      okBtn(context, redux),
+      cancelBtn(context, redux),
     ]);
   }
 
-  Widget buildWhenAddingPhoto(context, ReduxActions redux) {
+  Widget buildWhenAddingPhoto(BuildContext context, ReduxActions redux) {
     scroller = PhotoScrollerWidget(
       path: widget.args.path,
       controller: scrollerController,
@@ -144,7 +154,7 @@ class _CreatePhotoPageState extends State<CreatePhotoPage> {
           key: getViewResource().getGlobalKeyByName(containerKey),
           child: scroller,
         ),
-        buildAddingPhotoToolbar(redux),
+        buildAddingPhotoToolbar(context, redux),
       ],
     );
   }
@@ -167,7 +177,7 @@ class _CreatePhotoPageState extends State<CreatePhotoPage> {
           },
         );
       },
-      builder: (context, ReduxActions redux) {
+      builder: (BuildContext context, ReduxActions redux) {
         return Scaffold(
           appBar: AppBar(
             elevation: 0,

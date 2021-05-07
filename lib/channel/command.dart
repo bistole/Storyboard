@@ -7,6 +7,7 @@ import 'package:storyboard/redux/models/app.dart';
 
 const CMD_OPEN_DIALOG = 'CMD:OPEN_DIALOG';
 const CMD_TAKE_PHOTO = 'CMD:TAKE_PHOTO';
+const CMD_IMPORT_PHOTO = 'CMD:IMPORT_PHOTO';
 const CMD_TAKE_QRCODE = "CMD:TAKE_QRCODE";
 
 class CommandChannel {
@@ -64,6 +65,18 @@ class CommandChannel {
       return path;
     } else {
       _logger.info(_logTag, "takePhoto cancel");
+      return null;
+    }
+  }
+
+  Future<String> importPhotoFromAlbum() async {
+    _logger.info(_logTag, "importPhoto");
+    String path = await _channel.invokeMethod<String>(CMD_IMPORT_PHOTO);
+    if (path != null) {
+      _logger.info(_logTag, "importPhoto succ");
+      return path;
+    } else {
+      _logger.info(_logTag, "importPhoto cancel");
       return null;
     }
   }
