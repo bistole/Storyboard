@@ -126,25 +126,13 @@ class _PhotoPageState extends State<PhotoPage> {
         },
         icon: Icon(AppIcons.angle_right),
       ),
-      SBToolbarButton(
-        () {
-          var helper = scrollerController.helper;
-          var zoomCurrentState =
-              helper.getCurrentZoomState(containerKey, imageSize, imageScale);
-          var zoomNextState = helper.getNextZoomState(zoomCurrentState);
-          // do next
-          double scale = 1.0;
-          if (zoomNextState == Constant.zoomFitWidth) {
-            scale = helper.getZoomFitWidthScale(containerKey, imageSize);
-          } else if (zoomNextState == Constant.zoomFitHeight) {
-            scale = helper.getZoomFitHeightScale(containerKey, imageSize);
-          }
-          getViewResource()
-              .notifier
-              .notifyListeners<double>(Constant.eventPhotoScale, param: scale);
-        },
-        text: zoomDesc,
-      ),
+      scrollerController.helper.zoomBtn(context, zoomDesc, () {
+        double scale = scrollerController.helper
+            .getNextScale(containerKey, imageSize, imageScale);
+        getViewResource()
+            .notifier
+            .notifyListeners<double>(Constant.eventPhotoScale, param: scale);
+      }),
     ]);
   }
 

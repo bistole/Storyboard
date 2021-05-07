@@ -16,8 +16,6 @@ import 'common.dart';
 
 class MockFactory extends Mock implements Factory {}
 
-class MockViewResource extends Mock implements ViewsResource {}
-
 class MockDeviceManager extends Mock implements DeviceManager {}
 
 class MockMenuChannel extends Mock implements MenuChannel {}

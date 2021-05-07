@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/config/constants.dart';
@@ -64,10 +65,49 @@ class PhotoScrollerHelper {
       case Constant.zoomOrigin:
         return "100%";
       case Constant.zoomFitHeight:
-        return "^- Height -v";
+        return "^- H -v";
       case Constant.zoomFitWidth:
-        return "<- Width ->";
+        return "<- W ->";
     }
-    return "" + ((scale * 10000).toInt() / 100).toString() + "%";
+
+    if (scale > 10) {
+      return "x" + (scale.toInt()).toString();
+    }
+    if (scale > 1) {
+      return "x" + ((scale * 10).toInt() / 10).toString();
+    }
+    return "" + ((scale * 1000).toInt() / 10).toString() + "%";
+  }
+
+  double getNextScale(String containerKey, Size imageSize, double imageScale) {
+    var zoomCurrentState =
+        getCurrentZoomState(containerKey, imageSize, imageScale);
+    var zoomNextState = getNextZoomState(zoomCurrentState);
+    // do next
+    double scale = 1.0;
+    if (zoomNextState == Constant.zoomFitWidth) {
+      scale = getZoomFitWidthScale(containerKey, imageSize);
+    } else if (zoomNextState == Constant.zoomFitHeight) {
+      scale = getZoomFitHeightScale(containerKey, imageSize);
+    }
+    return scale;
+  }
+
+  Widget zoomBtn(BuildContext context, String zoomDesc, VoidCallback onPress) {
+    return Container(
+      width: 75,
+      child: TextButton(
+        onPressed: onPress,
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: Text(zoomDesc),
+        ),
+        style: ButtonStyle(
+          padding:
+              MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 16)),
+        ),
+      ),
+      margin: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+    );
   }
 }

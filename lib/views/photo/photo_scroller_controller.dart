@@ -23,7 +23,7 @@ class PhotoScrollerControllerState {
 
   @override
   String toString() {
-    return 'PhotoScrollerControllerState{size: $imageSize, scale: $imageScale}';
+    return 'PhotoScrollerControllerState{size:$imageSize, scale:$imageScale}';
   }
 }
 

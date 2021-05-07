@@ -20,6 +20,7 @@ import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/note_repo.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/views/auth/page.dart';
+import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/config/constants.dart';
 import 'package:storyboard/views/home/page.dart';
 import 'package:storyboard/views/logger/page.dart';
@@ -27,6 +28,8 @@ import 'package:storyboard/views/photo/create_photo_page.dart';
 import 'package:storyboard/views/photo/photo_page.dart';
 
 import 'helper/route_aware_widget.dart';
+
+class MockViewResource extends Mock implements ViewsResource {}
 
 class MockLogger extends Mock implements Logger {}
 

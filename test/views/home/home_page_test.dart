@@ -14,8 +14,6 @@ import 'package:storyboard/views/home/page.dart';
 
 import '../../common.dart';
 
-class MockViewsResource extends Mock implements ViewsResource {}
-
 class MockDeviceManager extends Mock implements DeviceManager {}
 
 class MockCommandChannel extends Mock implements CommandChannel {}
@@ -29,7 +27,7 @@ void main() {
   MenuChannel menu;
 
   setUp(() {
-    vr = MockViewsResource();
+    vr = MockViewResource();
     dm = MockDeviceManager();
     cmd = MockCommandChannel();
     menu = MockMenuChannel();
