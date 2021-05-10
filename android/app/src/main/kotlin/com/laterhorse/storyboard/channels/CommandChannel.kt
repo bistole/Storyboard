@@ -3,12 +3,14 @@ package com.laterhorse.storyboard.channels
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Environment
 import android.util.Log
 import androidx.annotation.NonNull
 import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.app.ActivityCompat.startActivityForResult
+import androidx.core.content.FileProvider
 import androidx.core.content.PermissionChecker
 import androidx.core.content.PermissionChecker.checkSelfPermission
 import com.google.zxing.integration.android.IntentIntegrator
@@ -17,6 +19,7 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import java.io.*
+import java.net.URLConnection
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -26,6 +29,9 @@ class CommandChannel {
 
         var CMD_TAKE_PHOTO = "CMD:TAKE_PHOTO"
         var CMD_IMPORT_PHOTO = "CMD:IMPORT_PHOTO"
+        var CMD_SHARE_PHOTO = "CMD:SHARE_PHOTO"
+        var CMD_SHARE_TEXT = "CMD:SHARE_TEXT"
+
         var CMD_TAKE_QR_CODE = "CMD:TAKE_QR_CODE"
 
         var REQUEST_READ_STORAGE_CODE = 999
@@ -47,6 +53,14 @@ class CommandChannel {
     private fun savePhoto(fOut: File , streamIn: InputStream) {
         fOut.outputStream().use { streamOut ->
             streamIn.copyTo(streamOut)
+        }
+    }
+
+    private fun copyPhoto(fOut: File, fIn: File) {
+        fOut.outputStream().use { streamOut ->
+            fIn.inputStream().use { streamIn ->
+                streamIn.copyTo(streamOut)
+            }
         }
     }
 
@@ -85,6 +99,46 @@ class CommandChannel {
         importPicture(activity)
     }
 
+    private fun dispatchSharePicture(activity: MainActivity, path: String) {
+        val file = File(path)
+
+        // TODO: flutter should add extension to image file, so it can show when sharing
+        //   without copying image file
+        val dir: File? = activity.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val shareFile = File.createTempFile("export-", ".jpeg", dir)
+        copyPhoto(shareFile, file)
+
+        val authority = "${activity.applicationContext.packageName}.fileprovider"
+        val photoURI = FileProvider.getUriForFile(activity, authority, shareFile)
+
+        val intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            type = "image/jpeg"
+            putExtra(Intent.EXTRA_STREAM, photoURI)
+        }
+
+        val chooser =Intent.createChooser(intent, "Share photo via")
+
+        // grant permission to all app can accept sharing
+        val permission = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        val resInfoList = activity.packageManager.queryIntentActivities(chooser, PackageManager.MATCH_DEFAULT_ONLY)
+        for (resolveInfo in resInfoList) {
+            val packageName = resolveInfo.activityInfo.packageName
+            activity.grantUriPermission(packageName, photoURI, permission)
+        }
+
+        activity.startActivity(chooser)
+    }
+
+    private fun dispatchShareText(activity: MainActivity, text: String) {
+        val intent = Intent(Intent.ACTION_SEND)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        intent.type = "text/plain"
+        intent.putExtra(Intent.EXTRA_TEXT, text)
+        activity.startActivity(Intent.createChooser(intent, "Share note via"))
+    }
+
     private fun dispatchTakeQRCodeIntent(activity: MainActivity, result: MethodChannel.Result) {
         currentMethodChannelResult = result
 
@@ -111,6 +165,14 @@ class CommandChannel {
                 CMD_IMPORT_PHOTO -> {
                     Log.d(LOG_TAG, "CMD_IMPORT_PHOTO")
                     dispatchImportPictureIntent(activity, result)
+                }
+                CMD_SHARE_PHOTO -> {
+                    Log.d(LOG_TAG, "CMD_SHARE_PHOTO")
+                    dispatchSharePicture(activity, call.arguments as String)
+                }
+                CMD_SHARE_TEXT -> {
+                    Log.d(LOG_TAG, "CMD_SHARE_TEXT")
+                    dispatchShareText(activity, call.arguments as String)
                 }
                 CMD_TAKE_QR_CODE -> {
                     Log.d(LOG_TAG, "CMD_TAKE_QR_CODE")

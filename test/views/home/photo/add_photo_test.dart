@@ -35,7 +35,8 @@ void main() {
       resourcePath = getResourcePath("test_resources/photo_test.jpg");
 
       mcc = MockCommandChannel();
-      when(mcc.importPhoto()).thenAnswer((_) => Future.value(resourcePath));
+      when(mcc.importPhotoFromDisk())
+          .thenAnswer((_) => Future.value(resourcePath));
       when(mcc.takePhoto()).thenAnswer((_) => Future.value(resourcePath));
       getViewResource().command = mcc;
 
@@ -77,7 +78,7 @@ void main() {
         await tester.tap(find.text('ADD PHOTO'));
         await tester.pumpAndSettle();
 
-        verify(mcc.importPhoto()).called(1);
+        verify(mcc.importPhotoFromDisk()).called(1);
         // Page pushed
         var c = verify(naviObserver.didPush(captureAny, any)).captured.last
             as MaterialPageRoute;
@@ -104,7 +105,7 @@ void main() {
         // callback
         await c[1]();
 
-        verify(mcc.importPhoto()).called(1);
+        verify(mcc.importPhotoFromDisk()).called(1);
 
         // Page pushed
         var c2 = verify(naviObserver.didPush(captureAny, any)).captured.last

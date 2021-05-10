@@ -48,5 +48,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Our application needs permission to export photos to album</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Our application needs permission to read photo from album</string>
 </dict>
 </plist>

@@ -133,6 +133,19 @@ class _PhotoPageState extends State<PhotoPage> {
             .notifier
             .notifyListeners<double>(Constant.eventPhotoScale, param: scale);
       }),
+      ...(redux.photo.hasOrigin == PhotoStatus.Ready
+          ? [
+              SBToolbarButton(
+                () {
+                  String path = getViewResource()
+                      .storage
+                      .getPhotoPathByUUID(redux.photo.uuid);
+                  getViewResource().command.sharePhoto(path);
+                },
+                icon: Icon(AppIcons.share),
+              )
+            ]
+          : [])
     ]);
   }
 

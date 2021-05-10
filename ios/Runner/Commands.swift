@@ -14,6 +14,8 @@ class Commands : NSObject {
     let CMD_OPEN_DIALOG = "CMD:OPEN_DIALOG";
     let CMD_TAKE_PHOTO = "CMD:TAKE_PHOTO";
     let CMD_IMPORT_PHOTO = "CMD:IMPORT_PHOTO";
+    let CMD_SHARE_PHOTO = "CMD:SHARE_PHOTO";
+    let CMD_SHARE_TEXT = "CMD:SHARE_TEXT";
     let CMD_TAKE_QRCODE = "CMD:TAKE_QRCODE";
     
     var delegate: FlutterAppDelegate?
@@ -41,6 +43,29 @@ class Commands : NSObject {
 
             let naviVC = self.delegate?.window?.rootViewController as! UINavigationController
             naviVC.present(picker, animated: true, completion: nil)
+            break;
+        case self.CMD_SHARE_PHOTO:
+            self.result = result
+            
+            let url = URL(fileURLWithPath: call.arguments as! String)
+            let image = UIImage(contentsOfFile: url.path)!
+            
+            let naviVC = self.delegate?.window?.rootViewController as! UINavigationController
+            let ctrl = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+            ctrl.popoverPresentationController?.sourceView = naviVC.view
+            ctrl.excludedActivityTypes = [UIActivity.ActivityType.airDrop]
+            naviVC.present(ctrl, animated: true, completion: nil)
+            break;
+        case self.CMD_SHARE_TEXT:
+            self.result = result
+
+            let text = call.arguments as! String
+            
+            let naviVC = self.delegate?.window?.rootViewController as! UINavigationController
+            let ctrl = UIActivityViewController(activityItems: [text], applicationActivities: nil)
+            ctrl.popoverPresentationController?.sourceView = naviVC.view
+            ctrl.excludedActivityTypes = [UIActivity.ActivityType.airDrop]
+            naviVC.present(ctrl, animated: true, completion: nil)
             break;
         case self.CMD_TAKE_QRCODE:
             self.result = result

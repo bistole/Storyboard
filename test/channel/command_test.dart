@@ -23,7 +23,7 @@ void main() {
     store = getMockStore(status: Status.noParam(StatusKey.ListNote));
   });
 
-  test('importPhoto', () async {
+  test('importPhotoFromDisk', () async {
     MethodChannel mc = MockMethodChannel();
 
     String path = "project_home/image.jpeg";
@@ -34,7 +34,7 @@ void main() {
     cc.setLogger(MockLogger());
     cc.setStore(store);
 
-    String newPath = await cc.importPhoto();
+    String newPath = await cc.importPhotoFromDisk();
 
     var captured = verify(mc.invokeListMethod(captureAny, captureAny)).captured;
     expect(captured[0] as String, 'CMD:OPEN_DIALOG');
@@ -64,6 +64,53 @@ void main() {
     expect(captured[0] as String, 'CMD:TAKE_PHOTO');
 
     expect(getPath, path);
+  });
+
+  test('importPhotoFromAlbum', () async {
+    MethodChannel mc = MockMethodChannel();
+    String path = "project_home/image.jpeg";
+    when(mc.invokeMethod(any, any)).thenAnswer((_) async => path);
+
+    var cc = CommandChannel(mc);
+    cc.setLogger(MockLogger());
+    cc.setStore(store);
+
+    String getPath = await cc.importPhotoFromAlbum();
+
+    var captured = verify(mc.invokeMethod(captureAny)).captured;
+    expect(captured[0] as String, 'CMD:IMPORT_PHOTO');
+
+    expect(getPath, path);
+  });
+
+  test('sharePhoto', () {
+    MethodChannel mc = MockMethodChannel();
+
+    var cc = CommandChannel(mc);
+    cc.setLogger(MockLogger());
+    cc.setStore(store);
+
+    var path = 'this/path/to/share.jpg';
+    cc.sharePhoto(path);
+
+    var captured = verify(mc.invokeMethod(captureAny, captureAny)).captured;
+    expect(captured[0] as String, 'CMD:SHARE_PHOTO');
+    expect(captured[1] as String, path);
+  });
+
+  test('shareText', () {
+    MethodChannel mc = MockMethodChannel();
+
+    var cc = CommandChannel(mc);
+    cc.setLogger(MockLogger());
+    cc.setStore(store);
+
+    var text = 'here is the text';
+    cc.shareText(text);
+
+    var captured = verify(mc.invokeMethod(captureAny, captureAny)).captured;
+    expect(captured[0] as String, 'CMD:SHARE_TEXT');
+    expect(captured[1] as String, text);
   });
 
   test('takeQRCode', () async {

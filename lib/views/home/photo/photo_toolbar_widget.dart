@@ -31,7 +31,7 @@ class PhotoToolbarState extends State<StatefulWidget> {
   void buildListener(BuildContext context) {
     if (listener != null) return;
     listener = () async {
-      String path = await getViewResource().command.importPhoto();
+      String path = await getViewResource().command.importPhotoFromDisk();
       showCreatePhotoPage(context, path);
     };
   }
@@ -103,7 +103,7 @@ class PhotoToolbarState extends State<StatefulWidget> {
     } else {
       photoActionButton = SBToolbarButton(
         () async {
-          String path = await getViewResource().command.importPhoto();
+          String path = await getViewResource().command.importPhotoFromDisk();
           showCreatePhotoPage(context, path);
         },
         text: "ADD PHOTO",
