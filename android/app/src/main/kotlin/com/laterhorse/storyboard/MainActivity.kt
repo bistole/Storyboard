@@ -70,6 +70,7 @@ class MainActivity: FlutterActivity() {
     }
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
+        Log.d(LOG_TAG, "configureFlutterEngine")
         GeneratedPluginRegistrant.registerWith(flutterEngine)
         this.flutterEngine?.run {
             commandChannel = CommandChannel()

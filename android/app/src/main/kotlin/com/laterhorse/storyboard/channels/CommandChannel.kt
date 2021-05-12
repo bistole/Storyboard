@@ -163,7 +163,7 @@ class CommandChannel {
 
     fun registerEngine(activity: MainActivity, @NonNull flutterEngine: FlutterEngine) {
         val packageName = activity.packageName
-        methodChannel =MethodChannel(flutterEngine.dartExecutor, "$packageName$CHANNEL_COMMANDS")
+        methodChannel = MethodChannel(flutterEngine.dartExecutor, "$packageName$CHANNEL_COMMANDS")
         methodChannel.setMethodCallHandler{
             call, result ->
             when(call.method) {
@@ -201,6 +201,16 @@ class CommandChannel {
                     Log.d(LOG_TAG, "CMD_TAKE_QR_CODE")
                     dispatchTakeQRCodeIntent(activity, result)
                 }
+            }
+        }
+    }
+
+    fun onRequestPermissionsResult(activity: MainActivity, requestCode: Int, grantResults: IntArray) {
+        if (requestCode == REQUEST_READ_STORAGE_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                importPicture(activity)
+            } else {
+                currentMethodChannelResult.run { error("Permission denied") }
             }
         }
     }

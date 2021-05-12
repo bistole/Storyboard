@@ -137,6 +137,18 @@ class CommandChannel {
     }
   }
 
+  Future<String> importPhoto() async {
+    _logger.info(_logTag, "importPhoto");
+    String path = await _channel.invokeMethod<String>(CMD_IMPORT_PHOTO);
+    if (path != null) {
+      _logger.info(_logTag, "importPhoto succ");
+      return path;
+    } else {
+      _logger.info(_logTag, "importPhoto cancel");
+      return null;
+    }
+  }
+
   Future<void> sharePhoto(String path) async {
     _logger.info(_logTag, "sharePhoto");
     await _channel.invokeMethod<String>(CMD_SHARE_OUT_PHOTO, path);
