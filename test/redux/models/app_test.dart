@@ -49,6 +49,20 @@ void main() {
     );
   }
 
+  test('appState init', () {
+    var appState = AppState.initState();
+    expect(
+        appState.toString(),
+        startsWith(
+            "AppState{status: Status{status: StatusKey.ListNote, param1: null, param2: null}, " +
+                "noteRepo: NoteRepo{notes: {}, lastTS: 0}, " +
+                "photoRepo: PhotoRepo{photos: {}, lastTS: 0}, " +
+                "queue: Queue{list: [], tick: 0, now: null}, " +
+                "setting: Setting{clientID:"));
+    expect(appState.toString(),
+        endsWith(", serverKey: null, serverReachable: Reachable.Unknown}}"));
+  });
+
   test("appState fromJson", () {
     var appState = AppState.fromJson({
       'notes': {
@@ -183,22 +197,38 @@ void main() {
     });
   });
 
-  test('copyWith', () {
-    AppState app = AppState(
-      photoRepo: PhotoRepo(photos: {}, lastTS: 0),
-      noteRepo: NoteRepo(notes: {}, lastTS: 0),
-      status: getListStatus(),
-      queue: Queue(
-        tick: 1,
-        list: [getCreateQueue()],
-      ),
-    );
+  group('copyWith', () {
+    test('copyWith new queue', () {
+      AppState app = AppState(
+        photoRepo: PhotoRepo(photos: {}, lastTS: 0),
+        noteRepo: NoteRepo(notes: {}, lastTS: 0),
+        status: getListStatus(),
+        queue: Queue(
+          tick: 1,
+          list: [getCreateQueue()],
+        ),
+      );
 
-    AppState app2 = app.copyWith(
-      queue: app.queue.copyWith(tick: 2),
-    );
+      AppState app2 = app.copyWith(
+        queue: app.queue.copyWith(tick: 2),
+      );
 
-    expect(app == app2, false);
-    expect(app.hashCode, isNot(app2.hashCode));
+      expect(app == app2, false);
+      expect(app.hashCode, isNot(app2.hashCode));
+    });
+
+    test('copyWith all same', () {
+      AppState app = AppState(
+        photoRepo: PhotoRepo(photos: {}, lastTS: 0),
+        noteRepo: NoteRepo(notes: {}, lastTS: 0),
+        status: getListStatus(),
+        queue: Queue(tick: 1, list: [getCreateQueue()]),
+      );
+
+      AppState app2 = app.copyWith();
+
+      expect(app == app2, true);
+      expect(app.hashCode, app2.hashCode);
+    });
   });
 }

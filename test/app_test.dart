@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:storyboard/app.dart';
+import 'package:storyboard/views/root/app.dart';
 import 'package:storyboard/channel/menu.dart';
 import 'package:storyboard/configs/device_manager.dart';
 import 'package:storyboard/configs/factory.dart';
@@ -11,6 +11,7 @@ import 'package:storyboard/views/home/page.dart';
 import 'package:storyboard/views/logger/page.dart';
 import 'package:storyboard/views/photo/create_photo_page.dart';
 import 'package:storyboard/views/photo/photo_page.dart';
+import 'package:storyboard/views/root/app_wrapper.dart';
 
 import 'common.dart';
 
@@ -24,7 +25,7 @@ void main() {
   group('app', () {
     testWidgets('factory not available', (WidgetTester tester) async {
       // not available
-      await tester.pumpWidget(StoryBoardApp());
+      await tester.pumpWidget(StoryBoardAppWrapper());
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
@@ -46,7 +47,7 @@ void main() {
       when(vr.isWiderLayout(any)).thenReturn(true);
       setViewResource(vr);
 
-      await tester.pumpWidget(StoryBoardApp());
+      await tester.pumpWidget(StoryBoardAppWrapper());
 
       await tester.pumpAndSettle();
 

@@ -169,11 +169,16 @@ class _CreatePhotoPageState extends State<CreatePhotoPage> {
             getViewResource()
                 .actPhotos
                 .actUploadPhoto(store, widget.args.path, direction);
-            Navigator.of(context).pop();
+
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
           },
           cancel: () {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListPhoto));
-            Navigator.of(context).pop();
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
           },
         );
       },

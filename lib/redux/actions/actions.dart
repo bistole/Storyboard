@@ -173,6 +173,18 @@ class ChangeStatusWithPathAction {
   }
 }
 
+class ChangeStatusWithTextAction {
+  final StatusKey status;
+  final String text;
+
+  ChangeStatusWithTextAction({@required this.status, @required this.text});
+
+  @override
+  String toString() {
+    return 'ChangeStatusWithTextAction{status: $status, text: $text}';
+  }
+}
+
 class PushQueueItemAction {
   final QueueItemType type;
   final QueueItemAction action;

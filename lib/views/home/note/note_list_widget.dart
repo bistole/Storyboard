@@ -35,7 +35,7 @@ class NoteListWidget extends StatelessWidget {
     });
     updatedNoteList.forEach((note) {
       Widget w = redux.status.status == StatusKey.EditingNote &&
-              redux.status.param1 == note.uuid
+              redux.status.uuid == note.uuid
           ? UpdateNoteWidget(note: note)
           : NoteWidget(note: note);
       children.add(w);

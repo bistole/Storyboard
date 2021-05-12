@@ -50,16 +50,19 @@ void main() {
       Directory(path.join(homePath, 'photos')).deleteSync(recursive: true);
     });
 
-    testWidgets('click ok', (WidgetTester tester) async {
+    testWidgets('click ok when creating', (WidgetTester tester) async {
       String resourcePath = getResourcePath("test_resources/photo_test.jpg");
 
       await mockImageHelper(tester, resourcePath);
-
-      Widget w = buildTestableWidget(
+      Widget w = buildTestablePageWithArguments(
         CreatePhotoPage(CreatePhotoPageArguments(resourcePath)),
         store,
+        CreatePhotoPageArguments(resourcePath),
       );
       await tester.pumpWidget(w);
+
+      await tester.tap(find.byType(TextButton));
+      await tester.pumpAndSettle();
 
       // Show the selected image
       expect(find.byType(SBToolbarButton), findsNWidgets(4));

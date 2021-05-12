@@ -29,6 +29,17 @@ void main() {
     'createdAt': 1000,
     '_ts': 1000000,
   });
+
+  test('SettingServerKeyAction', () {
+    final act = SettingServerKeyAction(serverKey: 'sk');
+    expect(act.toString(), "SettingServerKeyAction{serverKey: sk}");
+  });
+
+  test('SettingServerReachableAction', () {
+    final act = SettingServerReachableAction(reachable: false);
+    expect(act.toString(), "SettingServerReachableAction{reachable: false}");
+  });
+
   test("FetchNotesAction", () {
     final act = FetchNotesAction(noteMap: {"uuid": note});
     expect(act.toString(),
@@ -103,6 +114,13 @@ void main() {
         ChangeStatusWithPathAction(status: StatusKey.AddingNote, path: 'path');
     expect(act.toString(),
         "ChangeStatusWithPathAction{status: StatusKey.AddingNote, path: path}");
+  });
+
+  test("ChangeStatusWithTextAction", () {
+    final act = ChangeStatusWithTextAction(
+        status: StatusKey.ShareInNote, text: 'content');
+    expect(act.toString(),
+        "ChangeStatusWithTextAction{status: StatusKey.ShareInNote, text: content}");
   });
 
   test("PushQueueItemAction", () {

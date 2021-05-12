@@ -5,6 +5,8 @@ enum StatusKey {
   AddingNote,
   EditingNote,
   EditingPhoto,
+  ShareInPhoto,
+  ShareInNote,
   ListNote,
   ListPhoto,
 }
@@ -36,11 +38,13 @@ class Status {
   }
 
   bool get inNote =>
+      status == StatusKey.ShareInNote ||
       status == StatusKey.AddingNote ||
       status == StatusKey.ListNote ||
       status == StatusKey.EditingNote;
 
   bool get inPhoto =>
+      status == StatusKey.ShareInPhoto ||
       status == StatusKey.AddingPhoto ||
       status == StatusKey.ListPhoto ||
       status == StatusKey.EditingPhoto;
@@ -55,6 +59,10 @@ class Status {
           status == other.status &&
           param1 == other.param1 &&
           param2 == other.param2);
+
+  String get uuid => param1;
+  String get path => param1;
+  String get text => param1;
 
   @override
   String toString() {

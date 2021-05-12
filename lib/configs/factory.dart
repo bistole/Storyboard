@@ -27,6 +27,7 @@ import 'package:storyboard/net/sse.dart';
 import 'package:storyboard/net/notes.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
+import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/store.dart';
 import 'package:storyboard/storage/storage.dart';
 import 'package:storyboard/views/config/config.dart';
@@ -36,6 +37,8 @@ const CHANNEL_MENU_EVENTS = "/MENU_EVENTS";
 const CHANNEL_COMMANDS = '/COMMANDS';
 
 class Factory {
+  static String _logTag = (Factory).toString();
+
   DeviceManager deviceManager;
   Logger logger;
   Notifier notifier;
@@ -111,13 +114,13 @@ class Factory {
     channelManager.setLogger(logger);
     storage.setLogger(logger);
 
+    getViewResource().logger = logger;
+    getViewResource().notifier = notifier;
     getViewResource().deviceManager = deviceManager;
     getViewResource().storage = storage;
     getViewResource().actPhotos = actPhotos;
     getViewResource().actNotes = actNotes;
     getViewResource().actServer = actServer;
-    getViewResource().logger = logger;
-    getViewResource().notifier = notifier;
   }
 
   Future<void> initCrashlytics() async {
@@ -177,6 +180,7 @@ class Factory {
     MethodChannel mcCommand = await createChannelByName(CHANNEL_COMMANDS);
     command = CommandChannel(mcCommand);
     command.setLogger(logger);
+    command.setNotifier(notifier);
     command.setActServer(actServer);
 
     // init menu
@@ -203,6 +207,13 @@ class Factory {
     netQueue.start();
 
     command.setStore(store);
+
+    // if share, handle in different way
+    command.listenAction(CMD_SHARE_IN_PHOTO, shareInPhotoListener);
+    command.listenAction(CMD_SHARE_IN_TEXT, shareInNoteListener);
+    await command.setChannelReady();
+
+    shareInPhotoListener() || shareInNoteListener();
   }
 
   Future<void> checkServerStatus() async {
@@ -211,6 +222,37 @@ class Factory {
     } else {
       checkServerKeyOnMobile();
     }
+  }
+
+  bool shareInPhotoListener() {
+    var path = command.getActionValue<String>(CMD_SHARE_IN_PHOTO);
+    if (path != null) {
+      logger.info(_logTag, "shareInPhotoListener $path");
+      store.dispatch(ChangeStatusWithPathAction(
+        status: StatusKey.ShareInPhoto,
+        path: path,
+      ));
+      command.clearActionValue(CMD_SHARE_IN_PHOTO);
+      return true;
+    }
+    return false;
+  }
+
+  bool shareInNoteListener() {
+    var text = command.getActionValue<String>(CMD_SHARE_IN_TEXT);
+    if (text != null) {
+      logger.info(_logTag, "shareInNoteListener $text");
+      actNotes.actCreateNote(store, text);
+      store.dispatch(ChangeStatusAction(status: StatusKey.ListNote));
+      // TODO: have UI for share in text
+      // store.dispatch(ChangeStatusWithTextAction(
+      //   status: StatusKey.ShareInNote,
+      //   text: text,
+      // ));
+      command.clearActionValue(CMD_SHARE_IN_TEXT);
+      return true;
+    }
+    return false;
   }
 }
 

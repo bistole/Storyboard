@@ -11,13 +11,17 @@ import Flutter
 
 class Commands : NSObject {
     let COMMANDS = "/COMMANDS";
+    let CMD_READY = "CMD:READY";
     let CMD_OPEN_DIALOG = "CMD:OPEN_DIALOG";
     let CMD_TAKE_PHOTO = "CMD:TAKE_PHOTO";
     let CMD_IMPORT_PHOTO = "CMD:IMPORT_PHOTO";
-    let CMD_SHARE_PHOTO = "CMD:SHARE_PHOTO";
-    let CMD_SHARE_TEXT = "CMD:SHARE_TEXT";
+    let CMD_SHARE_OUT_PHOTO = "CMD:SHARE_OUT_PHOTO";
+    let CMD_SHARE_OUT_TEXT = "CMD:SHARE_OUT_TEXT";
     let CMD_TAKE_QRCODE = "CMD:TAKE_QRCODE";
     
+    let CMD_SHARE_IN_PHOTO = "CMD:SHARE_IN_PHOTO";
+    let CMD_SHARE_IN_TEXT = "CMD:SHARE_IN_TEXT";
+
     var delegate: FlutterAppDelegate?
     var methodChannel : FlutterMethodChannel?
     var result: FlutterResult?
@@ -44,7 +48,7 @@ class Commands : NSObject {
             let naviVC = self.delegate?.window?.rootViewController as! UINavigationController
             naviVC.present(picker, animated: true, completion: nil)
             break;
-        case self.CMD_SHARE_PHOTO:
+        case self.CMD_SHARE_OUT_PHOTO:
             self.result = result
             
             let url = URL(fileURLWithPath: call.arguments as! String)
@@ -56,7 +60,7 @@ class Commands : NSObject {
             ctrl.excludedActivityTypes = [UIActivity.ActivityType.airDrop]
             naviVC.present(ctrl, animated: true, completion: nil)
             break;
-        case self.CMD_SHARE_TEXT:
+        case self.CMD_SHARE_OUT_TEXT:
             self.result = result
 
             let text = call.arguments as! String

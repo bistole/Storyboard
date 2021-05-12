@@ -3,7 +3,6 @@ package com.laterhorse.storyboard.channels
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Environment
 import android.util.Log
@@ -19,7 +18,6 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import java.io.*
-import java.net.URLConnection
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -27,12 +25,16 @@ class CommandChannel {
     companion object {
         var CHANNEL_COMMANDS = "/COMMANDS"
 
+        var CMD_READY = "CMD:READY"
         var CMD_TAKE_PHOTO = "CMD:TAKE_PHOTO"
         var CMD_IMPORT_PHOTO = "CMD:IMPORT_PHOTO"
-        var CMD_SHARE_PHOTO = "CMD:SHARE_PHOTO"
-        var CMD_SHARE_TEXT = "CMD:SHARE_TEXT"
+        var CMD_SHARE_OUT_PHOTO = "CMD:SHARE_OUT_PHOTO"
+        var CMD_SHARE_OUT_TEXT = "CMD:SHARE_OUT_TEXT"
 
         var CMD_TAKE_QR_CODE = "CMD:TAKE_QR_CODE"
+        
+        var CMD_SHARE_IN_PHOTO = "CMD:SHARE_IN_PHOTO"
+        var CMD_SHARE_IN_TEXT = "CMD:SHARE_IN_TEXT"
 
         var REQUEST_READ_STORAGE_CODE = 999
         var REQUEST_IMAGE_CAPTURE = 1001
@@ -43,6 +45,12 @@ class CommandChannel {
 
     lateinit var currentAbsolutePath : String
     lateinit var currentMethodChannelResult : MethodChannel.Result
+
+    lateinit var methodChannel : MethodChannel
+
+    var channelIsReady: Boolean = false
+    var bufferShareInPhoto : Uri? = null
+    var bufferShareInText : String? = null
 
     private fun createPhotoFile(activity: MainActivity): File {
         val ts: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
@@ -118,7 +126,7 @@ class CommandChannel {
             putExtra(Intent.EXTRA_STREAM, photoURI)
         }
 
-        val chooser =Intent.createChooser(intent, "Share photo via")
+        val chooser = Intent.createChooser(intent, "Share photo via")
 
         // grant permission to all app can accept sharing
         val permission = Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -155,9 +163,24 @@ class CommandChannel {
 
     fun registerEngine(activity: MainActivity, @NonNull flutterEngine: FlutterEngine) {
         val packageName = activity.packageName
-        MethodChannel(flutterEngine.dartExecutor, "$packageName$CHANNEL_COMMANDS").setMethodCallHandler{
+        methodChannel =MethodChannel(flutterEngine.dartExecutor, "$packageName$CHANNEL_COMMANDS")
+        methodChannel.setMethodCallHandler{
             call, result ->
             when(call.method) {
+                CMD_READY -> {
+                    Log.d(LOG_TAG, "CMD_READY")
+                    result.success(null)
+                    if (!channelIsReady) {
+                        channelIsReady = true
+                        if (bufferShareInPhoto != null) {
+                            shareInPhoto(activity, bufferShareInPhoto!!)
+                            bufferShareInPhoto = null
+                        } else if (bufferShareInText != null) {
+                            shareInText(bufferShareInText!!)
+                            bufferShareInText = null
+                        }
+                    }
+                }
                 CMD_TAKE_PHOTO -> {
                     Log.d(LOG_TAG, "CMD_TAKE_PHOTO")
                     dispatchTakePictureIntent(activity, result)
@@ -166,12 +189,12 @@ class CommandChannel {
                     Log.d(LOG_TAG, "CMD_IMPORT_PHOTO")
                     dispatchImportPictureIntent(activity, result)
                 }
-                CMD_SHARE_PHOTO -> {
-                    Log.d(LOG_TAG, "CMD_SHARE_PHOTO")
+                CMD_SHARE_OUT_PHOTO -> {
+                    Log.d(LOG_TAG, "CMD_SHARE_OUT_PHOTO")
                     dispatchSharePicture(activity, call.arguments as String)
                 }
-                CMD_SHARE_TEXT -> {
-                    Log.d(LOG_TAG, "CMD_SHARE_TEXT")
+                CMD_SHARE_OUT_TEXT -> {
+                    Log.d(LOG_TAG, "CMD_SHARE_OUT_TEXT")
                     dispatchShareText(activity, call.arguments as String)
                 }
                 CMD_TAKE_QR_CODE -> {
@@ -180,6 +203,31 @@ class CommandChannel {
                 }
             }
         }
+    }
+
+    fun shareInPhoto(activity: MainActivity, uri: Uri) {
+        if (!channelIsReady) {
+            bufferShareInPhoto = uri
+            return
+        }
+
+        val streamIn = activity.contentResolver.openInputStream(uri)
+        Log.d(LOG_TAG, "CMD_SHARE_IN_PHOTO got: $streamIn")
+
+        if (streamIn != null) {
+            createPhotoFile(activity).also { photoFile ->
+                savePhoto(photoFile, streamIn)
+                methodChannel.invokeMethod(CMD_SHARE_IN_PHOTO, currentAbsolutePath )
+            }
+        }
+    }
+
+    fun shareInText(text: String) {
+        if (!channelIsReady) {
+            bufferShareInText = text
+            return
+        }
+        methodChannel.invokeMethod(CMD_SHARE_IN_TEXT, text )
     }
 
     fun onRequestPermissionsResult(activity: MainActivity, requestCode: Int, grantResults: IntArray) {

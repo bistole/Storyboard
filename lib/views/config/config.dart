@@ -20,6 +20,7 @@ class ViewsResource {
 
   DeviceManager deviceManager;
   Storage storage;
+
   BackendChannel backend;
   MenuChannel menu;
   CommandChannel command;

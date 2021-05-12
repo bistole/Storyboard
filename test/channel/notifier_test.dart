@@ -6,7 +6,7 @@ import 'package:storyboard/logger/logger.dart';
 import '../common.dart';
 
 void main() {
-  group('MenuNotifier', () {
+  group('Notifier', () {
     test('add notify remove succ', () {
       Notifier mn = Notifier();
       mn.setLogger(MockLogger());
@@ -42,6 +42,10 @@ void main() {
 
       expect(called, 1);
       expect(mn.getValue<String>('event_id'), 'out');
+
+      mn.clearValue('event_id');
+
+      expect(mn.getValue<String>('event_id'), null);
     });
 
     test('err in callback', () {
@@ -64,7 +68,7 @@ void main() {
       Notifier mn = Notifier();
       mn.setLogger(MockLogger());
       mn.dispose();
-      mn.hasListeners('event_id');
+      expect(mn.hasListeners('event_id'), false);
     });
   });
 }
