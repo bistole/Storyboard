@@ -205,16 +205,6 @@ class CommandChannel {
         }
     }
 
-    fun onRequestPermissionsResult(activity: MainActivity, requestCode: Int, grantResults: IntArray) {
-        if (requestCode == REQUEST_READ_STORAGE_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                importPicture(activity)
-            } else {
-                currentMethodChannelResult.run { error("Permission denied") }
-            }
-        }
-    }
-
     fun shareInPhoto(activity: MainActivity, uri: Uri) {
         if (!channelIsReady) {
             bufferShareInPhoto = uri
