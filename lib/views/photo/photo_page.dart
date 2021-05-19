@@ -140,7 +140,9 @@ class _PhotoPageState extends State<PhotoPage> {
                   String path = getViewResource()
                       .storage
                       .getPhotoPathByUUID(redux.photo.uuid);
-                  getViewResource().command.sharePhoto(path);
+                  String name = redux.photo.filename;
+                  String mime = redux.photo.mime;
+                  getViewResource().command.sharePhoto(name, mime, path);
                 },
                 icon: Icon(AppIcons.share),
               )

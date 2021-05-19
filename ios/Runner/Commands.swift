@@ -98,10 +98,11 @@ class Commands : NSObject {
             break;
         case self.CMD_SHARE_OUT_PHOTO:
             self.result = result
-            
-            let url = URL(fileURLWithPath: call.arguments as! String)
+            // name, mime, path
+            let args = call.arguments as! [String]
+            guard args.count == 3 else { return }
+            let url = URL(fileURLWithPath: args[2])
             let image = UIImage(contentsOfFile: url.path)!
-            
             let naviVC = self.delegate!.getNavigationController()
             let ctrl = UIActivityViewController(activityItems: [image], applicationActivities: nil)
             ctrl.popoverPresentationController?.sourceView = naviVC.view

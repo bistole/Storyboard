@@ -149,9 +149,9 @@ class CommandChannel {
     }
   }
 
-  Future<void> sharePhoto(String path) async {
+  Future<void> sharePhoto(String name, String mime, String path) async {
     _logger.info(_logTag, "sharePhoto");
-    await _channel.invokeMethod<bool>(CMD_SHARE_OUT_PHOTO, path);
+    await _channel.invokeMethod<bool>(CMD_SHARE_OUT_PHOTO, [name, mime, path]);
   }
 
   Future<void> shareText(String text) async {

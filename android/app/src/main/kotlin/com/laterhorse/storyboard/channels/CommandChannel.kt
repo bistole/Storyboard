@@ -107,13 +107,38 @@ class CommandChannel {
         importPicture(activity)
     }
 
-    private fun dispatchSharePicture(activity: MainActivity, path: String) {
-        val file = File(path)
+    private fun mimeToExtension(mime: String) : String? {
+        return when(mime) {
+            "image/jpeg", "image/jpg" -> "jpeg"
+            "image/png" -> "png"
+            "image/gif" -> "gif"
+            else -> null
+        }
+    }
 
+    private fun dispatchSharePicture(activity: MainActivity, name: String, mime: String, path: String,
+                                     result: MethodChannel.Result) {
+        val file = File(path)
+        val ext = mimeToExtension(mime)
+        Log.d(LOG_TAG, "dispatchSharePicture:{ name:$name mime:$mime ext:$ext path:$path}")
+        if (ext == null) {
+            result.run { error("Unknown mime type") }
+            return
+        }
         // TODO: flutter should add extension to image file, so it can show when sharing
         //   without copying image file
         val dir: File? = activity.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        val shareFile = File.createTempFile("export-", ".jpeg", dir)
+        if (dir == null) {
+            result.run{ error("Missing folder") }
+            return
+        }
+
+        val nameNoExt = name.substringBefore(".")
+        val shareFile = File(dir.absolutePath, "$nameNoExt.$ext")
+        Log.d(LOG_TAG, "shareFile: ${shareFile.absolutePath}")
+        if (shareFile.exists()) {
+            shareFile.delete()
+        }
         copyPhoto(shareFile, file)
 
         val authority = "${activity.applicationContext.packageName}.fileprovider"
@@ -122,7 +147,7 @@ class CommandChannel {
         val intent = Intent().apply {
             action = Intent.ACTION_SEND
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            type = "image/jpeg"
+            type = mime
             putExtra(Intent.EXTRA_STREAM, photoURI)
         }
 
@@ -191,7 +216,15 @@ class CommandChannel {
                 }
                 CMD_SHARE_OUT_PHOTO -> {
                     Log.d(LOG_TAG, "CMD_SHARE_OUT_PHOTO")
-                    dispatchSharePicture(activity, call.arguments as String)
+                    val args = call.arguments as List<*>
+                    if (args.size == 3) {
+                        val name = args[0] as String
+                        val mime = args[1] as String
+                        val path = args[2] as String
+                        dispatchSharePicture(activity, name, mime, path, result)
+                    } else {
+                        result.run { error("Invalid arguments") }
+                    }
                 }
                 CMD_SHARE_OUT_TEXT -> {
                     Log.d(LOG_TAG, "CMD_SHARE_OUT_TEXT")

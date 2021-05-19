@@ -103,12 +103,14 @@ void main() {
     cc.setLogger(MockLogger());
     cc.setStore(store);
 
-    var path = 'this/path/to/share.jpg';
-    cc.sharePhoto(path);
+    var filename = 'name.jpeg';
+    var mime = 'image/jpeg';
+    var path = 'this/path/to/share';
+    cc.sharePhoto(filename, mime, path);
 
     var captured = verify(mc.invokeMethod(captureAny, captureAny)).captured;
     expect(captured[0] as String, 'CMD:SHARE_OUT_PHOTO');
-    expect(captured[1] as String, path);
+    expect(captured[1] as List<String>, [filename, mime, path]);
   });
 
   test('shareText', () {

@@ -33,13 +33,31 @@ class OpenDialog : NSObject {
         })
     }
     
-    func saveFileDialog(title: String, fileURL: URL, result: @escaping FlutterResult) -> Void {
+    func mimeToExtension(mime: String) -> String? {
+        switch mime {
+        case "image/jpeg", "image/jpg":
+            return "jpeg"
+        case "image/png":
+            return "png"
+        case "image/gif":
+            return "gif"
+        default:
+            return nil
+        }
+    }
+    
+    func saveFileDialog(title: String, name: String, mime: String, fileURL: URL, result: @escaping FlutterResult) -> Void {
+        guard let ext = mimeToExtension(mime: mime) else {
+            result(false)
+            return
+        }
+        
         let dialog = NSSavePanel.init()
         dialog.title = title
         dialog.canCreateDirectories = true
         dialog.canSelectHiddenExtension = true
-        dialog.nameFieldStringValue = fileURL.lastPathComponent
-        dialog.allowedFileTypes = ["jpeg", "jpg", "png", "gif"]
+        dialog.nameFieldStringValue = name
+        dialog.allowedFileTypes = [ext]
         dialog.allowsOtherFileTypes = true
         self.rs = result
         dialog.begin(completionHandler: {(response: NSApplication.ModalResponse) in
@@ -93,11 +111,15 @@ class Commands : NSObject {
                 result: result)
             break
         case self.CMD_SHARE_OUT_PHOTO:
-            let filename = call.arguments as! String
-            let fileURL = URL(fileURLWithPath: filename)
+            // name, mime, path
+            let args = call.arguments as! [String]
+            guard args.count == 3 else { return }
+            let fileURL = URL(fileURLWithPath: args[2])
             let dialog = OpenDialog()
             dialog.saveFileDialog(
                 title: "Export Photo",
+                name: args[0],
+                mime: args[1],
                 fileURL: fileURL,
                 result: result)
             break
