@@ -10,12 +10,25 @@
 #include <sstream>
 #include <string>
 #include "windows.h"
+#define STRICT_TYPED_ITEMIDS
+#include "ShlObj.h"
+#include "objbase.h"
 #include "ShObjIdl.h"
+#include "shlwapi.h"
+#include <knownfolders.h> // for KnownFolder APIs/datatypes/function headers
+#include <propvarutil.h>  // for PROPVAR-related functions
+#include <propkey.h>      // for the Property key APIs/datatypes
+#include <propidl.h>      // for the Property System APIs
+#include <strsafe.h>      // for StringCchPrintfW
+#include "shtypes.h"
 
 #include <flutter/standard_method_codec.h>
 
 #define COMMANDS 			"/COMMANDS"
 #define CMD_OPEN_DIALOG 	"CMD:OPEN_DIALOG"
+#define CMD_SHARE_OUT_PHOTO "CMD:SHARE_OUT_PHOTO"
+#define CMD_SHARE_OUT_TEXT	"CMD:SHARE_OUT_TEXT"
+
 
 Commands::Commands() : binary_messenger_(nullptr), method_channel_(nullptr) {}
 
@@ -118,6 +131,66 @@ std::vector<EncodableValue> Commands::openFileDialog(std::string& title, std::ve
 	return result;
 }
 
+bool Commands::saveFileDialog(std::string& title, std::string& filename, std::string& mime, std::string& path) {
+	// Get Dialog Handler
+	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+	if (SUCCEEDED(hr)) {
+		IFileSaveDialog* pFileSave;
+
+		hr = CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_ALL, IID_IFileSaveDialog,
+			reinterpret_cast<void**>(&pFileSave));
+		if (SUCCEEDED(hr)) {
+
+			// Show Dialog
+			PWSTR pTitle = ConvertString2LPWSTR(title);
+			pFileSave->SetTitle(pTitle);
+
+			DWORD dwFlags;
+			hr = pFileSave->GetOptions(&dwFlags);
+
+			if (SUCCEEDED(hr)) {
+				hr = pFileSave->SetOptions(dwFlags | FOS_FORCEFILESYSTEM);
+
+				if (SUCCEEDED(hr)) {
+					hr = pFileSave->SetDefaultExtension(L"jpeg");
+
+					hr = pFileSave->Show(NULL);
+					if (SUCCEEDED(hr)) {
+
+						IShellItem* psiResult;
+						hr = pFileSave->GetResult(&psiResult);
+						if (SUCCEEDED(hr))
+						{
+							PWSTR pwszFilePath = NULL;
+							hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pwszFilePath);
+							if (SUCCEEDED(hr)) {
+								printf("dialog is ok");
+								// TODO: copy file
+								int size = WideCharToMultiByte(CP_UTF8, 0, pwszFilePath, -1,
+									NULL, 0, NULL, NULL);
+								if (size > 0) {
+									PSTR pszFilePath = (char*)malloc((size + 1) * sizeof(CHAR));
+									pszFilePath[size] = '\0';
+									WideCharToMultiByte(CP_UTF8, 0, pwszFilePath, -1,
+										pszFilePath, size, NULL, NULL);
+									std::stringstream file;
+									file << pszFilePath;
+									// result.push_back(EncodableValue(file.str()));
+									std::cout << "Got file:" << file.str() << std::endl;
+									free(pszFilePath);
+								}
+								CoTaskMemFree(pwszFilePath);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
 void Commands::methodChannelHandler(
     const MethodCall<EncodableValue>& call,
     std::unique_ptr<MethodResult<EncodableValue>>& result)
@@ -154,5 +227,24 @@ void Commands::methodChannelHandler(
 			return result->Success(files);
 		}
 		result->Success({});
+	}
+	else if (method_name.compare(CMD_SHARE_OUT_PHOTO) == 0) {
+		printf("CMD_SHARE_OUT_PHOTO\n");
+		const EncodableValue* value = call.arguments();
+		if (std::holds_alternative<EncodableList>(*value)) {
+			EncodableList list = std::get<EncodableList>(*value);
+			if (list.size() == 3) {
+				std::string name = std::holds_alternative<std::string>(list.at(0)) 
+					? std::get<std::string>(list.at(0)) : std::string("");
+				std::string mime = std::holds_alternative<std::string>(list.at(1))
+					? std::get<std::string>(list.at(1)) : std::string("");
+				std::string path = std::holds_alternative<std::string>(list.at(2))
+					? std::get<std::string>(list.at(2)) : std::string("");
+				std::string title = std::string("export file");
+				bool ret = this->saveFileDialog(title, name, mime, path);
+				return result->Success(ret);
+			}
+		}
+
 	}
 }
