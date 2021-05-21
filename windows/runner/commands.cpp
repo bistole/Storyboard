@@ -55,6 +55,75 @@ void Commands::registerMessenger(BinaryMessenger* binary_messenger)
     });
 }
 
+std::vector<EncodableValue> Commands::parseOpenFileDialogResult(IFileOpenDialog* pFileOpen) {
+	std::vector<EncodableValue> result{};
+
+	IShellItemArray* pItemArray;
+	HRESULT hr = pFileOpen->GetResults(&pItemArray);
+	if (SUCCEEDED(hr)) {
+		DWORD cnt;
+		pItemArray->GetCount(&cnt);
+		for (DWORD idx = 0; idx < cnt; idx++) {
+			IShellItem* pItem;
+			hr = pItemArray->GetItemAt(idx, &pItem);
+			if (SUCCEEDED(hr)) {
+				PWSTR pwszFilePath;
+				hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pwszFilePath);
+				if (SUCCEEDED(hr)) {
+					int size = WideCharToMultiByte(CP_UTF8, 0, pwszFilePath, -1,
+						NULL, 0, NULL, NULL);
+					if (size > 0) {
+						PSTR pszFilePath = (char*)malloc((size + 1) * sizeof(CHAR));
+						pszFilePath[size] = '\0';
+						WideCharToMultiByte(CP_UTF8, 0, pwszFilePath, -1,
+							pszFilePath, size, NULL, NULL);
+						std::stringstream file;
+						file << pszFilePath;
+						result.push_back(EncodableValue(file.str()));
+						std::cout << "Got file:" << file.str() << std::endl;
+						free(pszFilePath);
+					}
+					CoTaskMemFree(pwszFilePath);
+				}
+			}
+		}
+		pItemArray->Release();
+	}
+	return result;
+}
+
+std::vector<EncodableValue> Commands::setupOpenFileDialog(IFileOpenDialog* pFileOpen, std::string& title, std::vector<std::string>& types) {
+	std::vector<EncodableValue> result{};
+
+	PWSTR pTitle = ConvertString2LPWSTR(title);
+	pFileOpen->SetTitle(pTitle);
+
+	COMDLG_FILTERSPEC* wtypes = (COMDLG_FILTERSPEC*)malloc(types.size() * sizeof(COMDLG_FILTERSPEC));
+	for (int idx = 0; idx < types.size(); idx++) {
+		LPWSTR name = ConvertString2LPWSTR(types[idx]);
+		std::string strSpec = std::string("*.") + types[idx];
+		LPWSTR spec = ConvertString2LPWSTR(strSpec);
+		wtypes[idx].pszName = name;
+		wtypes[idx].pszSpec = spec;
+	}
+	pFileOpen->SetFileTypes((unsigned)types.size(), wtypes);
+	pFileOpen->SetOptions(FOS_ALLOWMULTISELECT);
+
+	// Show Dialog
+	HRESULT hr = pFileOpen->Show(NULL);
+	if (SUCCEEDED(hr)) {
+		// Get File Names
+		result = this->parseOpenFileDialogResult(pFileOpen);
+	}
+	// release types
+	for (int idx = 0; idx < types.size(); idx++) {
+		free((void*)(wtypes[idx].pszName));
+		free((void*)(wtypes[idx].pszSpec));
+	}
+	free(wtypes);
+	return result;
+}
+
 std::vector<EncodableValue> Commands::openFileDialog(std::string& title, std::vector<std::string>& types) {
 	// Initialize
 	std::vector<EncodableValue> result{};
@@ -66,64 +135,9 @@ std::vector<EncodableValue> Commands::openFileDialog(std::string& title, std::ve
 		IFileOpenDialog* pFileOpen;
 		hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL, IID_IFileOpenDialog,
 			reinterpret_cast<void**>(&pFileOpen));
+
 		if (SUCCEEDED(hr)) {
-
-			// Show Dialog
-			PWSTR pTitle = ConvertString2LPWSTR(title);
-			pFileOpen->SetTitle(pTitle);
-
-			COMDLG_FILTERSPEC* wtypes = (COMDLG_FILTERSPEC*)malloc(types.size() * sizeof(COMDLG_FILTERSPEC));
-			for (int idx = 0; idx < types.size(); idx++) {
-				LPWSTR name = ConvertString2LPWSTR(types[idx]);
-				std::string strSpec = std::string("*.") + types[idx];
-				LPWSTR spec = ConvertString2LPWSTR(strSpec);
-				wtypes[idx].pszName = name;
-				wtypes[idx].pszSpec = spec;
-			}
-			pFileOpen->SetFileTypes((unsigned)types.size(), wtypes);
-			pFileOpen->SetOptions(FOS_ALLOWMULTISELECT);
-			pFileOpen->Show(NULL);
-			if (SUCCEEDED(hr)) {
-				// Get File Names
-
-				IShellItemArray* pItemArray;
-				hr = pFileOpen->GetResults(&pItemArray);
-				if (SUCCEEDED(hr)) {
-					DWORD cnt;
-					pItemArray->GetCount(&cnt);
-					for (DWORD idx = 0; idx < cnt; idx++) {
-						IShellItem* pItem;
-						hr = pItemArray->GetItemAt(idx, &pItem);
-						if (SUCCEEDED(hr)) {
-							PWSTR pwszFilePath;
-							hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pwszFilePath);
-							if (SUCCEEDED(hr)) {
-								int size = WideCharToMultiByte(CP_UTF8, 0, pwszFilePath, -1,
-									NULL, 0, NULL, NULL);
-								if (size > 0) {
-									PSTR pszFilePath = (char*)malloc((size + 1) * sizeof(CHAR));
-									pszFilePath[size] = '\0';
-									WideCharToMultiByte(CP_UTF8, 0, pwszFilePath, -1,
-										pszFilePath, size, NULL, NULL);
-									std::stringstream file;
-									file << pszFilePath;
-									result.push_back(EncodableValue(file.str()));
-									std::cout << "Got file:" << file.str() << std::endl;
-									free(pszFilePath);
-								}
-								CoTaskMemFree(pwszFilePath);
-							}
-						}
-					}
-					pItemArray->Release();
-				}
-			}
-			// release types
-			for (int idx = 0; idx < types.size(); idx++) {
-				free((void*)(wtypes[idx].pszName));
-				free((void*)(wtypes[idx].pszSpec));
-			}
-			free(wtypes);
+			result = this->setupOpenFileDialog(pFileOpen, title, types);
 			pFileOpen->Release();
 		}
 		CoUninitialize();
@@ -131,63 +145,111 @@ std::vector<EncodableValue> Commands::openFileDialog(std::string& title, std::ve
 	return result;
 }
 
-bool Commands::saveFileDialog(std::string& title, std::string& filename, std::string& mime, std::string& path) {
-	// Get Dialog Handler
-	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+bool Commands::copyFile(PWSTR source, PWSTR target) {
+	CopyFileW(source, target, false);
+	return true;
+}
+
+bool Commands::parseSaveFileDialogResult(IFileSaveDialog* pFileSave, std::string& path) {
+	IShellItem* psiResult;
+	HRESULT hr = pFileSave->GetResult(&psiResult);
+	if (SUCCEEDED(hr))
+	{
+		PWSTR pwszTargetPath = NULL;
+		hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pwszTargetPath);
+		if (SUCCEEDED(hr))
+		{
+			std::wcout << L"Got file:" << pwszTargetPath << std::endl;
+			PWSTR pwszSourcePath = ConvertString2LPWSTR(path);
+			this->copyFile(pwszSourcePath, pwszTargetPath);
+		}
+		CoTaskMemFree(pwszTargetPath);
+	}
+	return true;
+}
+
+bool Commands::setupSaveFileDialogExtension(IFileSaveDialog* pFileSave, std::string& mime) {
+	COMDLG_FILTERSPEC* saveTypes = NULL;
+	LPCWSTR saveDefaultExtension = NULL;
+
+	if (mime.compare("image/jpeg") == 0 || mime.compare("image/jpg") == 0) {
+		saveTypes = (COMDLG_FILTERSPEC*)malloc(1 * sizeof(COMDLG_FILTERSPEC));
+		saveTypes[0].pszName = L"JPEG Photo Document (*.jpg, *jpeg)";
+		saveTypes[0].pszSpec = L"*.jpg, *.jpeg";
+		saveDefaultExtension = L"jpeg";
+	} else if (mime.compare("image/png") == 0) {
+		saveTypes = (COMDLG_FILTERSPEC*)malloc(1 * sizeof(COMDLG_FILTERSPEC));
+		saveTypes[0].pszName = L"PNG Photo Document (*.png)";
+		saveTypes[0].pszSpec = L"*.png";
+		saveDefaultExtension = L"png";
+	} else if (mime.compare("image/gif") == 0) {
+		saveTypes = (COMDLG_FILTERSPEC*)malloc(1 * sizeof(COMDLG_FILTERSPEC));
+		saveTypes[0].pszName = L"PNG Photo Document (*.gif)";
+		saveTypes[0].pszSpec = L"*.gif";
+		saveDefaultExtension = L"gif";
+	}
+
+	if (saveTypes == NULL || saveDefaultExtension == NULL) {
+		return 0; // SUCCEED
+	}
+
+	// Set the file types to display.
+	HRESULT hr = pFileSave->SetFileTypes(1, saveTypes);
+	if (SUCCEEDED(hr))
+	{
+		hr = pFileSave->SetFileTypeIndex(0);
+		if (SUCCEEDED(hr))
+		{
+			hr = pFileSave->SetDefaultExtension(saveDefaultExtension);
+		}
+	}
+	return hr;
+}
+
+bool Commands::setupSaveFileDialog(IFileSaveDialog* pFileSave,
+	std::string& title, std::string& filename, std::string& mime, std::string& path) {
+	
+	PWSTR pTitle = ConvertString2LPWSTR(title);
+	HRESULT hr = pFileSave->SetTitle(pTitle);
 	if (SUCCEEDED(hr)) {
-		IFileSaveDialog* pFileSave;
+		DWORD dwFlags;
+		hr = pFileSave->GetOptions(&dwFlags);
 
-		hr = CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_ALL, IID_IFileSaveDialog,
-			reinterpret_cast<void**>(&pFileSave));
 		if (SUCCEEDED(hr)) {
-
-			// Show Dialog
-			PWSTR pTitle = ConvertString2LPWSTR(title);
-			pFileSave->SetTitle(pTitle);
-
-			DWORD dwFlags;
-			hr = pFileSave->GetOptions(&dwFlags);
+			hr = pFileSave->SetOptions(dwFlags | FOS_FORCEFILESYSTEM);
 
 			if (SUCCEEDED(hr)) {
-				hr = pFileSave->SetOptions(dwFlags | FOS_FORCEFILESYSTEM);
+				hr = this->setupSaveFileDialogExtension(pFileSave, mime);
 
 				if (SUCCEEDED(hr)) {
-					hr = pFileSave->SetDefaultExtension(L"jpeg");
+					PWSTR pFilename = ConvertString2LPWSTR(filename);
+					hr = pFileSave->SetFileName(pFilename);
 
-					hr = pFileSave->Show(NULL);
 					if (SUCCEEDED(hr)) {
-
-						IShellItem* psiResult;
-						hr = pFileSave->GetResult(&psiResult);
-						if (SUCCEEDED(hr))
-						{
-							PWSTR pwszFilePath = NULL;
-							hr = psiResult->GetDisplayName(SIGDN_FILESYSPATH, &pwszFilePath);
-							if (SUCCEEDED(hr)) {
-								printf("dialog is ok");
-								// TODO: copy file
-								int size = WideCharToMultiByte(CP_UTF8, 0, pwszFilePath, -1,
-									NULL, 0, NULL, NULL);
-								if (size > 0) {
-									PSTR pszFilePath = (char*)malloc((size + 1) * sizeof(CHAR));
-									pszFilePath[size] = '\0';
-									WideCharToMultiByte(CP_UTF8, 0, pwszFilePath, -1,
-										pszFilePath, size, NULL, NULL);
-									std::stringstream file;
-									file << pszFilePath;
-									// result.push_back(EncodableValue(file.str()));
-									std::cout << "Got file:" << file.str() << std::endl;
-									free(pszFilePath);
-								}
-								CoTaskMemFree(pwszFilePath);
-							}
+						hr = pFileSave->Show(NULL);
+						if (SUCCEEDED(hr)) {
+							this->parseSaveFileDialogResult(pFileSave, path);
 						}
 					}
 				}
 			}
 		}
 	}
+	return true;
+}
 
+bool Commands::saveFileDialog(std::string& title, std::string& filename, std::string& mime, std::string& path) {
+	// Get Dialog Handler
+	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+	if (SUCCEEDED(hr)) {
+		IFileSaveDialog* pFileSave;
+		hr = CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_ALL, IID_IFileSaveDialog,
+			reinterpret_cast<void**>(&pFileSave));
+		if (SUCCEEDED(hr)) {
+			// Show Dialog
+			this->setupSaveFileDialog(pFileSave, title, filename, mime, path);
+		}
+	}
 	return false;
 }
 
