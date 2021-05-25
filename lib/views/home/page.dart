@@ -3,11 +3,13 @@ import 'package:storyboard/views/common/app_icons.dart';
 import 'package:storyboard/views/common/panel_popup_route.dart';
 import 'package:storyboard/views/common/server_status.dart';
 import 'package:storyboard/views/config/config.dart';
+import 'package:storyboard/views/config/styles.dart';
 import 'package:storyboard/views/home/category_panel.dart';
 import 'package:storyboard/views/home/detail_page_widget.dart';
 
 class HomePage extends StatelessWidget {
   static const routeName = '/';
+  static const globalKey = 'HomePage';
   HomePage({Key key, this.title}) : super(key: key);
 
   final String title;
@@ -49,7 +51,7 @@ class HomePage extends StatelessWidget {
   Widget buildMenuButton(context, Function onTap) {
     return TextButton.icon(
       onPressed: onTap,
-      icon: Icon(AppIcons.menu, color: Colors.white),
+      icon: Icon(AppIcons.menu, color: Styles.buttonTextColor),
       label: Text(""),
     );
   }
@@ -99,10 +101,16 @@ class HomePage extends StatelessWidget {
       ),
     );
     return Scaffold(
+      key: getViewResource().getGlobalKeyByName(globalKey),
       appBar: appBar,
-      body: getViewResource().isWiderLayout(context)
-          ? buildDesktopLayout(context)
-          : buildMobileLayout(context),
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: getViewResource().isWiderLayout(context)
+            ? buildDesktopLayout(context)
+            : buildMobileLayout(context),
+      ),
     );
   }
 }

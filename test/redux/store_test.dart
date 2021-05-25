@@ -25,7 +25,7 @@ void main() {
     // init
     var store = await initStore(s, l);
     expect(store.state.photoRepo.photos, {});
-    expect(store.state.taskRepo.tasks, {});
+    expect(store.state.noteRepo.notes, {});
     expect(store.state.queue, Queue());
   });
 }

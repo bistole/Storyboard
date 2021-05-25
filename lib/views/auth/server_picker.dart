@@ -4,6 +4,7 @@ import 'package:storyboard/net/config.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/views/common/app_icons.dart';
 import 'package:storyboard/views/config/config.dart';
+import 'package:storyboard/views/config/styles.dart';
 
 class ReduxActions {
   final Function(String) changeServerKey;
@@ -64,10 +65,7 @@ class _ServerPickerState extends State<ServerPicker> {
       children: [
         Text(
           "Alternatives:",
-          style: Theme.of(context)
-              .textTheme
-              .headline2
-              .copyWith(color: Colors.black),
+          style: Styles.titleTextStyle,
         ),
       ],
     );
@@ -81,18 +79,18 @@ class _ServerPickerState extends State<ServerPicker> {
           margin: EdgeInsets.symmetric(vertical: 4),
           padding: EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: Colors.grey,
+            color: Styles.unselectedBackColor,
             borderRadius: BorderRadius.all(Radius.circular(4)),
-            border: Border.all(width: 1, color: Colors.grey),
+            border: Border.all(width: 1, color: Styles.borderColor),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(AppIcons.check, color: Colors.grey[700]),
+              Icon(AppIcons.check, color: Styles.unselectedColor),
               Container(
                 margin: EdgeInsets.only(left: 4),
                 child: Text(element.key.toUpperCase(),
-                    style: TextStyle(color: Colors.grey[700])),
+                    style: TextStyle(color: Styles.unselectedColor)),
               ),
             ],
           ),
@@ -102,9 +100,9 @@ class _ServerPickerState extends State<ServerPicker> {
           margin: EdgeInsets.symmetric(vertical: 4),
           padding: EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor,
+            color: Styles.selectedBackColor,
             borderRadius: BorderRadius.all(Radius.circular(4)),
-            border: Border.all(width: 1, color: Colors.grey),
+            border: Border.all(width: 1, color: Styles.borderColor),
           ),
           child: InkWell(
             onTap: () {
@@ -113,11 +111,11 @@ class _ServerPickerState extends State<ServerPicker> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Icon(AppIcons.check_empty, color: Colors.white),
+                Icon(AppIcons.check_empty, color: Styles.selectedColor),
                 Container(
                     margin: EdgeInsets.only(left: 4),
                     child: Text(element.key.toUpperCase(),
-                        style: TextStyle(color: Colors.white))),
+                        style: TextStyle(color: Styles.selectedColor))),
               ],
             ),
           ),
@@ -133,16 +131,11 @@ class _ServerPickerState extends State<ServerPicker> {
         RichText(
           text: TextSpan(
             text: 'If',
-            style: Theme.of(context)
-                .textTheme
-                .headline3
-                .copyWith(color: Colors.grey),
+            style: Styles.lessBodyText,
             children: <TextSpan>[
               TextSpan(
                 text: ' Storyboard Mobile ',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary),
+                style: Styles.boldBodyText,
               ),
               TextSpan(
                 text:

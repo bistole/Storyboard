@@ -11,7 +11,7 @@ import (
 const headerNameClientID = "client-id"
 
 const notifyTypePhoto = "photo"
-const notifyTypeTask = "task"
+const notifyTypeNote = "note"
 
 // ConvertQueryParamToInt get url query
 func ConvertQueryParamToInt(r *http.Request, key string, def int) int {

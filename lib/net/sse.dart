@@ -23,7 +23,7 @@ const String actionNotify = "notify";
 const String actionWelcome = "welcome";
 const String actionClose = "close";
 
-const String notifyTypeTask = "task";
+const String notifyTypeNote = "note";
 const String notifyTypePhoto = "photo";
 
 class NetSSE {

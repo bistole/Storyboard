@@ -20,7 +20,7 @@ type RESTServer struct {
 	ServerIP    string
 	Server      *http.Server
 	Wg          *sync.WaitGroup
-	TaskRepo    interfaces.TaskRepo
+	NoteRepo    interfaces.NoteRepo
 	PhotoRepo   interfaces.PhotoRepo
 	EventServer eventServer
 }
@@ -30,7 +30,7 @@ func NewRESTServer(
 	net interfaces.NetProxy,
 	http interfaces.HTTPProxy,
 	config interfaces.ConfigService,
-	taskRepo interfaces.TaskRepo,
+	noteRepo interfaces.NoteRepo,
 	photoRepo interfaces.PhotoRepo,
 ) *RESTServer {
 	var wg = &sync.WaitGroup{}
@@ -41,7 +41,7 @@ func NewRESTServer(
 		ServerIP:  "",
 		Server:    nil,
 		Wg:        wg,
-		TaskRepo:  taskRepo,
+		NoteRepo:  noteRepo,
 		PhotoRepo: photoRepo,
 	}
 }
@@ -49,11 +49,11 @@ func NewRESTServer(
 func (rs RESTServer) route() *mux.Router {
 	r := mux.NewRouter()
 	r.HandleFunc("/ping", rs.Ping).Methods("GET")
-	r.HandleFunc("/tasks", rs.GetTasks).Methods("GET")
-	r.HandleFunc("/tasks", rs.CreateTask).Methods("POST")
-	r.HandleFunc("/tasks/{id}", rs.GetTask).Methods("GET")
-	r.HandleFunc("/tasks/{id}", rs.UpdateTask).Methods("POST")
-	r.HandleFunc("/tasks/{id}", rs.DeleteTask).Methods("DELETE")
+	r.HandleFunc("/notes", rs.GetNotes).Methods("GET")
+	r.HandleFunc("/notes", rs.CreateNote).Methods("POST")
+	r.HandleFunc("/notes/{id}", rs.GetNote).Methods("GET")
+	r.HandleFunc("/notes/{id}", rs.UpdateNote).Methods("POST")
+	r.HandleFunc("/notes/{id}", rs.DeleteNote).Methods("DELETE")
 	r.HandleFunc("/photos", rs.GetPhotos).Methods("GET")
 	r.HandleFunc("/photos", rs.UploadPhoto).Methods("POST")
 	r.HandleFunc("/photos/{id}", rs.DownloadPhoto).Methods("GET")

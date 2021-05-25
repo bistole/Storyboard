@@ -15,15 +15,15 @@ void main() {
         CategoryPanel(size: Size(200, 500)), store);
     await tester.pumpWidget(w);
 
-    var taskBtn = find.ancestor(
-      of: find.text("Tasks"),
+    var noteBtn = find.ancestor(
+      of: find.text("Notes"),
       matching: find.byWidgetPredicate((widget) => widget is InkWell),
     );
 
-    await tester.tap(taskBtn);
+    await tester.tap(noteBtn);
     await tester.pumpAndSettle();
 
-    expect(store.state.status.status, StatusKey.ListTask);
+    expect(store.state.status.status, StatusKey.ListNote);
 
     var photoBtn = find.ancestor(
       of: find.text("Photos"),

@@ -3,6 +3,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/status.dart';
+import 'package:storyboard/views/config/styles.dart';
 import 'package:storyboard/views/home/photo/photo_toolbar_widget.dart';
 import 'package:storyboard/views/home/photo/photo_widget.dart';
 
@@ -52,7 +53,7 @@ class PhotoListWidget extends StatelessWidget {
       builder: (context, ReduxActions redux) {
         return Container(
           decoration: BoxDecoration(
-            color: Colors.grey[100],
+            color: Styles.photoBackColor,
           ),
           child: Column(children: [
             PhotoToolbarWidget(),

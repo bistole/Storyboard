@@ -7,7 +7,7 @@ import 'package:storyboard/redux/models/photo_repo.dart';
 import 'package:storyboard/redux/models/queue.dart';
 import 'package:storyboard/redux/models/queue_item.dart';
 import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task_repo.dart';
+import 'package:storyboard/redux/models/note_repo.dart';
 import 'package:storyboard/redux/reducers/app_reducer.dart';
 
 import '../common.dart';
@@ -23,9 +23,9 @@ main() {
     getFactory().store = store = Store<AppState>(
       appReducer,
       initialState: AppState(
-        status: Status.noParam(StatusKey.ListTask),
+        status: Status.noParam(StatusKey.ListNote),
         photoRepo: PhotoRepo(photos: {}, lastTS: 0),
-        taskRepo: TaskRepo(tasks: {}, lastTS: 0),
+        noteRepo: NoteRepo(notes: {}, lastTS: 0),
         queue: queue,
       ),
     );
@@ -46,19 +46,19 @@ main() {
     }
 
     netQueue.registerQueueItemAction(
-        QueueItemType.Task, QueueItemAction.Create, callback);
+        QueueItemType.Note, QueueItemAction.Create, callback);
     netQueue.addQueueItem(
-      QueueItemType.Task,
+      QueueItemType.Note,
       QueueItemAction.Create,
       'uuid-no1',
     );
     netQueue.addBeforeQueueItem(
-      QueueItemType.Task,
+      QueueItemType.Note,
       QueueItemAction.Create,
       'uuid-before',
     );
     netQueue.addQueueItem(
-      QueueItemType.Task,
+      QueueItemType.Note,
       QueueItemAction.Create,
       'uuid-no2',
     );

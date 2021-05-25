@@ -7,6 +7,7 @@ import 'package:storyboard/views/common/app_icons.dart';
 import 'package:storyboard/views/common/footerbar.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/config/constants.dart';
+import 'package:storyboard/views/photo/photo_scroller_controller.dart';
 import 'package:storyboard/views/photo/photo_scroller_widget.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
 
@@ -40,18 +41,42 @@ class PhotoPage extends StatefulWidget {
 }
 
 class _PhotoPageState extends State<PhotoPage> {
+  static const containerKey = 'SHOW-PHOTO-CONTAINER';
+
+  PhotoScrollerWidget scroller;
+  PhotoScrollerController scrollerController;
+
+  Size imageSize;
+  double imageScale;
   int direction;
 
   @override
   void initState() {
     direction = widget.args.direction;
+    imageSize = null;
+    imageScale = 1.0;
+
+    scrollerController = getPhotoScrollerControllerFactory().createController()
+      ..outputStream.listen((event) {
+        setState(() {
+          imageSize = event.imageSize;
+          imageScale = event.imageScale;
+        });
+      });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    scrollerController.dispose();
+    super.dispose();
   }
 
   Widget buildPhotoWiget(BuildContext context, ReduxActions redux) {
     var photoPath =
         getViewResource().storage.getPhotoPathByUUID(widget.args.uuid);
-    return PhotoScollerWidget(
+    return PhotoScrollerWidget(
+      controller: scrollerController,
       path: photoPath,
       direction: redux.photo.direction,
     );
@@ -71,6 +96,11 @@ class _PhotoPageState extends State<PhotoPage> {
   }
 
   Widget buildViewPhotoToolbar(ReduxActions redux) {
+    var helper = scrollerController.helper;
+    var zoomState =
+        helper.getCurrentZoomState(containerKey, imageSize, imageScale);
+    var zoomDesc = helper.getZoomDescription(zoomState, imageScale);
+
     return SBFooterbar([
       SBToolbarButton(
         () {
@@ -96,12 +126,28 @@ class _PhotoPageState extends State<PhotoPage> {
         },
         icon: Icon(AppIcons.angle_right),
       ),
-      SBToolbarButton(
-        () {
-          getViewResource().notifier.notifyListeners(Constant.eventPhotoReset);
-        },
-        text: "RESET",
-      ),
+      scrollerController.helper.zoomBtn(context, zoomDesc, () {
+        double scale = scrollerController.helper
+            .getNextScale(containerKey, imageSize, imageScale);
+        getViewResource()
+            .notifier
+            .notifyListeners<double>(Constant.eventPhotoScale, param: scale);
+      }),
+      ...(redux.photo.hasOrigin == PhotoStatus.Ready
+          ? [
+              SBToolbarButton(
+                () {
+                  String path = getViewResource()
+                      .storage
+                      .getPhotoPathByUUID(redux.photo.uuid);
+                  String name = redux.photo.filename;
+                  String mime = redux.photo.mime;
+                  getViewResource().command.sharePhoto(name, mime, path);
+                },
+                icon: Icon(AppIcons.share),
+              )
+            ]
+          : [])
     ]);
   }
 
@@ -134,11 +180,14 @@ class _PhotoPageState extends State<PhotoPage> {
           ),
           body: Column(
             children: [
-              Expanded(
-                child: redux.photo.hasOrigin == PhotoStatus.Ready
-                    ? buildPhotoWiget(context, redux)
-                    : buildWaitingIndicator(),
-              ),
+              redux.photo.hasOrigin == PhotoStatus.Ready
+                  ? Expanded(
+                      key: getViewResource().getGlobalKeyByName(containerKey),
+                      child: buildPhotoWiget(context, redux),
+                    )
+                  : Expanded(
+                      child: buildWaitingIndicator(),
+                    ),
               buildViewPhotoToolbar(redux),
             ],
           ),

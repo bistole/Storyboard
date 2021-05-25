@@ -11,14 +11,19 @@ Future<Store<AppState>> initStore(Storage storage, Logger logger) async {
   String _logTag = 'Store';
 
   final statePath = storage.getPersistDataPath();
-  logger.info(_logTag, "state path: $statePath");
+  logger.always(_logTag, "state path: $statePath");
 
   final persistor = Persistor<AppState>(
     storage: FileStorage(File(statePath)),
     serializer: JsonSerializer<AppState>(AppState.fromJson),
   );
 
-  final initialState = await persistor.load();
+  AppState initialState;
+  try {
+    initialState = await persistor.load();
+  } catch (e) {
+    initialState = AppState.initState();
+  }
 
   final store = new Store<AppState>(
     appReducer,

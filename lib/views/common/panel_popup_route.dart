@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:storyboard/views/config/styles.dart';
 
 class PanelPopupRoute extends PopupRoute {
   final Duration _duration = Duration(milliseconds: 100);
@@ -52,7 +53,7 @@ class PanelPopupWidget extends StatelessWidget {
       ).animate(animation),
       child: GestureDetector(
         child: Container(
-          decoration: BoxDecoration(color: Colors.green),
+          decoration: BoxDecoration(color: Styles.selectedBackColor),
           child: child,
         ),
         onTap: () {
@@ -66,14 +67,14 @@ class PanelPopupWidget extends StatelessWidget {
     );
 
     return Material(
-      color: Colors.green.withOpacity(0),
+      color: Styles.transparentColor,
       child: GestureDetector(
         child: Stack(
           children: [
             Container(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
-              color: Colors.white.withAlpha(0),
+              color: Styles.transparentColor,
             ),
             wrappedChild,
           ],

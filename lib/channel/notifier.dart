@@ -67,6 +67,10 @@ class _ItemNotifier<T> extends ValueListenable implements ChangeNotifier {
     return value;
   }
 
+  clearValue() {
+    value = null;
+  }
+
   @override
   T value;
 }
@@ -87,44 +91,48 @@ class Notifier {
     _map = null;
   }
 
-  bool hasListeners(String menu) {
+  bool hasListeners(String key) {
     if (_map == null) return false;
-    if (_map[menu] == null) return false;
-    return _map[menu].hasListeners;
+    if (_map[key] == null) return false;
+    return _map[key].hasListeners;
   }
 
-  void registerNotifier<T>(String menu) {
+  void registerNotifier<T>(String key) {
     if (_map == null) return;
-    if (_map[menu] == null) {
-      _map[menu] = _ItemNotifier<T>(logger: this._logger);
+    if (_map[key] == null) {
+      _map[key] = _ItemNotifier<T>(logger: this._logger);
     }
   }
 
   void addListener<T>(
-    String menu,
+    String key,
     VoidCallback listener,
   ) {
     if (_map == null) return;
-    if (_map[menu] != null) {
-      _map[menu].addListener(listener);
+    if (_map[key] != null) {
+      _map[key].addListener(listener);
     }
   }
 
-  void removeListener(String menu, VoidCallback listener) {
+  void removeListener(String key, VoidCallback listener) {
     if (_map == null) return;
-    if (_map[menu] != null) {
-      _map[menu].removeListener(listener);
+    if (_map[key] != null) {
+      _map[key].removeListener(listener);
     }
   }
 
-  void notifyListeners<T>(String menu, {T param}) {
+  void notifyListeners<T>(String key, {T param}) {
     if (_map == null) return;
-    if (_map[menu] != null) {
-      _map[menu].notifyListeners(param: param);
+    if (_map[key] != null) {
+      _map[key].notifyListeners(param: param);
     }
   }
 
-  T getValue<T>(String menu) {
-    return _map[menu].getValue();
+  T getValue<T>(String key) {
+    return _map[key].getValue();
+  }
+
+  clearValue(String key) {
+    _map[key].clearValue();
   }
 }

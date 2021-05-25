@@ -7,6 +7,7 @@ final statusReducer = combineReducers<Status>([
   TypedReducer<Status, ChangeStatusAction>(_changeStatus),
   TypedReducer<Status, ChangeStatusWithUUIDAction>(_changeStatusWithUUID),
   TypedReducer<Status, ChangeStatusWithPathAction>(_changeStatusWithPath),
+  TypedReducer<Status, ChangeStatusWithTextAction>(_changeStatusWithText),
 ]);
 
 Status _changeStatus(Status status, ChangeStatusAction action) {
@@ -19,4 +20,8 @@ Status _changeStatusWithUUID(Status status, ChangeStatusWithUUIDAction action) {
 
 Status _changeStatusWithPath(Status status, ChangeStatusWithPathAction action) {
   return Status.oneParam(action.status, action.path);
+}
+
+Status _changeStatusWithText(Status status, ChangeStatusWithTextAction action) {
+  return Status.oneParam(action.status, action.text);
 }

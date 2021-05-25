@@ -31,12 +31,70 @@ class OpenDialog : NSObject {
                 self.rs?([])
             }
         })
-    }    
+    }
+    
+    func mimeToExtension(mime: String) -> String? {
+        switch mime {
+        case "image/jpeg", "image/jpg":
+            return "jpeg"
+        case "image/png":
+            return "png"
+        case "image/gif":
+            return "gif"
+        default:
+            return nil
+        }
+    }
+    
+    func saveFileDialog(title: String, name: String, mime: String, fileURL: URL, result: @escaping FlutterResult) -> Void {
+        guard let ext = mimeToExtension(mime: mime) else {
+            result(false)
+            return
+        }
+        
+        let dialog = NSSavePanel.init()
+        dialog.title = title
+        dialog.canCreateDirectories = true
+        dialog.canSelectHiddenExtension = true
+        dialog.nameFieldStringValue = name
+        dialog.allowedFileTypes = [ext]
+        dialog.allowsOtherFileTypes = true
+        self.rs = result
+        dialog.begin(completionHandler: {(response: NSApplication.ModalResponse) in
+            if (response == .OK) {
+                guard let url = dialog.url else {
+                    self.rs?(false)
+                    return
+                }
+                do {
+                    if FileManager.default.fileExists(atPath: url.path) {
+                        print("try remove")
+                        try FileManager.default.removeItem(atPath: url.path)
+                    }
+                    print("copy")
+                    try FileManager.default.copyItem(atPath: fileURL.path,
+                                                     toPath: url.path)
+                    print("change date")
+                    try FileManager.default.setAttributes(
+                        [FileAttributeKey.modificationDate: NSDate()],
+                        ofItemAtPath: url.path
+                    )
+                } catch {
+                    print(error)
+                }
+                self.rs?(true)
+            } else {
+                self.rs?(false)
+            }
+        })
+    }
 }
 
 class Commands : NSObject {
     let COMMANDS = "/COMMANDS";
     let CMD_OPEN_DIALOG = "CMD:OPEN_DIALOG";
+    let CMD_SHARE_OUT_PHOTO = "CMD:SHARE_OUT_PHOTO";
+    let CMD_SHARE_OUT_TEXT = "CMD:SHARE_OUT_TEXT";
     
     weak var binaryMessager : FlutterBinaryMessenger?
     var methodChannel : FlutterMethodChannel?
@@ -45,12 +103,27 @@ class Commands : NSObject {
         NSLog(call.method);
         switch(call.method) {
         case self.CMD_OPEN_DIALOG:
-            let dict = call.arguments as! Dictionary<String, String>;
+            let dict = call.arguments as! Dictionary<String, String>
             let dialog = OpenDialog()
             dialog.openFileDialog(
                 title: dict["title"] ?? "Import Files",
                 fileTypes: dict["types"] ?? "*",
                 result: result)
+            break
+        case self.CMD_SHARE_OUT_PHOTO:
+            // name, mime, path
+            let args = call.arguments as! [String]
+            guard args.count == 3 else { return }
+            let fileURL = URL(fileURLWithPath: args[2])
+            let dialog = OpenDialog()
+            dialog.saveFileDialog(
+                title: "Export Photo",
+                name: args[0],
+                mime: args[1],
+                fileURL: fileURL,
+                result: result)
+            break
+        case self.CMD_SHARE_OUT_TEXT:
             break
         default:
             result(FlutterMethodNotImplemented);

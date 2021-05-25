@@ -52,7 +52,7 @@ void main() {
           .thenReturn(180);
 
       var w =
-          buildTestableWidget(PhotoScollerWidget(path: resourcePath), store);
+          buildTestableWidget(PhotoScrollerWidget(path: resourcePath), store);
       await tester.pumpWidget(w);
       await tester.pumpAndSettle();
 
@@ -61,13 +61,13 @@ void main() {
       var capRegister =
           verify(getViewResource().notifier.registerNotifier(captureAny))
               .captured;
-      expect(capRegister[0], Constant.eventPhotoReset);
+      expect(capRegister[0], Constant.eventPhotoScale);
       expect(capRegister[1], Constant.eventPhotoRotate);
 
       var capListener =
           verify(getViewResource().notifier.addListener(captureAny, captureAny))
               .captured;
-      expect(capListener[0], Constant.eventPhotoReset);
+      expect(capListener[0], Constant.eventPhotoScale);
       expect(capListener[2], Constant.eventPhotoRotate);
 
       // do reset

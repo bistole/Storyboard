@@ -4,7 +4,7 @@ import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/home/photo/photo_list_widget.dart';
-import 'package:storyboard/views/home/task/task_list_widget.dart';
+import 'package:storyboard/views/home/note/note_list_widget.dart';
 
 class ReduxActions {
   Status status;
@@ -26,8 +26,8 @@ class DetailPageWidget extends StatelessWidget {
         );
       },
       builder: (context, ReduxActions redux) {
-        if (redux.status.inTask) {
-          return TaskListWidget(padding: padding);
+        if (redux.status.inNote) {
+          return NoteListWidget(padding: padding);
         } else if (redux.status.inPhoto) {
           return PhotoListWidget(padding: padding);
         } else {

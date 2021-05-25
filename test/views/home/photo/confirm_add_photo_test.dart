@@ -14,6 +14,7 @@ import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/queue_item.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/storage/storage.dart';
+import 'package:storyboard/views/common/app_icons.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/photo/create_photo_page.dart';
@@ -49,32 +50,36 @@ void main() {
       Directory(path.join(homePath, 'photos')).deleteSync(recursive: true);
     });
 
-    testWidgets('click ok', (WidgetTester tester) async {
+    testWidgets('click ok when creating', (WidgetTester tester) async {
       String resourcePath = getResourcePath("test_resources/photo_test.jpg");
 
       await mockImageHelper(tester, resourcePath);
-
-      Widget w = buildTestableWidget(
+      Widget w = buildTestablePageWithArguments(
         CreatePhotoPage(CreatePhotoPageArguments(resourcePath)),
         store,
+        CreatePhotoPageArguments(resourcePath),
       );
       await tester.pumpWidget(w);
 
-      // Show the selected image
-      expect(find.byType(SBToolbarButton), findsNWidgets(5));
-      expect(find.text("OK"), findsOneWidget);
-      expect(find.text("CANCEL"), findsOneWidget);
-      expect(find.byType(PhotoScollerWidget), findsOneWidget);
+      await tester.tap(find.byType(TextButton));
+      await tester.pumpAndSettle();
 
-      PhotoScollerWidget scrollerWidget = find
-          .byType(PhotoScollerWidget)
+      // Show the selected image
+      expect(find.byType(SBToolbarButton), findsNWidgets(4));
+      expect(find.byType(TextButton), findsOneWidget);
+      expect(find.byIcon(AppIcons.ok), findsOneWidget);
+      expect(find.byIcon(AppIcons.cancel), findsOneWidget);
+      expect(find.byType(PhotoScrollerWidget), findsOneWidget);
+
+      PhotoScrollerWidget scrollerWidget = find
+          .byType(PhotoScrollerWidget)
           .evaluate()
           .single
-          .widget as PhotoScollerWidget;
+          .widget as PhotoScrollerWidget;
       expect(scrollerWidget.path, resourcePath);
 
       // click 'OK'
-      await tester.tap(find.text("OK"));
+      await tester.tap(find.byIcon(AppIcons.ok));
       await tester.pumpAndSettle();
 
       // Photo is in redux list
@@ -94,7 +99,7 @@ void main() {
       expect(photo.updatedAt, photo.createdAt);
 
       // navigator popped.
-      expect(find.text('OK'), findsNothing);
+      expect(find.byIcon(AppIcons.ok), findsNothing);
 
       verify(netQueue.addQueueItem(
         QueueItemType.Photo,

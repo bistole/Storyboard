@@ -16,6 +16,7 @@ import 'package:storyboard/views/photo/create_photo_page.dart';
 
 import '../../common.dart';
 import '../home/photo/add_photo_test.dart';
+import 'common.dart';
 
 void main() {
   Store<AppState> store;
@@ -36,6 +37,8 @@ void main() {
     getViewResource().actPhotos.setLogger(MockLogger());
     getViewResource().actPhotos.setNetQueue(MockNetQueue());
     getViewResource().actPhotos.setStorage(s);
+
+    setUpPhotoScrollerControllerFactory();
   });
 
   tearDown(() {
@@ -79,7 +82,7 @@ void main() {
       expect(captured2[1] as int, 0);
     });
 
-    testWidgets('reset', (WidgetTester tester) async {
+    testWidgets('scale', (WidgetTester tester) async {
       String resourcePath = getResourcePath("test_resources/photo_test.jpg");
       await mockImageHelper(tester, resourcePath);
 
@@ -91,14 +94,26 @@ void main() {
       );
       await tester.pumpWidget(w);
 
-      expect(find.text('RESET'), findsOneWidget);
-      await tester.tap(find.text('RESET'));
+      expect(find.text('100%'), findsOneWidget);
+      await tester.tap(find.text('100%'));
       await tester.pumpAndSettle();
 
-      var captured =
-          verify(getViewResource().notifier.notifyListeners(captureAny))
-              .captured;
-      expect(captured[0] as String, Constant.eventPhotoReset);
+      var captured1 = verify(getViewResource()
+              .notifier
+              .notifyListeners(captureAny, param: captureAnyNamed('param')))
+          .captured;
+      expect(captured1[0] as String, Constant.eventPhotoScale);
+      expect(captured1[1] as double, 0.5);
+
+      await tester.tap(find.text('100%'));
+      await tester.pumpAndSettle();
+
+      var captured2 = verify(getViewResource()
+              .notifier
+              .notifyListeners(captureAny, param: captureAnyNamed('param')))
+          .captured;
+      expect(captured2[0] as String, Constant.eventPhotoScale);
+      expect(captured2[1] as double, 2.0);
     });
   });
 }

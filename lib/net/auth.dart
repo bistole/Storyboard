@@ -28,8 +28,8 @@ class NetAuth {
 
       _logger.debug(_logTag, "req: null");
 
-      final response =
-          await _httpClient.get(prefix + "/ping").timeout(Duration(seconds: 1));
+      final uri = Uri.parse(prefix + "/ping");
+      final response = await _httpClient.get(uri).timeout(Duration(seconds: 1));
       if (response.statusCode == 200) {
         _logger.debug(_logTag, "body: ${response.body}");
         Map<String, dynamic> object = jsonDecode(response.body);

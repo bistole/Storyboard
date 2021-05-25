@@ -12,6 +12,12 @@ class LogListWidget extends StatefulWidget {
 }
 
 class _LogListState extends State<LogListWidget> {
+  static Color debugColor = Colors.grey;
+  static Color infoColor = Colors.black;
+  static Color warnColor = Colors.orange;
+  static Color errColor = Colors.red;
+  static Color fatalColor = Colors.deepPurple;
+
   List<String> logs;
   StreamSubscription<String> subscription;
 
@@ -67,7 +73,7 @@ class _LogListState extends State<LogListWidget> {
       controller: widget._scrollController,
       padding: const EdgeInsets.all(8),
       itemBuilder: (context, i) {
-        Color color = Colors.black;
+        Color color = infoColor;
         List<String> logSegments = logs[i].split(" ");
 
         LogLevel logLevel = LogLevel.debug();
@@ -76,11 +82,11 @@ class _LogListState extends State<LogListWidget> {
         } else {
           logLevel = LogLevel.valueOfName(logSegments[2]);
           if (logLevel == LogLevel.warn()) {
-            color = Colors.orange;
+            color = warnColor;
           } else if (logLevel == LogLevel.error()) {
-            color = Colors.red;
+            color = errColor;
           } else if (logLevel == LogLevel.fatal()) {
-            color = Colors.deepPurple;
+            color = fatalColor;
           }
         }
 
@@ -88,7 +94,7 @@ class _LogListState extends State<LogListWidget> {
           children: [
             Expanded(
               child: logLevel == LogLevel.debug()
-                  ? buildWholeLogWithColor(logs[i], Colors.grey)
+                  ? buildWholeLogWithColor(logs[i], debugColor)
                   : buildLogWithColorOnLevel(logSegments, color),
             ),
           ],

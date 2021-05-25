@@ -8,6 +8,7 @@ import 'package:storyboard/views/common/footerbar.dart';
 import 'package:storyboard/views/common/toolbar_button.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/config/constants.dart';
+import 'package:storyboard/views/photo/photo_scroller_controller.dart';
 import 'package:storyboard/views/photo/photo_scroller_widget.dart';
 
 class ReduxActions {
@@ -41,15 +42,72 @@ class CreatePhotoPage extends StatefulWidget {
 }
 
 class _CreatePhotoPageState extends State<CreatePhotoPage> {
+  static const containerKey = 'CREATE-PHOTO-CONTAINER';
+
+  PhotoScrollerWidget scroller;
+  PhotoScrollerController scrollerController;
+
+  Size imageSize;
+  double imageScale;
   int direction;
 
   @override
   initState() {
     direction = 0;
+    imageSize = null;
+    imageScale = 1.0;
+
+    scrollerController = getPhotoScrollerControllerFactory().createController()
+      ..outputStream.listen((event) {
+        setState(() {
+          imageSize = event.imageSize;
+          imageScale = event.imageScale;
+        });
+      });
     super.initState();
   }
 
-  Widget buildAddingPhotoToolbar(ReduxActions redux) {
+  @override
+  void dispose() {
+    scrollerController.dispose();
+    super.dispose();
+  }
+
+  Widget okBtn(BuildContext context, ReduxActions redux) {
+    if (getViewResource().isWiderLayout(context)) {
+      return SBToolbarButton(
+        () => redux.createPhoto(widget.args.path),
+        icon: Icon(AppIcons.ok),
+        text: "OK",
+      );
+    } else {
+      return SBToolbarButton(
+        () => redux.createPhoto(widget.args.path),
+        icon: Icon(AppIcons.ok),
+      );
+    }
+  }
+
+  Widget cancelBtn(BuildContext context, ReduxActions redux) {
+    if (getViewResource().isWiderLayout(context)) {
+      return SBToolbarButton(
+        redux.cancel,
+        icon: Icon(AppIcons.cancel),
+        text: "CANCEL",
+      );
+    } else {
+      return SBToolbarButton(
+        redux.cancel,
+        icon: Icon(AppIcons.cancel),
+      );
+    }
+  }
+
+  Widget buildAddingPhotoToolbar(BuildContext context, ReduxActions redux) {
+    var helper = scrollerController.helper;
+    var zoomState =
+        helper.getCurrentZoomState(containerKey, imageSize, imageScale);
+    var zoomDesc = helper.getZoomDescription(zoomState, imageScale);
     return SBFooterbar([
       SBToolbarButton(
         () {
@@ -73,32 +131,30 @@ class _CreatePhotoPageState extends State<CreatePhotoPage> {
         },
         icon: Icon(AppIcons.angle_right),
       ),
-      SBToolbarButton(
-        () {
-          getViewResource().notifier.notifyListeners(Constant.eventPhotoReset);
-        },
-        text: "RESET",
-      ),
-      SBToolbarButton(
-        () => redux.createPhoto(widget.args.path),
-        icon: Icon(AppIcons.ok),
-        text: "OK",
-      ),
-      SBToolbarButton(
-        redux.cancel,
-        icon: Icon(AppIcons.cancel),
-        text: "CANCEL",
-      ),
+      scrollerController.helper.zoomBtn(context, zoomDesc, () {
+        double scale = scrollerController.helper
+            .getNextScale(containerKey, imageSize, imageScale);
+        getViewResource()
+            .notifier
+            .notifyListeners<double>(Constant.eventPhotoScale, param: scale);
+      }),
+      okBtn(context, redux),
+      cancelBtn(context, redux),
     ]);
   }
 
-  Widget buildWhenAddingPhoto(context, ReduxActions redux) {
+  Widget buildWhenAddingPhoto(BuildContext context, ReduxActions redux) {
+    scroller = PhotoScrollerWidget(
+      path: widget.args.path,
+      controller: scrollerController,
+    );
     return Column(
       children: [
         Expanded(
-          child: PhotoScollerWidget(path: widget.args.path),
+          key: getViewResource().getGlobalKeyByName(containerKey),
+          child: scroller,
         ),
-        buildAddingPhotoToolbar(redux),
+        buildAddingPhotoToolbar(context, redux),
       ],
     );
   }
@@ -113,15 +169,20 @@ class _CreatePhotoPageState extends State<CreatePhotoPage> {
             getViewResource()
                 .actPhotos
                 .actUploadPhoto(store, widget.args.path, direction);
-            Navigator.of(context).pop();
+
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
           },
           cancel: () {
             store.dispatch(ChangeStatusAction(status: StatusKey.ListPhoto));
-            Navigator.of(context).pop();
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
           },
         );
       },
-      builder: (context, ReduxActions redux) {
+      builder: (BuildContext context, ReduxActions redux) {
         return Scaffold(
           appBar: AppBar(
             elevation: 0,

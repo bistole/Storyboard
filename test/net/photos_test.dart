@@ -98,9 +98,10 @@ void main() {
         'succ': true,
         'photos': [getJsonPhotoObject()],
       });
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed('headers')))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed('headers'),
+      )).thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
@@ -110,7 +111,8 @@ void main() {
           verify(httpClient.get(captureAny, headers: anyNamed('headers')))
               .captured
               .first;
-      expect(captured, mockURLPrefix + '/photos?ts=1&c=100');
+      expect(
+          (captured as Uri).toString(), mockURLPrefix + '/photos?ts=1&c=100');
 
       expect(store.state.photoRepo.photos, {'uuid': getPhotoObject()});
     });
@@ -131,9 +133,10 @@ void main() {
         'photos': [getJsonPhotoObject()],
       });
 
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed('headers')))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed('headers'),
+      )).thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
@@ -143,7 +146,8 @@ void main() {
           verify(httpClient.get(captureAny, headers: anyNamed('headers')))
               .captured
               .first;
-      expect(captured, mockURLPrefix + '/photos?ts=1&c=100');
+      expect(
+          (captured as Uri).toString(), mockURLPrefix + '/photos?ts=1&c=100');
 
       expect(store.state.photoRepo.photos, {
         'uuid': getPhotoObject().copyWith(
@@ -168,9 +172,10 @@ void main() {
         ],
       });
 
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed('headers')))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed('headers'),
+      )).thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
@@ -180,7 +185,8 @@ void main() {
           verify(httpClient.get(captureAny, headers: anyNamed('headers')))
               .captured
               .first;
-      expect(captured, mockURLPrefix + '/photos?ts=1&c=100');
+      expect(
+          (captured as Uri).toString(), mockURLPrefix + '/photos?ts=1&c=100');
 
       expect(
           verify(storage.deletePhotoAndThumbByUUID(captureAny)).captured.single,
@@ -201,9 +207,10 @@ void main() {
           getJsonPhotoObject(),
         ],
       });
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed('headers')))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed('headers'),
+      )).thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
@@ -213,7 +220,7 @@ void main() {
           verify(httpClient.get(captureAny, headers: anyNamed('headers')))
               .captured
               .first;
-      expect(captured, mockURLPrefix + '/photos?ts=1&c=2');
+      expect((captured as Uri).toString(), mockURLPrefix + '/photos?ts=1&c=2');
 
       verifyNever(actPhotos.actFetchPhotos());
 
@@ -234,9 +241,10 @@ void main() {
           getJsonPhotoObject()..addAll({'uuid': 'uuid2'})
         ],
       });
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed('headers')))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed('headers'),
+      )).thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
@@ -246,7 +254,7 @@ void main() {
           verify(httpClient.get(captureAny, headers: anyNamed('headers')))
               .captured
               .first;
-      expect(captured, mockURLPrefix + '/photos?ts=1&c=2');
+      expect((captured as Uri).toString(), mockURLPrefix + '/photos?ts=1&c=2');
 
       verify(actPhotos.actFetchPhotos()).called(1);
 
@@ -325,9 +333,10 @@ void main() {
     test('download succ', () async {
       buildStore({'uuid': getPhotoObject()});
 
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed('headers')))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed('headers'),
+      )).thenAnswer((_) async {
         return http.Response("buffer", 200);
       });
 
@@ -337,7 +346,7 @@ void main() {
           verify(httpClient.get(captureAny, headers: anyNamed('headers')))
               .captured
               .first;
-      expect(capHttp, mockURLPrefix + '/photos/uuid');
+      expect((capHttp as Uri).toString(), mockURLPrefix + '/photos/uuid');
 
       var capStorage =
           verify(storage.savePhotoByUUID(captureAny, captureAny)).captured;
@@ -364,9 +373,10 @@ void main() {
     test('download succ', () async {
       buildStore({'uuid': getPhotoObject()});
 
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed('headers')))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed('headers'),
+      )).thenAnswer((_) async {
         return http.Response("buffer", 200);
       });
 
@@ -376,7 +386,8 @@ void main() {
           verify(httpClient.get(captureAny, headers: anyNamed('headers')))
               .captured
               .first;
-      expect(capHttp, mockURLPrefix + '/photos/uuid/thumbnail');
+      expect((capHttp as Uri).toString(),
+          mockURLPrefix + '/photos/uuid/thumbnail');
 
       var capStorage =
           verify(storage.saveThumbailByUUID(captureAny, captureAny)).captured;
@@ -409,7 +420,7 @@ void main() {
       });
 
       when(httpClient.post(
-        startsWith(mockURLPrefix),
+        argThat(isA<Uri>()),
         headers: anyNamed('headers'),
         body: anyNamed('body'),
         encoding: Encoding.getByName('utf-8'),
@@ -426,7 +437,7 @@ void main() {
         encoding: Encoding.getByName('utf-8'),
       )).captured;
 
-      expect(captured[0], mockURLPrefix + '/photos/uuid');
+      expect((captured[0] as Uri).toString(), mockURLPrefix + '/photos/uuid');
       expect(captured[1]['Content-Type'], 'application/json');
       expect(captured[2],
           jsonEncode(getPhotoObject().copyWith(ts: 1606500000000).toJson()));

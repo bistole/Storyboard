@@ -57,7 +57,7 @@ func (rs RESTServer) GetPhoto(w http.ResponseWriter, r *http.Request) {
 	rs.buildSuccPhotoResponse(w, *photo)
 }
 
-// GetPhotos is a restful API handler to get tasks
+// GetPhotos is a restful API handler to get photos
 func (rs RESTServer) GetPhotos(w http.ResponseWriter, r *http.Request) {
 	ts := ConvertQueryParamToInt(r, "ts", 0)
 	limit := ConvertQueryParamToInt(r, "c", 20)

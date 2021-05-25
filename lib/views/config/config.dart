@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/actions/server.dart';
-import 'package:storyboard/actions/tasks.dart';
+import 'package:storyboard/actions/notes.dart';
 import 'package:storyboard/channel/backend.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/channel/menu.dart';
@@ -16,10 +16,11 @@ class ViewsResource {
 
   ActServer actServer;
   ActPhotos actPhotos;
-  ActTasks actTasks;
+  ActNotes actNotes;
 
   DeviceManager deviceManager;
   Storage storage;
+
   BackendChannel backend;
   MenuChannel menu;
   CommandChannel command;

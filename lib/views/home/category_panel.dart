@@ -3,6 +3,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
+import 'package:storyboard/views/config/styles.dart';
 import 'package:storyboard/views/home/category_panel_item.dart';
 
 class ReduxActions {
@@ -39,18 +40,18 @@ class CategoryPanel extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             border: Border(
-              top: BorderSide(width: 1, color: Colors.grey[300]),
-              right: BorderSide(width: 2, color: Colors.grey[300]),
+              top: BorderSide(width: 1, color: Styles.toolbarBorderColor),
+              right: BorderSide(width: 2, color: Styles.toolbarBorderColor),
             ),
-            color: Colors.white,
+            color: Styles.toolbarBackColor,
           ),
           // child: Expanded(
           child: Column(
             children: [
               CategoryPanelItem(
-                () => redux.changeStatus(StatusKey.ListTask),
-                text: "Tasks",
-                selected: redux.status.inTask,
+                () => redux.changeStatus(StatusKey.ListNote),
+                text: "Notes",
+                selected: redux.status.inNote,
                 padding: EdgeInsets.only(left: this.padding.left),
               ),
               CategoryPanelItem(

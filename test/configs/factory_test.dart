@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:mockito/mockito.dart';
+import 'package:storyboard/actions/notes.dart';
 import 'package:storyboard/channel/backend.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/configs/channel_manager.dart';
@@ -12,6 +13,7 @@ import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/sse.dart';
 import 'package:storyboard/redux/models/setting.dart';
+import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/storage/storage.dart';
 import 'package:storyboard/views/config/config.dart';
 
@@ -19,6 +21,8 @@ import '../common.dart';
 import '../redux/store_test.dart';
 
 class MockStorage extends Mock implements Storage {}
+
+class MockActNotes extends Mock implements ActNotes {}
 
 class MockChannelManager extends Mock implements ChannelManager {}
 
@@ -227,6 +231,49 @@ void main() {
 
       var capture = verify(f.netSSE.connect(captureAny)).captured;
       expect(capture[0], f.store);
+    });
+  });
+
+  group('shareIn', () {
+    test('shareInPhotoListener', () {
+      Factory f = getFactory();
+      f.command = MockCommandChannel();
+      f.actNotes = MockActNotes();
+      f.store = getMockStore();
+      when(f.command.getActionValue(CMD_SHARE_IN_PHOTO))
+          .thenReturn("photo_path");
+
+      f.shareInPhotoListener();
+
+      expect(f.store.state.status.status, StatusKey.ShareInPhoto);
+      expect(f.store.state.status.param1, 'photo_path');
+
+      var captureCommand =
+          verify(f.command.clearActionValue(captureAny)).captured;
+      expect(captureCommand[0], CMD_SHARE_IN_PHOTO);
+    });
+
+    test('shareInNoteListener', () {
+      Factory f = getFactory();
+      f.command = MockCommandChannel();
+      f.actNotes = MockActNotes();
+      f.store = getMockStore();
+
+      when(f.command.getActionValue(CMD_SHARE_IN_TEXT))
+          .thenReturn("text_content");
+
+      f.shareInNoteListener();
+
+      var captureNotes =
+          verify(f.actNotes.actCreateNote(captureAny, captureAny)).captured;
+      expect(captureNotes[0], f.store);
+      expect(captureNotes[1], 'text_content');
+
+      expect(f.store.state.status.status, StatusKey.ListNote);
+
+      var captureCommand =
+          verify(f.command.clearActionValue(captureAny)).captured;
+      expect(captureCommand[0], CMD_SHARE_IN_TEXT);
     });
   });
 }

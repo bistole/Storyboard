@@ -9,6 +9,7 @@ import 'package:storyboard/views/auth/version_widget.dart';
 import 'package:storyboard/views/common/app_icons.dart';
 import 'package:storyboard/views/common/button.dart';
 import 'package:storyboard/views/config/config.dart';
+import 'package:storyboard/views/config/styles.dart';
 
 class ReduxActions {
   final String serverKey;
@@ -84,9 +85,7 @@ class _ClientWidgetState extends State<ClientWidget> {
       margin: EdgeInsets.only(bottom: 4),
       child: Text(
         "Current Access Point",
-        style: Theme.of(context).textTheme.headline2.copyWith(
-              color: Colors.black,
-            ),
+        style: Styles.titleTextStyle,
       ),
     );
   }
@@ -103,7 +102,7 @@ class _ClientWidgetState extends State<ClientWidget> {
             ),
             child: Text(
               redux.serverKey ?? "NONE",
-              style: Theme.of(context).textTheme.headline2,
+              style: Styles.colorTitleTextStyle,
             ),
           ),
         ),
@@ -146,10 +145,7 @@ class _ClientWidgetState extends State<ClientWidget> {
             margin: EdgeInsets.only(top: 4),
             child: Text(
               this.editingError == null ? '' : ('* ' + this.editingError),
-              style: Theme.of(context)
-                  .textTheme
-                  .headline3
-                  .copyWith(color: Colors.red),
+              style: Styles.errBodyText,
             ),
           ),
         ),
@@ -165,8 +161,8 @@ class _ClientWidgetState extends State<ClientWidget> {
         : (reachable == Reachable.Yes ? 'Reachable' : 'Unreachable');
 
     var color = reachable == Reachable.Unknown
-        ? Colors.grey
-        : (reachable == Reachable.Yes ? Colors.green : Colors.red);
+        ? Styles.unknownColor
+        : (reachable == Reachable.Yes ? Styles.succColor : Styles.errColor);
 
     var icon = reachable == Reachable.Unknown
         ? Icon(AppIcons.help, color: color)
@@ -179,17 +175,14 @@ class _ClientWidgetState extends State<ClientWidget> {
         Expanded(
           child: Text(
             'Access Point Status:',
-            style: Theme.of(context)
-                .textTheme
-                .headline3
-                .copyWith(color: Colors.black),
+            style: Styles.normalBodyText,
           ),
         ),
         icon,
         Expanded(
           child: Text(
             desc,
-            style: Theme.of(context).textTheme.headline3.copyWith(color: color),
+            style: Styles.normalBodyText.copyWith(color: color),
           ),
         ),
       ],
@@ -268,7 +261,7 @@ class _ClientWidgetState extends State<ClientWidget> {
                     buildTitle(context),
                     ...buildEditLocation(context, redux),
                     ...buildEditButtons(context, redux),
-                    Divider(color: Colors.grey),
+                    Styles.divider,
                     LogEntrance(),
                     VersionWidget(),
                   ]
@@ -277,7 +270,7 @@ class _ClientWidgetState extends State<ClientWidget> {
                     ...buildDisplayLocation(context, redux),
                     buildLaunched(context, redux),
                     ...buildScanButtons(context),
-                    Divider(color: Colors.grey),
+                    Styles.divider,
                     LogEntrance(),
                     VersionWidget(),
                   ],

@@ -35,7 +35,8 @@ void main() {
       resourcePath = getResourcePath("test_resources/photo_test.jpg");
 
       mcc = MockCommandChannel();
-      when(mcc.importPhoto()).thenAnswer((_) => Future.value(resourcePath));
+      when(mcc.importPhotoFromDisk())
+          .thenAnswer((_) => Future.value(resourcePath));
       when(mcc.takePhoto()).thenAnswer((_) => Future.value(resourcePath));
       getViewResource().command = mcc;
 
@@ -77,7 +78,7 @@ void main() {
         await tester.tap(find.text('ADD PHOTO'));
         await tester.pumpAndSettle();
 
-        verify(mcc.importPhoto()).called(1);
+        verify(mcc.importPhotoFromDisk()).called(1);
         // Page pushed
         var c = verify(naviObserver.didPush(captureAny, any)).captured.last
             as MaterialPageRoute;
@@ -104,7 +105,7 @@ void main() {
         // callback
         await c[1]();
 
-        verify(mcc.importPhoto()).called(1);
+        verify(mcc.importPhotoFromDisk()).called(1);
 
         // Page pushed
         var c2 = verify(naviObserver.didPush(captureAny, any)).captured.last
@@ -118,7 +119,7 @@ void main() {
         when(dm.isMobile()).thenReturn(true);
       });
 
-      testWidgets('click button', (WidgetTester tester) async {
+      testWidgets('click take photo', (WidgetTester tester) async {
         NavigatorObserver naviObserver = MockNavigatorObserver();
         setRouteObserver(naviObserver);
 
@@ -134,10 +135,18 @@ void main() {
 
         // Find button
         expect(find.byType(SBToolbarButton), findsNWidgets(1));
-        expect(find.text('TAKE PHOTO'), findsOneWidget);
+        expect(find.text('ADD PHOTO'), findsOneWidget);
 
         // Tap button
-        await tester.tap(find.text('TAKE PHOTO'));
+        await tester.tap(find.text('ADD PHOTO'));
+        await tester.pumpAndSettle();
+
+        // show popup
+        expect(find.text('Take Photo'), findsOneWidget);
+        expect(find.text('Import from Album'), findsOneWidget);
+
+        // Tap 'Take Photo'
+        await tester.tap(find.text('Take Photo'));
         await tester.pumpAndSettle();
 
         verify(mcc.takePhoto()).called(1);
@@ -146,6 +155,42 @@ void main() {
         var c = verify(naviObserver.didPush(captureAny, any)).captured.last
             as MaterialPageRoute;
         expect(c.settings.name, CreatePhotoPage.routeName);
+      });
+
+      testWidgets('click import from album', (WidgetTester tester) async {
+        NavigatorObserver naviObserver = MockNavigatorObserver();
+        setRouteObserver(naviObserver);
+
+        await mockImageHelper(tester, resourcePath);
+
+        var store = getMockStore();
+        var widget = buildTestableWidget(
+          HomePage(title: 'title'),
+          store,
+          navigator: naviObserver,
+        );
+        await tester.pumpWidget(widget);
+
+        // Find button
+        expect(find.byType(SBToolbarButton), findsNWidgets(1));
+        expect(find.text('ADD PHOTO'), findsOneWidget);
+
+        // Tap button
+        await tester.tap(find.text('ADD PHOTO'));
+        await tester.pumpAndSettle();
+
+        // show popup
+        expect(find.text('Take Photo'), findsOneWidget);
+        expect(find.text('Import from Album'), findsOneWidget);
+
+        // Tap 'Take Photo'
+        await tester.tap(find.text('Import from Album'));
+        await tester.pumpAndSettle();
+
+        verify(mcc.importPhotoFromAlbum()).called(1);
+
+        // poped
+        verify(naviObserver.didPop(any, any)).called(1);
       });
     });
   });

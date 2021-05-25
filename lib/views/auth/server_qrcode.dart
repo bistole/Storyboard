@@ -4,6 +4,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/setting.dart';
 import 'package:storyboard/views/common/app_icons.dart';
+import 'package:storyboard/views/config/styles.dart';
 
 class ReduxActions {
   final String serverKey;
@@ -23,13 +24,7 @@ class ServerQRCode extends StatelessWidget {
       children: [
         Container(
           margin: EdgeInsets.only(bottom: 5),
-          child: Text(
-            "Access Point Info",
-            style: Theme.of(context)
-                .textTheme
-                .headline2
-                .copyWith(color: Colors.black),
-          ),
+          child: Text("Access Point Info", style: Styles.titleTextStyle),
         ),
       ],
     );
@@ -37,10 +32,10 @@ class ServerQRCode extends StatelessWidget {
 
   Widget buildStatus(BuildContext context, ReduxActions redux) {
     var icon = redux.serverReachable == Reachable.Unknown
-        ? Icon(AppIcons.help, color: Colors.grey)
+        ? Icon(AppIcons.help, color: Styles.unknownColor)
         : (redux.serverReachable == Reachable.Yes
-            ? Icon(AppIcons.ok, color: Colors.green)
-            : Icon(AppIcons.cancel, color: Colors.red));
+            ? Icon(AppIcons.ok, color: Styles.succColor)
+            : Icon(AppIcons.cancel, color: Styles.errColor));
     return Table(
       defaultVerticalAlignment: TableCellVerticalAlignment.middle,
       columnWidths: {
@@ -51,13 +46,7 @@ class ServerQRCode extends StatelessWidget {
         TableRow(children: [
           TableCell(
             verticalAlignment: TableCellVerticalAlignment.top,
-            child: Text(
-              'QR Code:',
-              style: Theme.of(context)
-                  .textTheme
-                  .headline2
-                  .copyWith(color: Colors.black),
-            ),
+            child: Text('QR Code:', style: Styles.titleTextStyle),
           ),
           Container(
             constraints: BoxConstraints(maxWidth: 320, maxHeight: 320),
@@ -69,29 +58,11 @@ class ServerQRCode extends StatelessWidget {
           ),
         ]),
         TableRow(children: [
-          Text(
-            'Server Key:',
-            style: Theme.of(context)
-                .textTheme
-                .headline2
-                .copyWith(color: Colors.black),
-          ),
-          Text(
-            redux.serverKey,
-            style: Theme.of(context).textTheme.headline2.copyWith(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
+          Text('Server Key:', style: Styles.titleTextStyle),
+          Text(redux.serverKey, style: Styles.titleTextStyle),
         ]),
         TableRow(children: [
-          Text(
-            'Status:',
-            style: Theme.of(context)
-                .textTheme
-                .headline2
-                .copyWith(color: Colors.black),
-          ),
+          Text('Status:', style: Styles.titleTextStyle),
           Align(alignment: Alignment.centerLeft, child: icon),
         ]),
       ],
@@ -105,17 +76,9 @@ class ServerQRCode extends StatelessWidget {
       child: RichText(
         text: TextSpan(
             text: 'Scan QR Code or set server key in ',
-            style: Theme.of(context)
-                .textTheme
-                .headline3
-                .copyWith(color: Colors.grey),
+            style: Styles.lessBodyText,
             children: <TextSpan>[
-              TextSpan(
-                text: 'Storyboard Mobile',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary),
-              ),
+              TextSpan(text: 'Storyboard Mobile', style: Styles.boldBodyText),
               TextSpan(text: ' to connect this app.'),
             ]),
       ),
@@ -130,7 +93,7 @@ class ServerQRCode extends StatelessWidget {
       width: 200,
       height: 200,
       decoration: BoxDecoration(
-        border: Border.all(width: 4, color: Colors.grey),
+        border: Border.all(width: 4, color: Styles.borderColor),
       ),
       child: Text(
         'N/A',

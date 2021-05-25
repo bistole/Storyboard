@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:storyboard/logger/log_level.dart';
 import 'package:storyboard/views/common/app_icons.dart';
 import 'package:storyboard/views/config/config.dart';
+import 'package:storyboard/views/config/styles.dart';
 
 class LogLevelWidget extends StatefulWidget {
   @override
@@ -44,19 +45,19 @@ class _LogLevelWidgetState extends State<LogLevelWidget> {
         Expanded(
           child: Text(
             "Log Level >= " + logLevel.name(),
-            style: Theme.of(context).textTheme.headline3.copyWith(
-                  color: Colors.white,
-                ),
+            style: Styles.normalBodyText.copyWith(
+              color: Styles.buttonTextColor,
+            ),
           ),
         ),
         TextButton.icon(
           onPressed: logLevel.canUpper() ? logLevelUpper : null,
-          icon: Icon(AppIcons.level_up, color: Colors.white),
+          icon: Icon(AppIcons.level_up, color: Styles.buttonTextColor),
           label: Text(""),
         ),
         TextButton.icon(
           onPressed: logLevel.canLower() ? logLevelLower : null,
-          icon: Icon(AppIcons.level_down, color: Colors.white),
+          icon: Icon(AppIcons.level_down, color: Styles.buttonTextColor),
           label: Text(""),
         )
       ]),
