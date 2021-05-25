@@ -23,7 +23,7 @@ func (rs RESTServer) buildErrorResponse(w http.ResponseWriter, err error) {
 	var response Succ
 	response.Succ = false
 	response.Error = err.Error()
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -35,7 +35,7 @@ func (rs RESTServer) buildSuccNoteResponse(w http.ResponseWriter, note Note) {
 	var response SuccNote
 	response.Succ = true
 	response.Note = note
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -47,7 +47,7 @@ func (rs RESTServer) buildSuccNotesResponse(w http.ResponseWriter, notes []Note)
 	var response SuccNotes
 	response.Succ = true
 	response.Notes = notes
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	json.NewEncoder(w).Encode(response)
 }
 

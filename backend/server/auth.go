@@ -23,7 +23,7 @@ func (rs RESTServer) Ping(w http.ResponseWriter, r *http.Request) {
 	}
 	var response Succ
 	response.Pong = true
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -124,7 +124,7 @@ func (es *eventServer) Handler(w http.ResponseWriter, r *http.Request) {
 			},
 			TS: time.Now().Unix(),
 		}
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		json.NewEncoder(w).Encode(data)
 		return
 	}

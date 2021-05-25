@@ -28,7 +28,7 @@ func (rs RESTServer) buildSuccPhotoResponse(w http.ResponseWriter, photo Photo) 
 	var response SuccPhoto
 	response.Succ = true
 	response.Photo = photo
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -40,7 +40,7 @@ func (rs RESTServer) buildSuccPhotosResponse(w http.ResponseWriter, photos []Pho
 	var response SuccPhotos
 	response.Succ = true
 	response.Photos = photos
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	json.NewEncoder(w).Encode(response)
 }
 
