@@ -3,6 +3,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/models/note.dart';
+import 'package:storyboard/views/common/server_status_warning_messager.dart';
 import 'package:storyboard/views/config/styles.dart';
 import 'package:storyboard/views/home/note/create_note_widget.dart';
 import 'package:storyboard/views/home/note/note_toolbar_widget.dart';
@@ -67,6 +68,7 @@ class NoteListWidget extends StatelessWidget {
           ),
           child: Column(children: [
             NoteToolbarWidget(),
+            ServerStatusWarningMessage(),
             Expanded(
               child: Container(
                 margin: padding,

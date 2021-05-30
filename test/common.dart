@@ -151,11 +151,17 @@ Widget buildTestablePageWithArguments(
   );
 }
 
-Widget buildTestableWidgetInMaterial(Widget widget, Store<AppState> store) {
+Widget buildTestableWidgetInMaterial(
+  Widget widget,
+  Store<AppState> store, {
+  NavigatorObserver navigator,
+}) {
   return StoreProvider(
     store: store,
     child: MaterialApp(
+      onGenerateRoute: onMockGenerateRoute,
       home: Scaffold(body: widget),
+      navigatorObservers: navigator != null ? [navigator] : [],
     ),
   );
 }
