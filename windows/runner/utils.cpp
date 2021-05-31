@@ -60,7 +60,7 @@ std::string GetHomeDir() {
   if (SUCCEEDED(hr)) {
     std::string* strPath = ConvertLPWSTR2String(szPath);
     if (strPath != NULL) {
-        std::string fullpath = *strPath + "\\" + PACKAGE_NAME + "\\" + this->GetEnvDir();
+        std::string fullpath = *strPath + "\\" + PACKAGE_NAME + "\\" + GetEnvDir();
         return fullpath;
     }
   }
