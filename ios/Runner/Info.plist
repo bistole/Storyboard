@@ -84,5 +84,7 @@
             </array>
         </dict>
     </dict>
+		<key>SB_ENV</key>
+		<string>$(SB_ENV)</string>
 </dict>
 </plist>
