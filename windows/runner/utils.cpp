@@ -44,13 +44,23 @@ std::vector<std::string> GetCommandLineArguments() {
   return command_line_arguments;
 }
 
+std::string GetEnvDir() {
+#ifdef _DEBUG 
+  return "debug";
+#elif defined(_PROFILE)
+  return "profile";
+#else 
+  return "release";
+#endif
+}
+
 std::string GetHomeDir() {
   TCHAR szPath[MAX_PATH];
   HRESULT hr = SHGetFolderPath( NULL, CSIDL_COMMON_APPDATA, NULL, 0, szPath );
   if (SUCCEEDED(hr)) {
     std::string* strPath = ConvertLPWSTR2String(szPath);
     if (strPath != NULL) {
-        std::string fullpath = *strPath + "\\" + PACKAGE_NAME;
+        std::string fullpath = *strPath + "\\" + PACKAGE_NAME + "\\" + GetEnvDir();
         return fullpath;
     }
   }
