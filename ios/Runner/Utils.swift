@@ -7,13 +7,13 @@
 
 import Foundation
 
-enum Error: Swift.Error {
+enum UtilsError: Swift.Error {
     case missingKey, invalidValue
 }
 
 func getConfigureValue<T>(for key: String) throws -> T where T: LosslessStringConvertible {
     guard let object = Bundle.main.object(forInfoDictionaryKey: key) else {
-        throw Error.missingKey;
+        throw UtilsError.missingKey;
     }
     
     switch object {
@@ -23,7 +23,7 @@ func getConfigureValue<T>(for key: String) throws -> T where T: LosslessStringCo
         guard let value = T(string) else { fallthrough }
         return value
     default:
-        throw Error.invalidValue
+        throw UtilsError.invalidValue
     }
 }
 
@@ -33,9 +33,8 @@ func getEnv() -> String {
 
 func getDataHome() -> String {
     let env = getEnv()
-    let localPath = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!
-    let idComp = (Bundle.main.infoDictionary?["CFBundleIdentifier"] as! String)
-    let components = env != "" ? [localPath, idComp, env] : [localPath, idComp]
+    let localPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
+    let components = env != "" ? [localPath, env] : [localPath]
     let fullPath = NSString.path(withComponents: components)
     return fullPath
 }

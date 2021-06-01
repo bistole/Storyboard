@@ -62,6 +62,9 @@ class Logger {
       this._file = null;
     }
 
+    // create folder
+    dir.createSync();
+
     var ts = DateFormat('yyyy-MM-dd').format(DateTime.now());
     this._filename = dir.path + '/log-$ts.log';
     this._file = File(_filename);
