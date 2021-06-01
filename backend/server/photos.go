@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"storyboard/backend/interfaces"
+	"storyboard/backend/slog"
 	"strconv"
 	"strings"
 
@@ -146,9 +146,9 @@ func (rs RESTServer) UploadPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("File Name: %+v\n", filename)
-	log.Printf("File Size: %+v\n", size)
-	log.Printf("MIME Header: %+v\n", mimeType)
+	slog.Printf("File Name: %+v\n", filename)
+	slog.Printf("File Size: %+v\n", size)
+	slog.Printf("MIME Header: %+v\n", mimeType)
 	mimeTypeArr := strings.Split(mimeType, ";")
 
 	photo, err := rs.PhotoRepo.AddPhoto(uuid, filename, mimeTypeArr[0], size, direction, file, createdAt)

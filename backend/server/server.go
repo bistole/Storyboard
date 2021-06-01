@@ -2,10 +2,10 @@ package server
 
 import (
 	"context"
-	"log"
 	"net"
 	"net/http"
 	"storyboard/backend/interfaces"
+	"storyboard/backend/slog"
 	"sync"
 	"time"
 
@@ -88,9 +88,9 @@ func (rs *RESTServer) Start() {
 			rs.Wg.Done()
 		}()
 
-		log.Println("Started: ", ip)
+		slog.Println("Started: ", ip)
 		if err := rs.HTTP.ListenAndServe(rs.Server); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("ListenAndServe(): %v", err)
+			slog.Fatalf("ListenAndServe(): %v", err)
 		}
 	}()
 }
@@ -108,12 +108,12 @@ func (rs *RESTServer) Stop() {
 
 	err := rs.HTTP.Shutdown(ctx, rs.Server)
 	if err != nil {
-		log.Fatalf("Shutdown(): %v", err)
+		slog.Fatalf("Shutdown(): %v", err)
 	}
 
 	rs.Wg.Wait()
 
-	log.Println("Stopped")
+	slog.Println("Stopped")
 }
 
 // GetCurrentIP set current ip
@@ -165,7 +165,7 @@ func (rs *RESTServer) getOutboundIP() string {
 	defer rs.Net.ConnClose(conn)
 
 	localIP := rs.Net.ConnLocalAddr(conn).(*net.UDPAddr).IP.String()
-	log.Println("Outbound IP: " + localIP)
+	slog.Println("Outbound IP: " + localIP)
 	return localIP
 }
 
@@ -200,7 +200,7 @@ func (rs *RESTServer) GetServerIPs() map[string]string {
 			var v4 = ip.To4()
 			if v4 != nil {
 				results[i.Name] = v4.String()
-				log.Println("Found IP: " + i.Name + " -> " + v4.String())
+				slog.Println("Found IP: " + i.Name + " -> " + v4.String())
 			}
 		}
 	}
