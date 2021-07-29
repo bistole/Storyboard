@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:storyboard/logger/log_level.dart';
 import 'package:storyboard/views/config/config.dart';
 
-class LogListWidget extends StatefulWidget {
+class UserLogListWidget extends StatefulWidget {
   final ScrollController _scrollController = ScrollController();
 
   @override
-  _LogListState createState() => _LogListState();
+  _UserLogListState createState() => _UserLogListState();
 }
 
-class _LogListState extends State<LogListWidget> {
+class _UserLogListState extends State<UserLogListWidget> {
   static Color debugColor = Colors.grey;
   static Color infoColor = Colors.black;
   static Color warnColor = Colors.orange;

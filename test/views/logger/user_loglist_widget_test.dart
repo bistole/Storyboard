@@ -7,7 +7,7 @@ import 'package:redux/redux.dart';
 import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/views/config/config.dart';
-import 'package:storyboard/views/logger/loglist_widget.dart';
+import 'package:storyboard/views/logger/user_loglist_widget.dart';
 
 import '../../common.dart';
 
@@ -23,7 +23,7 @@ void main() {
     getFactory().store = store = getMockStore();
   });
 
-  group('LogListWidget', () {
+  group('UserLogListWidget', () {
     testWidgets('.getLogsInCache', (WidgetTester tester) async {
       when(getViewResource().logger.getLogsInCache()).thenReturn([
         "2021-02-03 13:00:07 ERROR error",
@@ -35,8 +35,10 @@ void main() {
       when(mockStream.listen(any)).thenAnswer((_) => MockStreamSubscription());
       when(getViewResource().logger.getStream()).thenAnswer((_) => mockStream);
 
-      Widget w = buildTestableWidget(LogListWidget(), store);
+      Widget w = buildTestableWidget(UserLogListWidget(), store);
       await tester.pumpWidget(w);
+
+      expect(find.byType(SelectableText), findsNWidgets(4));
     });
 
     testWidgets('.getStream', (WidgetTester tester) async {
@@ -47,7 +49,7 @@ void main() {
       when(getViewResource().logger.getLogsInCache()).thenReturn([]);
       when(getViewResource().logger.getStream()).thenAnswer((_) => func());
 
-      Widget w = buildTestableWidget(LogListWidget(), store);
+      Widget w = buildTestableWidget(UserLogListWidget(), store);
       await tester.pumpWidget(w);
 
       await tester.pump(Duration(seconds: 1));

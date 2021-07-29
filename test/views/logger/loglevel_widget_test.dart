@@ -21,7 +21,12 @@ void main() {
   testWidgets('init', (WidgetTester tester) async {
     when(getViewResource().logger.getLevel()).thenReturn(LogLevel.error());
 
-    Widget w = buildTestableWidget(LogLevelWidget(), store);
+    Widget w = buildTestableWidgetInMaterial(
+        LogLevelWidget(
+          LogType.user,
+          (level) {},
+        ),
+        store);
     await tester.pumpWidget(w);
 
     // show log level
@@ -32,18 +37,15 @@ void main() {
 
     // click up
     await tester.tap(find.ancestor(
-      of: find.byIcon(AppIcons.level_up),
-      matching: find.byWidgetPredicate((widget) => widget is TextButton),
-    ));
+        of: find.byIcon(AppIcons.level_up), matching: find.byType(InkWell)));
     await tester.pumpAndSettle();
+
     var cap1 = verify(getViewResource().logger.setLevel(captureAny)).captured;
     expect((cap1[cap1.length - 1] as LogLevel).level, LogLevel.LOG_LEVEL_FATAL);
 
     // click down
     await tester.tap(find.ancestor(
-      of: find.byIcon(AppIcons.level_down),
-      matching: find.byWidgetPredicate((widget) => widget is TextButton),
-    ));
+        of: find.byIcon(AppIcons.level_down), matching: find.byType(InkWell)));
     await tester.pumpAndSettle();
     var cap2 = verify(getViewResource().logger.setLevel(captureAny)).captured;
     expect((cap2[cap2.length - 1] as LogLevel).level, LogLevel.LOG_LEVEL_WARN);
