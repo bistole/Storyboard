@@ -4,8 +4,8 @@ package photorepo
 // TODO: test error cases
 
 import (
-	"log"
 	"storyboard/backend/interfaces"
+	"storyboard/backend/slog"
 
 	"database/sql"
 	"fmt"
@@ -65,14 +65,14 @@ func (p PhotoRepo) AddPhoto(uuid string, filename string, mimeType string, size 
 
 	dst, err := p._getFileHandler(uuid, false)
 	if err != nil {
-		log.Println(err)
+		slog.Println(err)
 		return nil, fmt.Errorf("Failed to save photo")
 	}
 	defer dst.Close()
 
 	err = p._writeToDisk(src, dst)
 	if err != nil {
-		log.Println(err)
+		slog.Println(err)
 		return nil, fmt.Errorf("Failed to save photo")
 	}
 
@@ -88,12 +88,12 @@ func (p PhotoRepo) AddPhoto(uuid string, filename string, mimeType string, size 
 		CreatedAt: createdAt,
 	}
 	if err = p._createPhoto(inPhoto); err != nil {
-		log.Println(err)
+		slog.Println(err)
 		return nil, fmt.Errorf("Failed to save to DB")
 	}
 	outPhoto, err = p._getPhoto(inPhoto.UUID)
 	if err != nil {
-		log.Println(err)
+		slog.Println(err)
 		return nil, fmt.Errorf("Failed to load from DB")
 	}
 
@@ -227,7 +227,7 @@ func (p PhotoRepo) _updatePhoto(photo Photo) error {
 		return err
 	}
 
-	log.Printf("Updated: %t\n", affectRow > 0)
+	slog.Printf("Updated: %t\n", affectRow > 0)
 	if affectRow > 0 {
 		return nil
 	}
@@ -298,12 +298,12 @@ const (
 func (p PhotoRepo) _createThumbnail(UUID string, mimeType string) {
 	reader, err := p._readFromDisk(UUID, false)
 	if err != nil {
-		log.Fatalln(err)
+		slog.Fatalln(err)
 	}
 
 	srcImage, _, err := image.Decode(reader)
 	if err != nil {
-		log.Fatalln(err)
+		slog.Fatalln(err)
 	}
 
 	originW := srcImage.Bounds().Max.X
@@ -342,7 +342,7 @@ func (p PhotoRepo) _createThumbnail(UUID string, mimeType string) {
 
 	dst, err := p._getFileHandler(UUID, true)
 	if err != nil {
-		log.Fatalln(err)
+		slog.Fatalln(err)
 	}
 
 	if mimeType == "image/png" {

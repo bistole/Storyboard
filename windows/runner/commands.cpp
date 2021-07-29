@@ -25,7 +25,9 @@
 #include <flutter/standard_method_codec.h>
 
 #define COMMANDS 			"/COMMANDS"
-#define CMD_OPEN_DIALOG 	"CMD:OPEN_DIALOG"
+
+#define CMD_READY						"CMD:READY"
+#define CMD_OPEN_DIALOG 		"CMD:OPEN_DIALOG"
 #define CMD_SHARE_OUT_PHOTO "CMD:SHARE_OUT_PHOTO"
 #define CMD_SHARE_OUT_TEXT	"CMD:SHARE_OUT_TEXT"
 
@@ -257,9 +259,12 @@ void Commands::methodChannelHandler(
     const MethodCall<EncodableValue>& call,
     std::unique_ptr<MethodResult<EncodableValue>>& result)
 {
-    const std::string& method_name = call.method_name();
-    if (method_name.compare(CMD_OPEN_DIALOG) == 0) {
-        printf("CMD_OPEN_DIALOG\n");
+	const std::string& method_name = call.method_name();
+	if (method_name.compare(CMD_READY) == 0) {
+		printf("CMD_READY\n");
+		result->Success(NULL);
+	} else if (method_name.compare(CMD_OPEN_DIALOG) == 0) {
+		printf("CMD_OPEN_DIALOG\n");
 		const EncodableValue* value = call.arguments();
 		if (std::holds_alternative<EncodableMap>(*value)) {
 			EncodableMap map = std::get<EncodableMap>(*value);

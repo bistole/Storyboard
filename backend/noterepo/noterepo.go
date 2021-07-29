@@ -3,8 +3,8 @@ package noterepo
 // TODO: error cases
 
 import (
-	"log"
 	"storyboard/backend/interfaces"
+	"storyboard/backend/slog"
 
 	"database/sql"
 	"fmt"
@@ -139,7 +139,7 @@ func (t NoteRepo) _updateNote(note Note) error {
 		return err
 	}
 
-	log.Printf("Updated: %t\n", affectRow > 0)
+	slog.Printf("Updated: %t\n", affectRow > 0)
 	if affectRow > 0 {
 		return nil
 	}
@@ -174,7 +174,7 @@ func (t NoteRepo) _deleteNote(UUID string, updatedAt int64) error {
 		return err
 	}
 
-	log.Printf("Deleted: %t\n", affectRow > 0)
+	slog.Printf("Deleted: %t\n", affectRow > 0)
 	if affectRow > 0 {
 		return nil
 	}

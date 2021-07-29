@@ -32,6 +32,7 @@ class Styles {
 
   static const unknownColor = Colors.grey;
   static const succColor = Colors.green;
+  static const warningColor = Color(0xFFFFC107);
   static const errColor = Colors.red;
 
   static const unsyncedColor = Color(0xFFF57C00); // orange 700

@@ -80,7 +80,11 @@
 			"unordered_map": "cpp",
 			"utility": "cpp",
 			"variant": "cpp",
-			"vector": "cpp"
+			"vector": "cpp",
+			"clocale": "cpp",
+			"deque": "cpp",
+			"unordered_set": "cpp",
+			"queue": "cpp"
 		}
 	}
 }

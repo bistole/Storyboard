@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"storyboard/backend/interfaces"
+	"storyboard/backend/slog"
 	"strconv"
 	"strings"
 
@@ -28,7 +28,7 @@ func (rs RESTServer) buildSuccPhotoResponse(w http.ResponseWriter, photo Photo) 
 	var response SuccPhoto
 	response.Succ = true
 	response.Photo = photo
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -40,7 +40,7 @@ func (rs RESTServer) buildSuccPhotosResponse(w http.ResponseWriter, photos []Pho
 	var response SuccPhotos
 	response.Succ = true
 	response.Photos = photos
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -146,9 +146,9 @@ func (rs RESTServer) UploadPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("File Name: %+v\n", filename)
-	log.Printf("File Size: %+v\n", size)
-	log.Printf("MIME Header: %+v\n", mimeType)
+	slog.Printf("File Name: %+v\n", filename)
+	slog.Printf("File Size: %+v\n", size)
+	slog.Printf("MIME Header: %+v\n", mimeType)
 	mimeTypeArr := strings.Split(mimeType, ";")
 
 	photo, err := rs.PhotoRepo.AddPhoto(uuid, filename, mimeTypeArr[0], size, direction, file, createdAt)

@@ -7,8 +7,8 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
+	"storyboard/backend/slog"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -23,7 +23,7 @@ func (rs RESTServer) Ping(w http.ResponseWriter, r *http.Request) {
 	}
 	var response Succ
 	response.Pong = true
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -102,7 +102,7 @@ func (es *eventServer) sendWelcome(channel chan []byte) {
 	msg, err := json.Marshal(data)
 	if err == nil {
 		channel <- msg
-		log.Println("ES Welcome: Sent")
+		slog.Println("ES Welcome: Sent")
 	}
 }
 
@@ -116,7 +116,7 @@ func (es *eventServer) Handler(w http.ResponseWriter, r *http.Request) {
 
 	clientID := r.Header.Get(headerNameClientID)
 	if clientID == "" {
-		log.Println("ES Handler: Missing client-id")
+		slog.Println("ES Handler: Missing client-id")
 		data := serverEventData{
 			Action: actionError,
 			Params: map[string]string{
@@ -124,7 +124,7 @@ func (es *eventServer) Handler(w http.ResponseWriter, r *http.Request) {
 			},
 			TS: time.Now().Unix(),
 		}
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		json.NewEncoder(w).Encode(data)
 		return
 	}
@@ -140,7 +140,7 @@ func (es *eventServer) Handler(w http.ResponseWriter, r *http.Request) {
 		clientID: clientID,
 	}
 
-	log.Println("ES Handler: New client connected.")
+	slog.Println("ES Handler: New client connected.")
 	es.newClient <- clientChan
 
 	// get notified when client is closed.
@@ -148,7 +148,7 @@ func (es *eventServer) Handler(w http.ResponseWriter, r *http.Request) {
 	go func() {
 		<-notify
 		es.closingClient <- clientChan
-		log.Println("ES Handler: Client disconnected.")
+		slog.Println("ES Handler: Client disconnected.")
 	}()
 
 	for {
@@ -159,7 +159,7 @@ func (es *eventServer) Handler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "%s\n\n", msg)
 		f.Flush()
 	}
-	log.Println("ES Handler: Server closed client connection.")
+	slog.Println("ES Handler: Server closed client connection.")
 }
 
 func (es *eventServer) route(r *mux.Router) {
@@ -167,7 +167,7 @@ func (es *eventServer) route(r *mux.Router) {
 }
 
 func (es *eventServer) KeepAlive() {
-	log.Println("ES Keep-alive is on.")
+	slog.Println("ES Keep-alive is on.")
 	var live = true
 	go func() {
 		<-es.kldone
@@ -177,11 +177,11 @@ func (es *eventServer) KeepAlive() {
 	for live {
 		ret := es.sendEvent(clientNobody, actionKeepalive, nil)
 		if ret {
-			log.Println("ES Keep-alive: Sent")
+			slog.Println("ES Keep-alive: Sent")
 		}
 		time.Sleep(keepAliveInterval)
 	}
-	log.Println("ES Keep-alive is closed")
+	slog.Println("ES Keep-alive is closed")
 }
 
 // main loop
@@ -193,14 +193,14 @@ func (es *eventServer) MainLoop() {
 			case s := <-es.newClient:
 				{
 					es.clients[s.clientID] = s.channel
-					log.Println("ES Main: Client connected.")
+					slog.Println("ES Main: Client connected.")
 					es.sendWelcome(s.channel)
 				}
 			case s := <-es.closingClient:
 				{
 					delete(es.clients, s.clientID)
 					close(s.channel)
-					log.Println("ES Main: Client disconnected.")
+					slog.Println("ES Main: Client disconnected.")
 				}
 			case pack, open := <-es.message:
 				{
@@ -216,9 +216,9 @@ func (es *eventServer) MainLoop() {
 								}
 							}
 						}
-						log.Printf("ES Main: Broadcast %d/%d clients\n", cnt, len(es.clients))
+						slog.Printf("ES Main: Broadcast %d/%d clients\n", cnt, len(es.clients))
 					} else {
-						log.Println("ES Main: Server is closing, notify clients...")
+						slog.Println("ES Main: Server is closing, notify clients...")
 						for clientID, channel := range es.clients {
 							close(channel)
 							delete(es.clients, clientID)
@@ -231,19 +231,19 @@ func (es *eventServer) MainLoop() {
 				}
 			}
 		}
-		log.Println("ES Main: End")
+		slog.Println("ES Main: End")
 	}()
 }
 
 func (es *eventServer) Notify(clientID string, params *map[string]string) {
 	ret := es.sendEvent(clientID, actionNotify, params)
 	if ret != false {
-		log.Println("ES Notify: Sent")
+		slog.Println("ES Notify: Sent")
 	}
 }
 
 func (es *eventServer) End() {
-	log.Printf("Shutting down event server...")
+	slog.Printf("Shutting down event server...")
 
 	// stop keepalive
 	es.kldone <- true
@@ -256,5 +256,5 @@ func (es *eventServer) End() {
 
 	// wait until dispatcher is done
 	<-es.done
-	log.Println("Shutting down event server is done")
+	slog.Println("Shutting down event server is done")
 }

@@ -6,11 +6,17 @@ import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
 import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/logger/log_level.dart';
+import 'package:storyboard/logger/log_reader.dart';
+import 'package:storyboard/logger/log_reader_factory.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/views/config/config.dart';
 import 'package:storyboard/views/logger/page.dart';
 
 import '../../common.dart';
+
+class LogReaderFactoryMock extends Mock implements LogReaderFactory {}
+
+class LogReaderMock extends Mock implements LogReader {}
 
 class MockStream extends Mock implements Stream<String> {}
 
@@ -22,6 +28,13 @@ void main() {
   setUp(() {
     setFactoryLogger(MockLogger());
     getFactory().store = store = getMockStore();
+
+    LogReaderFactory fact = LogReaderFactoryMock();
+    LogReader reader = LogReaderMock();
+    when(fact.createLogReader()).thenReturn(reader);
+    when(fact.getTodayFilename()).thenReturn("mock-today-filename");
+
+    setLogReaderFactory(fact);
   });
 
   testWidgets('init', (WidgetTester tester) async {
@@ -34,6 +47,11 @@ void main() {
 
     Widget w = buildTestableWidget(LoggerPage(), store);
     await tester.pumpWidget(w);
-    await tester.pump(Duration(seconds: 1));
+    await tester.pumpAndSettle();
+
+    // tap server
+    expect(find.text("Server"), findsOneWidget);
+    await tester.tap(find.text("Server"));
+    await tester.pumpAndSettle();
   });
 }

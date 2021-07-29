@@ -167,8 +167,14 @@ class Factory {
 
   Future<void> initMethodChannels() async {
     // init logger
-    Directory logDir = await getApplicationDocumentsDirectory();
-    logger.setDir(logDir);
+    Directory logDir;
+    if (deviceManager.isAndroid()) {
+      logDir = await getApplicationSupportDirectory();
+    } else {
+      logDir = await getApplicationDocumentsDirectory();
+    }
+
+    logger.setDir(Directory('${logDir.path}/logs'));
     logger.setLevel(LogLevel.warn());
 
     // init backend

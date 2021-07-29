@@ -92,6 +92,8 @@ class OpenDialog : NSObject {
 
 class Commands : NSObject {
     let COMMANDS = "/COMMANDS";
+
+    let CMD_READY = "CMD:READY";
     let CMD_OPEN_DIALOG = "CMD:OPEN_DIALOG";
     let CMD_SHARE_OUT_PHOTO = "CMD:SHARE_OUT_PHOTO";
     let CMD_SHARE_OUT_TEXT = "CMD:SHARE_OUT_TEXT";
@@ -102,6 +104,9 @@ class Commands : NSObject {
     func methodInvoked(call: FlutterMethodCall, result: @escaping FlutterResult) -> Void {
         NSLog(call.method);
         switch(call.method) {
+        case self.CMD_READY:
+            result(nil)
+            break
         case self.CMD_OPEN_DIALOG:
             let dict = call.arguments as! Dictionary<String, String>
             let dialog = OpenDialog()

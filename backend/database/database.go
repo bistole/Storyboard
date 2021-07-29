@@ -7,10 +7,10 @@ package database
 import (
 	"database/sql"
 	"errors"
-	"log"
 	"os"
 	"path"
 	"storyboard/backend/interfaces"
+	"storyboard/backend/slog"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -33,7 +33,7 @@ func NewDatabaseService(config interfaces.ConfigService) *Database {
 // ProcessError process if error raised
 func processError(prefix string, err error) {
 	if err != nil {
-		log.Fatalf("%s: %v", prefix, err)
+		slog.Fatalf("%s: %v", prefix, err)
 	}
 }
 
@@ -57,7 +57,7 @@ func (d Database) GetDataFolder() string {
 
 func (d Database) createDBInstance(dirPath string, dbName string) (fullPath string, existed bool) {
 	fullPath = path.Join(dirPath, dbName)
-	log.Printf("Create Database: %s\n", fullPath)
+	slog.Printf("Create Database: %s\n", fullPath)
 	_, err := os.Stat(fullPath)
 	if os.IsNotExist(err) {
 		os.MkdirAll(dirPath, 0755)
