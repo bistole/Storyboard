@@ -67,9 +67,9 @@ func TestSSESever(t *testing.T) {
 	configMock := &mocks.ConfigMock{}
 	netMock := MockNetProxy()
 	httpMock := wrapper.NewHTTPWrapper()
-	taskRepoMock := MockAllTaskError()
+	noteRepoMock := MockAllNoteError()
 	photoRepoMock := MockAllPhotoError()
-	ss := NewRESTServer(netMock, httpMock, configMock, taskRepoMock, photoRepoMock)
+	ss := NewRESTServer(netMock, httpMock, configMock, noteRepoMock, photoRepoMock)
 
 	// install sse server
 	ss.EventServer = *createEventServer()

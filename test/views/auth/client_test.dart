@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
@@ -11,13 +10,10 @@ import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
-import 'package:storyboard/redux/models/photo_repo.dart';
-import 'package:storyboard/redux/models/setting.dart';
-import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task_repo.dart';
-import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/views/auth/page.dart';
 import 'package:storyboard/views/config/config.dart';
+
+import '../../common.dart';
 
 class MockDeviceManager extends Mock implements DeviceManager {}
 
@@ -33,29 +29,10 @@ void main() {
 
   Store<AppState> store;
 
-  Widget buildTestableWidget(Widget widget) {
-    return StoreProvider(
-      store: store,
-      child: MaterialApp(
-        home: widget,
-      ),
-    );
-  }
-
   group('auth_client', () {
     setUp(() {
-      getFactory().store = store = Store<AppState>(
-        appReducer,
-        initialState: AppState(
-          status: Status.noParam(StatusKey.ListTask),
-          photoRepo: PhotoRepo(photos: {}, lastTS: 0),
-          taskRepo: TaskRepo(tasks: {}, lastTS: 0),
-          setting: Setting(
-            clientID: 'client-id',
-            serverReachable: Reachable.Unknown,
-          ),
-        ),
-      );
+      setFactoryLogger(MockLogger());
+      getFactory().store = store = getMockStore();
 
       getViewResource().actServer = MockActServer();
       getViewResource().command = MockCommandChannel();
@@ -65,7 +42,7 @@ void main() {
     testWidgets('qr scan failed', (WidgetTester tester) async {
       when(getViewResource().deviceManager.isDesktop()).thenReturn(false);
 
-      var widget = buildTestableWidget(AuthPage());
+      var widget = buildTestableWidget(AuthPage(), store);
       await tester.pumpWidget(widget);
 
       expect(find.text(btnTextQR), findsOneWidget);
@@ -92,7 +69,7 @@ void main() {
     testWidgets('qr scan succeed', (WidgetTester tester) async {
       when(getViewResource().deviceManager.isDesktop()).thenReturn(false);
 
-      var widget = buildTestableWidget(AuthPage());
+      var widget = buildTestableWidget(AuthPage(), store);
       await tester.pumpWidget(widget);
 
       expect(find.text(btnTextQR), findsOneWidget);
@@ -120,7 +97,7 @@ void main() {
     testWidgets('manual input - keyboard', (WidgetTester tester) async {
       when(getViewResource().deviceManager.isDesktop()).thenReturn(false);
 
-      var widget = buildTestableWidget(AuthPage());
+      var widget = buildTestableWidget(AuthPage(), store);
       await tester.pumpWidget(widget);
 
       expect(find.text(btnTextInput), findsOneWidget);
@@ -156,7 +133,7 @@ void main() {
     testWidgets('manual input - button', (WidgetTester tester) async {
       when(getViewResource().deviceManager.isDesktop()).thenReturn(false);
 
-      var widget = buildTestableWidget(AuthPage());
+      var widget = buildTestableWidget(AuthPage(), store);
       await tester.pumpWidget(widget);
 
       expect(find.text(btnTextInput), findsOneWidget);
@@ -192,7 +169,7 @@ void main() {
     testWidgets('manual input - escape', (WidgetTester tester) async {
       when(getViewResource().deviceManager.isDesktop()).thenReturn(false);
 
-      var widget = buildTestableWidget(AuthPage());
+      var widget = buildTestableWidget(AuthPage(), store);
       await tester.pumpWidget(widget);
 
       expect(find.text(btnTextInput), findsOneWidget);
@@ -201,7 +178,6 @@ void main() {
 
       // show manually input
       expect(find.byType(TextField), findsOneWidget);
-      expect(find.byType(RawKeyboardListener), findsOneWidget);
 
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await tester.pump();

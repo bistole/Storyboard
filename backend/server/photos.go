@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"storyboard/backend/interfaces"
+	"storyboard/backend/slog"
 	"strconv"
 	"strings"
 
@@ -28,7 +28,7 @@ func (rs RESTServer) buildSuccPhotoResponse(w http.ResponseWriter, photo Photo) 
 	var response SuccPhoto
 	response.Succ = true
 	response.Photo = photo
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -40,7 +40,7 @@ func (rs RESTServer) buildSuccPhotosResponse(w http.ResponseWriter, photos []Pho
 	var response SuccPhotos
 	response.Succ = true
 	response.Photos = photos
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -57,7 +57,7 @@ func (rs RESTServer) GetPhoto(w http.ResponseWriter, r *http.Request) {
 	rs.buildSuccPhotoResponse(w, *photo)
 }
 
-// GetPhotos is a restful API handler to get tasks
+// GetPhotos is a restful API handler to get photos
 func (rs RESTServer) GetPhotos(w http.ResponseWriter, r *http.Request) {
 	ts := ConvertQueryParamToInt(r, "ts", 0)
 	limit := ConvertQueryParamToInt(r, "c", 20)
@@ -78,6 +78,22 @@ func (rs RESTServer) getUUIDFromParameters(r *http.Request) (string, error) {
 		return "", err
 	}
 	return uuid, nil
+}
+
+func (rs RESTServer) getDirectionFromParameter(r *http.Request) (int32, error) {
+	if r.Form["direction"] == nil {
+		return 0, fmt.Errorf("direction is missing")
+	}
+	direction64, err := strconv.ParseInt(r.Form["direction"][0], 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("direction is invalid")
+	}
+
+	direction := int32(direction64)
+	if err := IsIntValidDirection(direction, "direction is missing"); err != nil {
+		return 0, err
+	}
+	return direction, nil
 }
 
 func (rs RESTServer) getCreatedAtFromParameter(r *http.Request) (int64, error) {
@@ -119,18 +135,23 @@ func (rs RESTServer) UploadPhoto(w http.ResponseWriter, r *http.Request) {
 	filename := handler.Filename
 	mimeType := handler.Header.Get("Content-Type")
 	size := handler.Header.Get("Content-Length")
+	direction, err := rs.getDirectionFromParameter(r)
+	if err != nil {
+		rs.buildErrorResponse(w, err)
+		return
+	}
 	createdAt, err := rs.getCreatedAtFromParameter(r)
 	if err != nil {
 		rs.buildErrorResponse(w, err)
 		return
 	}
 
-	log.Printf("File Name: %+v\n", filename)
-	log.Printf("File Size: %+v\n", size)
-	log.Printf("MIME Header: %+v\n", mimeType)
+	slog.Printf("File Name: %+v\n", filename)
+	slog.Printf("File Size: %+v\n", size)
+	slog.Printf("MIME Header: %+v\n", mimeType)
 	mimeTypeArr := strings.Split(mimeType, ";")
 
-	photo, err := rs.PhotoRepo.AddPhoto(uuid, filename, mimeTypeArr[0], size, file, createdAt)
+	photo, err := rs.PhotoRepo.AddPhoto(uuid, filename, mimeTypeArr[0], size, direction, file, createdAt)
 	if err != nil {
 		rs.buildErrorResponse(w, err)
 		return
@@ -174,6 +195,42 @@ func (rs RESTServer) ThumbnailPhoto(w http.ResponseWriter, r *http.Request) {
 		rs.buildErrorResponse(w, err)
 		return
 	}
+}
+
+// DeletePhoto is a restful API handler to update photo
+func (rs RESTServer) UpdatePhoto(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	clientID := r.Header.Get(headerNameClientID)
+	if clientID == "" {
+		rs.buildErrorResponse(w, fmt.Errorf("Missing request header: %s", headerNameClientID))
+		return
+	}
+
+	reqBody, _ := ioutil.ReadAll(r.Body)
+	var updatedPhoto Photo
+	json.Unmarshal(reqBody, &updatedPhoto)
+
+	if err := IsIntValidDirection(updatedPhoto.Direction, "Direction is invalid"); err != nil {
+		rs.buildErrorResponse(w, err)
+		return
+	}
+
+	if err := IsIntValidDate(updatedPhoto.UpdatedAt, "UpdatedAt is missing"); err != nil {
+		rs.buildErrorResponse(w, err)
+		return
+	}
+
+	photo, err := rs.PhotoRepo.UpdatePhoto(id, updatedPhoto)
+	if err != nil {
+		rs.buildErrorResponse(w, err)
+		return
+	}
+
+	param := map[string]string{"type": notifyTypePhoto}
+	rs.EventServer.Notify(clientID, &param)
+	rs.buildSuccPhotoResponse(w, *photo)
 }
 
 // DeletePhoto is a restful API handler to delete photo

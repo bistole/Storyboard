@@ -4,10 +4,10 @@ import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/queue_item.dart';
 import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task.dart';
+import 'package:storyboard/redux/models/note.dart';
 
 void main() {
-  final task = Task.fromJson({
+  final note = Note.fromJson({
     'uuid': 'uuid',
     'title': 'title',
     'deleted': 0,
@@ -21,6 +21,7 @@ void main() {
     'filename': 'image.jpeg',
     'mime': 'image/jpeg',
     'size': '100',
+    'direction': 180,
     'hasOrigin': 'PhotoStatus.None',
     'hasThumb': 'PhotoStatus.None',
     'deleted': 1,
@@ -28,27 +29,38 @@ void main() {
     'createdAt': 1000,
     '_ts': 1000000,
   });
-  test("FetchTasksAction", () {
-    final act = FetchTasksAction(taskMap: {"uuid": task});
-    expect(act.toString(),
-        "FetchTasksAction{taskMap: {uuid: Task{uuid: uuid, title: title, deleted: 0, updatedAt: 1000, createdAt: 1000}}}");
+
+  test('SettingServerKeyAction', () {
+    final act = SettingServerKeyAction(serverKey: 'sk');
+    expect(act.toString(), "SettingServerKeyAction{serverKey: sk}");
   });
 
-  test("CreateTaskAction", () {
-    final act = CreateTaskAction(task: task);
-    expect(act.toString(),
-        "CreateTaskAction{task: Task{uuid: uuid, title: title, deleted: 0, updatedAt: 1000, createdAt: 1000}}");
+  test('SettingServerReachableAction', () {
+    final act = SettingServerReachableAction(reachable: false);
+    expect(act.toString(), "SettingServerReachableAction{reachable: false}");
   });
 
-  test("UpdateTaskAction", () {
-    final act = UpdateTaskAction(task: task);
+  test("FetchNotesAction", () {
+    final act = FetchNotesAction(noteMap: {"uuid": note});
     expect(act.toString(),
-        "UpdateTaskAction{task: Task{uuid: uuid, title: title, deleted: 0, updatedAt: 1000, createdAt: 1000}}");
+        "FetchNotesAction{noteMap: {uuid: Note{uuid: uuid, title: title, deleted: 0, updatedAt: 1000, createdAt: 1000}}}");
   });
 
-  test("DeleteTaskAction", () {
-    final act = DeleteTaskAction(uuid: "uuid");
-    expect(act.toString(), "DeleteTaskAction{uuid: uuid}");
+  test("CreateNoteAction", () {
+    final act = CreateNoteAction(note: note);
+    expect(act.toString(),
+        "CreateNoteAction{note: Note{uuid: uuid, title: title, deleted: 0, updatedAt: 1000, createdAt: 1000}}");
+  });
+
+  test("UpdateNoteAction", () {
+    final act = UpdateNoteAction(note: note);
+    expect(act.toString(),
+        "UpdateNoteAction{note: Note{uuid: uuid, title: title, deleted: 0, updatedAt: 1000, createdAt: 1000}}");
+  });
+
+  test("DeleteNoteAction", () {
+    final act = DeleteNoteAction(uuid: "uuid");
+    expect(act.toString(), "DeleteNoteAction{uuid: uuid}");
   });
 
   test("FetchPhotosAction", () {
@@ -59,7 +71,7 @@ void main() {
   test("CreatePhotoAction", () {
     final act = CreatePhotoAction(photo: photo);
     expect(act.toString(),
-        "CreatePhotoAction{photo: Photo{uuid: uuid, filename: image.jpeg, mime: image/jpeg, size: 100, hasOrigin: PhotoStatus.None, hasThumb: PhotoStatus.None, deleted: 1, updatedAt: 1000, createdAt: 1000}}");
+        "CreatePhotoAction{photo: Photo{uuid: uuid, filename: image.jpeg, mime: image/jpeg, size: 100, direction: 180, hasOrigin: PhotoStatus.None, hasThumb: PhotoStatus.None, deleted: 1, updatedAt: 1000, createdAt: 1000}}");
   });
 
   test("DownloadPhotoAction", () {
@@ -77,7 +89,7 @@ void main() {
   test("UpdatePhotoAction", () {
     final act = UpdatePhotoAction(photo: photo);
     expect(act.toString(),
-        "UpdatePhotoAction{photo: Photo{uuid: uuid, filename: image.jpeg, mime: image/jpeg, size: 100, hasOrigin: PhotoStatus.None, hasThumb: PhotoStatus.None, deleted: 1, updatedAt: 1000, createdAt: 1000}}");
+        "UpdatePhotoAction{photo: Photo{uuid: uuid, filename: image.jpeg, mime: image/jpeg, size: 100, direction: 180, hasOrigin: PhotoStatus.None, hasThumb: PhotoStatus.None, deleted: 1, updatedAt: 1000, createdAt: 1000}}");
   });
 
   test("DeletePhotoAction", () {
@@ -86,22 +98,29 @@ void main() {
   });
 
   test("ChangeStatusAction", () {
-    final act = ChangeStatusAction(status: StatusKey.AddingTask);
-    expect(act.toString(), "ChangeStatusAction{status: StatusKey.AddingTask}");
+    final act = ChangeStatusAction(status: StatusKey.AddingNote);
+    expect(act.toString(), "ChangeStatusAction{status: StatusKey.AddingNote}");
   });
 
   test("ChangeStatusWithUUIDAction", () {
     final act =
-        ChangeStatusWithUUIDAction(status: StatusKey.AddingTask, uuid: 'uuid');
+        ChangeStatusWithUUIDAction(status: StatusKey.AddingNote, uuid: 'uuid');
     expect(act.toString(),
-        "ChangeStatusWithUUIDAction{status: StatusKey.AddingTask, uuid: uuid}");
+        "ChangeStatusWithUUIDAction{status: StatusKey.AddingNote, uuid: uuid}");
   });
 
   test("ChangeStatusWithPathAction", () {
     final act =
-        ChangeStatusWithPathAction(status: StatusKey.AddingTask, path: 'path');
+        ChangeStatusWithPathAction(status: StatusKey.AddingNote, path: 'path');
     expect(act.toString(),
-        "ChangeStatusWithPathAction{status: StatusKey.AddingTask, path: path}");
+        "ChangeStatusWithPathAction{status: StatusKey.AddingNote, path: path}");
+  });
+
+  test("ChangeStatusWithTextAction", () {
+    final act = ChangeStatusWithTextAction(
+        status: StatusKey.ShareInNote, text: 'content');
+    expect(act.toString(),
+        "ChangeStatusWithTextAction{status: StatusKey.ShareInNote, text: content}");
   });
 
   test("PushQueueItemAction", () {
@@ -114,9 +133,9 @@ void main() {
   });
   test("UnshiftQueueItemAction", () {
     final act = UnshiftQueueItemAction(
-        type: QueueItemType.Task, action: QueueItemAction.Create, uuid: 'uuid');
+        type: QueueItemType.Note, action: QueueItemAction.Create, uuid: 'uuid');
     expect(act.toString(),
-        "UnshiftQueueItemAction{type: QueueItemType.Task, action: QueueItemAction.Create, uuid: uuid}");
+        "UnshiftQueueItemAction{type: QueueItemType.Note, action: QueueItemAction.Create, uuid: uuid}");
   });
   test("ProcessQueueItemAction", () {
     final act = ProcessQueueItemAction();

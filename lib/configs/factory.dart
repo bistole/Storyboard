@@ -10,10 +10,11 @@ import 'package:redux/redux.dart';
 
 import 'package:storyboard/actions/photos.dart';
 import 'package:storyboard/actions/server.dart';
-import 'package:storyboard/actions/tasks.dart';
+import 'package:storyboard/actions/notes.dart';
 import 'package:storyboard/channel/backend.dart';
 import 'package:storyboard/channel/command.dart';
 import 'package:storyboard/channel/menu.dart';
+import 'package:storyboard/channel/notifier.dart';
 import 'package:storyboard/configs/channel_manager.dart';
 import 'package:storyboard/configs/device_manager.dart';
 import 'package:storyboard/logger/log_level.dart';
@@ -23,9 +24,10 @@ import 'package:storyboard/net/config.dart';
 import 'package:storyboard/net/photos.dart';
 import 'package:storyboard/net/queue.dart';
 import 'package:storyboard/net/sse.dart';
-import 'package:storyboard/net/tasks.dart';
+import 'package:storyboard/net/notes.dart';
 import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
+import 'package:storyboard/redux/models/status.dart';
 import 'package:storyboard/redux/store.dart';
 import 'package:storyboard/storage/storage.dart';
 import 'package:storyboard/views/config/config.dart';
@@ -35,16 +37,19 @@ const CHANNEL_MENU_EVENTS = "/MENU_EVENTS";
 const CHANNEL_COMMANDS = '/COMMANDS';
 
 class Factory {
+  static String _logTag = (Factory).toString();
+
   DeviceManager deviceManager;
   Logger logger;
+  Notifier notifier;
 
   ActServer actServer;
   ActPhotos actPhotos;
-  ActTasks actTasks;
+  ActNotes actNotes;
 
   NetAuth netAuth;
   NetPhotos netPhotos;
-  NetTasks netTasks;
+  NetNotes netNotes;
   NetSSE netSSE;
   NetQueue netQueue;
 
@@ -56,18 +61,19 @@ class Factory {
   Store<AppState> store;
   Storage storage;
 
-  Factory() {
+  Factory({@required this.logger}) {
     deviceManager = DeviceManager();
-    logger = Logger();
     logger.setLevel(LogLevel.debug());
+    notifier = Notifier();
+    notifier.setLogger(logger);
 
     actServer = ActServer();
     actPhotos = ActPhotos();
-    actTasks = ActTasks();
+    actNotes = ActNotes();
 
     netAuth = NetAuth();
     netPhotos = NetPhotos();
-    netTasks = NetTasks();
+    netNotes = NetNotes();
     netSSE = NetSSE();
     netQueue = NetQueue(60);
 
@@ -81,8 +87,8 @@ class Factory {
     actPhotos.setNetQueue(netQueue);
     actPhotos.setStorage(storage);
 
-    actTasks.setLogger(logger);
-    actTasks.setNetQueue(netQueue);
+    actNotes.setLogger(logger);
+    actNotes.setNetQueue(netQueue);
 
     netQueue.setLogger(logger);
 
@@ -95,25 +101,26 @@ class Factory {
     netPhotos.setStorage(storage);
     netPhotos.registerToQueue(netQueue);
 
-    netTasks.setLogger(logger);
-    netTasks.setHttpClient(http.Client());
-    netTasks.setActTasks(actTasks);
-    netTasks.registerToQueue(netQueue);
+    netNotes.setLogger(logger);
+    netNotes.setHttpClient(http.Client());
+    netNotes.setActNotes(actNotes);
+    netNotes.registerToQueue(netQueue);
 
     netSSE.setLogger(logger);
     netSSE.setGetHttpClient(() => http.Client());
-    netSSE.registerUpdateFunc(notifyTypeTask, actTasks.actFetchTasks);
+    netSSE.registerUpdateFunc(notifyTypeNote, actNotes.actFetchNotes);
     netSSE.registerUpdateFunc(notifyTypePhoto, actPhotos.actFetchPhotos);
 
     channelManager.setLogger(logger);
     storage.setLogger(logger);
 
+    getViewResource().logger = logger;
+    getViewResource().notifier = notifier;
     getViewResource().deviceManager = deviceManager;
     getViewResource().storage = storage;
     getViewResource().actPhotos = actPhotos;
-    getViewResource().actTasks = actTasks;
+    getViewResource().actNotes = actNotes;
     getViewResource().actServer = actServer;
-    getViewResource().logger = logger;
   }
 
   Future<void> initCrashlytics() async {
@@ -160,8 +167,14 @@ class Factory {
 
   Future<void> initMethodChannels() async {
     // init logger
-    Directory logDir = await getApplicationDocumentsDirectory();
-    logger.setDir(logDir);
+    Directory logDir;
+    if (deviceManager.isAndroid()) {
+      logDir = await getApplicationSupportDirectory();
+    } else {
+      logDir = await getApplicationDocumentsDirectory();
+    }
+
+    logger.setDir(Directory('${logDir.path}/logs'));
     logger.setLevel(LogLevel.warn());
 
     // init backend
@@ -173,17 +186,19 @@ class Factory {
     MethodChannel mcCommand = await createChannelByName(CHANNEL_COMMANDS);
     command = CommandChannel(mcCommand);
     command.setLogger(logger);
+    command.setNotifier(notifier);
     command.setActServer(actServer);
 
     // init menu
     MethodChannel mcMenu = await createChannelByName(CHANNEL_MENU_EVENTS);
     menu = MenuChannel(mcMenu);
     menu.setLogger(logger);
-    menu.setCommandChannel(command);
+    menu.setNotifier(notifier);
 
     // set to view resource
     getViewResource().command = command;
     getViewResource().backend = backend;
+    getViewResource().menu = menu;
   }
 
   Future<void> initStoreAndStorage() async {
@@ -198,6 +213,13 @@ class Factory {
     netQueue.start();
 
     command.setStore(store);
+
+    // if share, handle in different way
+    command.listenAction(CMD_SHARE_IN_PHOTO, shareInPhotoListener);
+    command.listenAction(CMD_SHARE_IN_TEXT, shareInNoteListener);
+    await command.setChannelReady();
+
+    shareInPhotoListener() || shareInNoteListener();
   }
 
   Future<void> checkServerStatus() async {
@@ -207,13 +229,53 @@ class Factory {
       checkServerKeyOnMobile();
     }
   }
+
+  bool shareInPhotoListener() {
+    var path = command.getActionValue<String>(CMD_SHARE_IN_PHOTO);
+    if (path != null) {
+      logger.info(_logTag, "shareInPhotoListener $path");
+      store.dispatch(ChangeStatusWithPathAction(
+        status: StatusKey.ShareInPhoto,
+        path: path,
+      ));
+      command.clearActionValue(CMD_SHARE_IN_PHOTO);
+      return true;
+    }
+    return false;
+  }
+
+  bool shareInNoteListener() {
+    var text = command.getActionValue<String>(CMD_SHARE_IN_TEXT);
+    if (text != null) {
+      logger.info(_logTag, "shareInNoteListener $text");
+      actNotes.actCreateNote(store, text);
+      store.dispatch(ChangeStatusAction(status: StatusKey.ListNote));
+      // TODO: have UI for share in text
+      // store.dispatch(ChangeStatusWithTextAction(
+      //   status: StatusKey.ShareInNote,
+      //   text: text,
+      // ));
+      command.clearActionValue(CMD_SHARE_IN_TEXT);
+      return true;
+    }
+    return false;
+  }
 }
 
 Factory _instance;
+Logger _logger;
+
+setFactoryLogger(Logger logger) {
+  _logger = logger;
+}
+
+setFactory(Factory fact) {
+  _instance = fact;
+}
 
 Factory getFactory() {
   if (_instance == null) {
-    _instance = Factory();
+    _instance = Factory(logger: _logger == null ? Logger() : _logger);
   }
   return _instance;
 }

@@ -9,12 +9,9 @@ import 'package:storyboard/configs/factory.dart';
 import 'package:storyboard/net/auth.dart';
 import 'package:storyboard/net/config.dart';
 import 'package:storyboard/redux/models/app.dart';
-import 'package:storyboard/redux/models/photo_repo.dart';
-import 'package:storyboard/redux/models/queue.dart';
 import 'package:storyboard/redux/models/setting.dart';
-import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task_repo.dart';
-import 'package:storyboard/redux/reducers/app_reducer.dart';
+
+import '../common.dart';
 
 var mockHostname = "192.168.3.146";
 var mockPort = 3000;
@@ -28,59 +25,67 @@ void main() {
   Store<AppState> store;
   MockHttpClient httpClient;
 
+  setUp(() {
+    setFactoryLogger(MockLogger());
+  });
+
   buildStore() {
-    getFactory().store = store = Store<AppState>(
-      appReducer,
-      initialState: AppState(
-        status: Status.noParam(StatusKey.ListTask),
-        photoRepo: PhotoRepo(photos: {}, lastTS: 0),
-        taskRepo: TaskRepo(tasks: {}, lastTS: 0),
-        queue: Queue(),
-        setting: Setting(
-            serverKey: mockServerKey, serverReachable: Reachable.Unknown),
+    getFactory().store = store = getMockStore(
+      setting: Setting(
+        serverKey: mockServerKey,
+        serverReachable: Reachable.Unknown,
       ),
     );
   }
 
-  group('netPing', () {
-    test('netPing succ', () async {
+  group('.netPing', () {
+    test('succ', () async {
       buildStore();
 
       httpClient = MockHttpClient();
 
       netAuth = NetAuth();
+      netAuth.setLogger(MockLogger());
       netAuth.setHttpClient(httpClient);
 
       final responseBody = jsonEncode({
         'pong': true,
       });
 
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed('headers')))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed('headers'),
+      )).thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
       await netAuth.netPing(store);
 
       expect(store.state.setting.serverReachable, Reachable.Yes);
+
+      var captured =
+          verify(httpClient.get(captureAny, headers: anyNamed('headers')))
+              .captured;
+      expect((captured[0] as Uri).origin, startsWith(mockURLPrefix));
     });
 
-    test('netPing timeout', () async {
+    test('timeout', () async {
       buildStore();
 
       httpClient = MockHttpClient();
 
       netAuth = NetAuth();
+      netAuth.setLogger(MockLogger());
       netAuth.setHttpClient(httpClient);
 
       final responseBody = jsonEncode({
         'pong': true,
       });
 
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed('headers')))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed('headers'),
+      )).thenAnswer((_) async {
         await Future.delayed(Duration(seconds: 5));
         return http.Response(responseBody, 200);
       });
@@ -88,23 +93,35 @@ void main() {
       await netAuth.netPing(store);
 
       expect(store.state.setting.serverReachable, Reachable.No);
+
+      var captured =
+          verify(httpClient.get(captureAny, headers: anyNamed('headers')))
+              .captured;
+      expect((captured[0] as Uri).origin, startsWith(mockURLPrefix));
     });
 
-    test('netPing have exception', () async {
+    test('have exception', () async {
       buildStore();
 
       httpClient = MockHttpClient();
 
       netAuth = NetAuth();
+      netAuth.setLogger(MockLogger());
       netAuth.setHttpClient(httpClient);
 
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed('headers')))
-          .thenThrow(new Exception("unknown error"));
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed('headers'),
+      )).thenThrow(new Exception("unknown error"));
 
       await netAuth.netPing(store);
 
       expect(store.state.setting.serverReachable, Reachable.Unknown);
+
+      var captured =
+          verify(httpClient.get(captureAny, headers: anyNamed('headers')))
+              .captured;
+      expect((captured[0] as Uri).origin, startsWith(mockURLPrefix));
     });
   });
 }

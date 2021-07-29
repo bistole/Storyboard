@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 
 enum StatusKey {
   AddingPhoto,
-  AddingTask,
-  EditingTask,
-  ListTask,
+  AddingNote,
+  EditingNote,
+  EditingPhoto,
+  ShareInPhoto,
+  ShareInNote,
+  ListNote,
+  ListPhoto,
 }
 
 @immutable
@@ -33,6 +37,18 @@ class Status {
     );
   }
 
+  bool get inNote =>
+      status == StatusKey.ShareInNote ||
+      status == StatusKey.AddingNote ||
+      status == StatusKey.ListNote ||
+      status == StatusKey.EditingNote;
+
+  bool get inPhoto =>
+      status == StatusKey.ShareInPhoto ||
+      status == StatusKey.AddingPhoto ||
+      status == StatusKey.ListPhoto ||
+      status == StatusKey.EditingPhoto;
+
   @override
   int get hashCode => status.hashCode ^ param1.hashCode ^ param2.hashCode;
 
@@ -43,6 +59,10 @@ class Status {
           status == other.status &&
           param1 == other.param1 &&
           param2 == other.param2);
+
+  String get uuid => param1;
+  String get path => param1;
+  String get text => param1;
 
   @override
   String toString() {

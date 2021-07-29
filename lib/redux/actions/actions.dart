@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/queue_item.dart';
 import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task.dart';
+import 'package:storyboard/redux/models/note.dart';
 
 class SettingServerKeyAction {
   final String serverKey;
@@ -26,47 +26,47 @@ class SettingServerReachableAction {
   }
 }
 
-class FetchTasksAction {
-  final Map<String, Task> taskMap;
+class FetchNotesAction {
+  final Map<String, Note> noteMap;
 
-  FetchTasksAction({@required this.taskMap});
-
-  @override
-  String toString() {
-    return 'FetchTasksAction{taskMap: $taskMap}';
-  }
-}
-
-class CreateTaskAction {
-  final Task task;
-
-  CreateTaskAction({@required this.task});
+  FetchNotesAction({@required this.noteMap});
 
   @override
   String toString() {
-    return 'CreateTaskAction{task: $task}';
+    return 'FetchNotesAction{noteMap: $noteMap}';
   }
 }
 
-class UpdateTaskAction {
-  final Task task;
+class CreateNoteAction {
+  final Note note;
 
-  UpdateTaskAction({@required this.task});
+  CreateNoteAction({@required this.note});
 
   @override
   String toString() {
-    return 'UpdateTaskAction{task: $task}';
+    return 'CreateNoteAction{note: $note}';
   }
 }
 
-class DeleteTaskAction {
+class UpdateNoteAction {
+  final Note note;
+
+  UpdateNoteAction({@required this.note});
+
+  @override
+  String toString() {
+    return 'UpdateNoteAction{note: $note}';
+  }
+}
+
+class DeleteNoteAction {
   final String uuid;
 
-  DeleteTaskAction({@required this.uuid});
+  DeleteNoteAction({@required this.uuid});
 
   @override
   String toString() {
-    return 'DeleteTaskAction{uuid: $uuid}';
+    return 'DeleteNoteAction{uuid: $uuid}';
   }
 }
 
@@ -170,6 +170,18 @@ class ChangeStatusWithPathAction {
   @override
   String toString() {
     return 'ChangeStatusWithPathAction{status: $status, path: $path}';
+  }
+}
+
+class ChangeStatusWithTextAction {
+  final StatusKey status;
+  final String text;
+
+  ChangeStatusWithTextAction({@required this.status, @required this.text});
+
+  @override
+  String toString() {
+    return 'ChangeStatusWithTextAction{status: $status, text: $text}';
   }
 }
 

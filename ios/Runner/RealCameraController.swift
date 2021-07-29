@@ -57,15 +57,7 @@ class RealCameraController : NSObject, CameraController {
                 throw CameraControllerError.captureSessionIsMissing
             }
             
-            if let frontCamera = self.frontCamera {
-                self.frontCameraInput = try AVCaptureDeviceInput(device: frontCamera)
-                if captureSession.canAddInput(self.frontCameraInput!) {
-                    captureSession.addInput(self.frontCameraInput!)
-                } else {
-                    throw CameraControllerError.inputsAreInvalid
-                }
-                self.cameraPosition = .front
-            } else if let rearCamera = self.rearCamera {
+            if let rearCamera = self.rearCamera {
                 self.rearCameraInput = try AVCaptureDeviceInput(device: rearCamera)
                 if captureSession.canAddInput(self.rearCameraInput!) {
                     captureSession.addInput(self.rearCameraInput!)
@@ -73,6 +65,14 @@ class RealCameraController : NSObject, CameraController {
                     throw CameraControllerError.inputsAreInvalid
                 }
                 self.cameraPosition = .rear
+            } else if let frontCamera = self.frontCamera {
+                self.frontCameraInput = try AVCaptureDeviceInput(device: frontCamera)
+                if captureSession.canAddInput(self.frontCameraInput!) {
+                    captureSession.addInput(self.frontCameraInput!)
+                } else {
+                    throw CameraControllerError.inputsAreInvalid
+                }
+                self.cameraPosition = .front
             } else {
                 throw CameraControllerError.noCamerasAvailable
             }

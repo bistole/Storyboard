@@ -11,13 +11,14 @@ const MAX_LOG_IN_CACHE = 100;
 class EndOfStreamError extends Error {}
 
 class Logger {
-  String _LOG_TAG = (Logger).toString();
+  String _logTag = (Logger).toString();
 
   LogLevel _logLevel;
 
   StreamController<String> _streamController;
   Stream<String> _stream;
   Queue<String> _logsInCache;
+  String _filename;
   File _file;
   IOSink _sink;
 
@@ -29,7 +30,6 @@ class Logger {
     _logsInCache = Queue<String>();
 
     _streamController = StreamController<String>();
-    _streamController.stream;
     _stream = _streamController.stream.asBroadcastStream();
     _stream.listen((line) {
       print(line);
@@ -41,12 +41,16 @@ class Logger {
   }
 
   void setLevel(LogLevel logLevel) {
-    this.always(_LOG_TAG, "Set Log Level: ${logLevel.name()}");
+    this.always(_logTag, "Set Log Level: ${logLevel.name()}");
     _logLevel = logLevel;
   }
 
   LogLevel getLevel() {
     return _logLevel;
+  }
+
+  String getFilename() {
+    return _filename;
   }
 
   void setDir(Directory dir) {
@@ -58,20 +62,23 @@ class Logger {
       this._file = null;
     }
 
-    var ts = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    var filename = dir.path + '/log-$ts.log';
-    this._file = File(filename);
+    // create folder
+    dir.createSync();
 
-    this.always(_LOG_TAG, "Log filename: $filename");
+    var ts = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    this._filename = dir.path + '/log-$ts.log';
+    this._file = File(_filename);
+
+    this.always(_logTag, "Log filename: $_filename");
 
     this._sink = this._file.openWrite(mode: FileMode.append);
     for (String line in this._logsInCache) {
-      this._sink.write(line);
+      this._sink.writeln(line);
     }
 
     this._stream.listen(
       (String line) {
-        this._sink.write(line);
+        this._sink.writeln(line);
       },
       onDone: () {
         this._sink.close();

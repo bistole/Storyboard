@@ -59,9 +59,9 @@ func TestServerStartup(t *testing.T) {
 	}
 	netMock := wrapper.NewNetWrapper()
 	httpMock := wrapper.NewHTTPWrapper()
-	var taskRepoMock = &mocks.TaskRepoMock{}
+	var noteRepoMock = &mocks.NoteRepoMock{}
 	var photoRepoMock = &mocks.PhotoRepoMock{}
-	ss := NewRESTServer(netMock, httpMock, configMock, taskRepoMock, photoRepoMock)
+	ss := NewRESTServer(netMock, httpMock, configMock, noteRepoMock, photoRepoMock)
 	ss.Start()
 	ss.Stop()
 }
@@ -143,9 +143,9 @@ func TestSetCurrentIP(t *testing.T) {
 			return nil
 		},
 	}
-	taskRepoMock := &mocks.TaskRepoMock{}
+	noteRepoMock := &mocks.NoteRepoMock{}
 	photoRepoMock := &mocks.PhotoRepoMock{}
-	ss := NewRESTServer(netMock, httpMock, configMock, taskRepoMock, photoRepoMock)
+	ss := NewRESTServer(netMock, httpMock, configMock, noteRepoMock, photoRepoMock)
 	ss.Start()
 	ss.SetCurrentIP(newIP)
 
@@ -205,10 +205,10 @@ func TestGetCurrenctIPWhichIsValid(t *testing.T) {
 			return addrs, nil
 		},
 	}
-	taskRepoMock := &mocks.TaskRepoMock{}
+	noteRepoMock := &mocks.NoteRepoMock{}
 	photoRepoMock := &mocks.PhotoRepoMock{}
 	httpMock := mocks.HTTPMock{}
-	ss := NewRESTServer(netMock, httpMock, configMock, taskRepoMock, photoRepoMock)
+	ss := NewRESTServer(netMock, httpMock, configMock, noteRepoMock, photoRepoMock)
 
 	newIP := ss.GetCurrentIP()
 	if newIP != oldIP {
@@ -241,9 +241,9 @@ func TestServerValidIPs(t *testing.T) {
 		},
 	}
 	httpMock := wrapper.NewHTTPWrapper()
-	taskRepoMock := &mocks.TaskRepoMock{}
+	noteRepoMock := &mocks.NoteRepoMock{}
 	photoRepoMock := &mocks.PhotoRepoMock{}
-	ss := NewRESTServer(netMock, httpMock, configMock, taskRepoMock, photoRepoMock)
+	ss := NewRESTServer(netMock, httpMock, configMock, noteRepoMock, photoRepoMock)
 	ips := ss.GetServerIPs()
 	if len(ips) != 1 || ips["eth0"] != "192.168.77.88" {
 		t.Error("expected server ips")

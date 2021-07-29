@@ -6,65 +6,66 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"storyboard/backend/config"
 	"storyboard/backend/database"
 	"storyboard/backend/interfaces"
+	"storyboard/backend/noterepo"
 	"storyboard/backend/photorepo"
 	"storyboard/backend/server"
-	"storyboard/backend/taskrepo"
+	"storyboard/backend/slog"
 	"storyboard/backend/wrapper"
 )
 
 var inited bool = false
 var c interfaces.ConfigService
 var db interfaces.DatabaseService
-var taskRepo interfaces.TaskRepo
+var noteRepo interfaces.NoteRepo
 var photoRepo interfaces.PhotoRepo
 var ss interfaces.RESTService
 
 //export Backend_Start
 func Backend_Start(app *C.char) {
 	if inited {
-		log.Printf("Already Started")
+		slog.Printf("Already Started")
 		return
 	}
 	inited = true
-	log.Println("Hello, Backend Server")
+	slog.Println("Hello, Backend Server")
 
 	// config service
 	appStr := ""
 	if app != nil {
 		appStr = C.GoString(app)
 	}
+	slog.SetPath(appStr)
 	c = config.NewConfigService(appStr)
 
 	// database service
 	db = database.NewDatabaseService(c)
 	db.Init()
 
-	// task & photo repo
-	taskRepo = taskrepo.NewTaskRepo(db)
+	// note & photo repo
+	noteRepo = noterepo.NewNoteRepo(db)
 	photoRepo = photorepo.NewPhotoRepo(db)
 
 	// server
 	httpProxy := *wrapper.NewHTTPWrapper()
 	netProxy := *wrapper.NewNetWrapper()
-	ss = server.NewRESTServer(netProxy, httpProxy, c, taskRepo, photoRepo)
+	ss = server.NewRESTServer(netProxy, httpProxy, c, noteRepo, photoRepo)
 	go ss.Start()
 }
 
 //export Backend_Stop
 func Backend_Stop() {
-	log.Println("Closing Backend Service")
+	slog.Println("Closing Backend Service")
 	// server
 	if ss != nil {
 		ss.Stop()
 		ss = nil
 	}
 
-	taskRepo = nil
+	noteRepo = nil
 	photoRepo = nil
 
 	// database
@@ -75,7 +76,7 @@ func Backend_Stop() {
 
 	c = nil
 	inited = false
-	log.Println("Goodbye, Backend Server")
+	slog.Println("Goodbye, Backend Server")
 }
 
 //export Backend_GetCurrentIP

@@ -12,14 +12,14 @@ import (
 // TODO: test GetServerIPs
 
 func TestConvertQueryParamToIntDefault(t *testing.T) {
-	url, _ := url.Parse("http://localhost:3000/tasks")
+	url, _ := url.Parse("http://localhost:3000/notes")
 	req := http.Request{URL: url}
 	key := ConvertQueryParamToInt(&req, "key", 100)
 	assert.Equal(t, key, 100)
 }
 
 func TestConvertQueryParamToIntValue(t *testing.T) {
-	url, _ := url.Parse("http://localhost:3000/tasks?key=999")
+	url, _ := url.Parse("http://localhost:3000/notes?key=999")
 	req := http.Request{URL: url}
 	key := ConvertQueryParamToInt(&req, "key", 100)
 	assert.Equal(t, key, 999)

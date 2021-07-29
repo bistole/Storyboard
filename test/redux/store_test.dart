@@ -6,9 +6,9 @@ import 'package:storyboard/redux/models/queue.dart';
 import 'package:storyboard/redux/store.dart';
 import 'package:storyboard/storage/storage.dart';
 
-class MockStorage extends Mock implements Storage {}
+import '../common.dart';
 
-class MockLogger extends Mock implements Logger {}
+class MockStorage extends Mock implements Storage {}
 
 class MockMenuChannel extends Mock implements MenuChannel {}
 
@@ -25,7 +25,7 @@ void main() {
     // init
     var store = await initStore(s, l);
     expect(store.state.photoRepo.photos, {});
-    expect(store.state.taskRepo.tasks, {});
+    expect(store.state.noteRepo.notes, {});
     expect(store.state.queue, Queue());
   });
 }

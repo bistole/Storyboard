@@ -13,11 +13,7 @@ import 'package:storyboard/net/photos.dart';
 import 'package:storyboard/redux/models/app.dart';
 import 'package:storyboard/redux/models/photo.dart';
 import 'package:storyboard/redux/models/photo_repo.dart';
-import 'package:storyboard/redux/models/queue.dart';
 import 'package:storyboard/redux/models/setting.dart';
-import 'package:storyboard/redux/models/status.dart';
-import 'package:storyboard/redux/models/task_repo.dart';
-import 'package:storyboard/redux/reducers/app_reducer.dart';
 import 'package:storyboard/storage/storage.dart';
 
 import '../common.dart';
@@ -40,16 +36,14 @@ void main() {
   ActPhotos actPhotos;
   Storage storage;
 
+  setUp(() {
+    setFactoryLogger(MockLogger());
+  });
+
   buildStore(Map<String, Photo> photos) {
-    getFactory().store = store = Store<AppState>(
-      appReducer,
-      initialState: AppState(
-        status: Status.noParam(StatusKey.ListTask),
-        photoRepo: PhotoRepo(photos: photos, lastTS: 0),
-        taskRepo: TaskRepo(tasks: {}, lastTS: 0),
-        queue: Queue(),
-        setting: Setting(serverKey: mockServerKey),
-      ),
+    getFactory().store = store = getMockStore(
+      pr: PhotoRepo(photos: photos, lastTS: 0),
+      setting: Setting(serverKey: mockServerKey),
     );
   }
 
@@ -59,6 +53,7 @@ void main() {
       'filename': 'file.jpeg',
       'mime': 'image/jpeg',
       'size': '8384',
+      'direction': 180,
       'deleted': 0,
       'updatedAt': 1606506017,
       'createdAt': 1606506017,
@@ -74,6 +69,7 @@ void main() {
       size: "8384",
       hasOrigin: PhotoStatus.None,
       hasThumb: PhotoStatus.None,
+      direction: 180,
       deleted: 0,
       updatedAt: 1606506017,
       createdAt: 1606506017,
@@ -88,6 +84,7 @@ void main() {
       actPhotos = MockActPhotos();
 
       netPhotos = NetPhotos();
+      netPhotos.setLogger(MockLogger());
       netPhotos.setHttpClient(httpClient);
       netPhotos.setActPhotos(actPhotos);
       netPhotos.setStorage(storage);
@@ -101,9 +98,10 @@ void main() {
         'succ': true,
         'photos': [getJsonPhotoObject()],
       });
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed('headers')))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed('headers'),
+      )).thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
@@ -113,7 +111,8 @@ void main() {
           verify(httpClient.get(captureAny, headers: anyNamed('headers')))
               .captured
               .first;
-      expect(captured, mockURLPrefix + '/photos?ts=1&c=100');
+      expect(
+          (captured as Uri).toString(), mockURLPrefix + '/photos?ts=1&c=100');
 
       expect(store.state.photoRepo.photos, {'uuid': getPhotoObject()});
     });
@@ -134,9 +133,10 @@ void main() {
         'photos': [getJsonPhotoObject()],
       });
 
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed('headers')))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed('headers'),
+      )).thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
@@ -146,7 +146,8 @@ void main() {
           verify(httpClient.get(captureAny, headers: anyNamed('headers')))
               .captured
               .first;
-      expect(captured, mockURLPrefix + '/photos?ts=1&c=100');
+      expect(
+          (captured as Uri).toString(), mockURLPrefix + '/photos?ts=1&c=100');
 
       expect(store.state.photoRepo.photos, {
         'uuid': getPhotoObject().copyWith(
@@ -171,9 +172,10 @@ void main() {
         ],
       });
 
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed('headers')))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed('headers'),
+      )).thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
@@ -183,7 +185,8 @@ void main() {
           verify(httpClient.get(captureAny, headers: anyNamed('headers')))
               .captured
               .first;
-      expect(captured, mockURLPrefix + '/photos?ts=1&c=100');
+      expect(
+          (captured as Uri).toString(), mockURLPrefix + '/photos?ts=1&c=100');
 
       expect(
           verify(storage.deletePhotoAndThumbByUUID(captureAny)).captured.single,
@@ -204,9 +207,10 @@ void main() {
           getJsonPhotoObject(),
         ],
       });
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed('headers')))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed('headers'),
+      )).thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
@@ -216,7 +220,7 @@ void main() {
           verify(httpClient.get(captureAny, headers: anyNamed('headers')))
               .captured
               .first;
-      expect(captured, mockURLPrefix + '/photos?ts=1&c=2');
+      expect((captured as Uri).toString(), mockURLPrefix + '/photos?ts=1&c=2');
 
       verifyNever(actPhotos.actFetchPhotos());
 
@@ -237,9 +241,10 @@ void main() {
           getJsonPhotoObject()..addAll({'uuid': 'uuid2'})
         ],
       });
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed('headers')))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed('headers'),
+      )).thenAnswer((_) async {
         return http.Response(responseBody, 200);
       });
 
@@ -249,7 +254,7 @@ void main() {
           verify(httpClient.get(captureAny, headers: anyNamed('headers')))
               .captured
               .first;
-      expect(captured, mockURLPrefix + '/photos?ts=1&c=2');
+      expect((captured as Uri).toString(), mockURLPrefix + '/photos?ts=1&c=2');
 
       verify(actPhotos.actFetchPhotos()).called(1);
 
@@ -261,9 +266,11 @@ void main() {
   group('netUploadPhoto', () {
     setUp(() {
       httpClient = MockHttpClient();
+      storage = MockStorage();
       actPhotos = MockActPhotos();
 
       netPhotos = NetPhotos();
+      netPhotos.setLogger(MockLogger());
       netPhotos.setHttpClient(httpClient);
       netPhotos.setActPhotos(actPhotos);
     });
@@ -317,6 +324,7 @@ void main() {
       actPhotos = MockActPhotos();
 
       netPhotos = NetPhotos();
+      netPhotos.setLogger(MockLogger());
       netPhotos.setHttpClient(httpClient);
       netPhotos.setActPhotos(actPhotos);
       netPhotos.setStorage(storage);
@@ -325,9 +333,10 @@ void main() {
     test('download succ', () async {
       buildStore({'uuid': getPhotoObject()});
 
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed('headers')))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed('headers'),
+      )).thenAnswer((_) async {
         return http.Response("buffer", 200);
       });
 
@@ -337,7 +346,7 @@ void main() {
           verify(httpClient.get(captureAny, headers: anyNamed('headers')))
               .captured
               .first;
-      expect(capHttp, mockURLPrefix + '/photos/uuid');
+      expect((capHttp as Uri).toString(), mockURLPrefix + '/photos/uuid');
 
       var capStorage =
           verify(storage.savePhotoByUUID(captureAny, captureAny)).captured;
@@ -355,6 +364,7 @@ void main() {
       actPhotos = MockActPhotos();
 
       netPhotos = NetPhotos();
+      netPhotos.setLogger(MockLogger());
       netPhotos.setHttpClient(httpClient);
       netPhotos.setActPhotos(actPhotos);
       netPhotos.setStorage(storage);
@@ -363,9 +373,10 @@ void main() {
     test('download succ', () async {
       buildStore({'uuid': getPhotoObject()});
 
-      when(httpClient.get(startsWith(mockURLPrefix),
-              headers: anyNamed('headers')))
-          .thenAnswer((_) async {
+      when(httpClient.get(
+        argThat(isA<Uri>()),
+        headers: anyNamed('headers'),
+      )).thenAnswer((_) async {
         return http.Response("buffer", 200);
       });
 
@@ -375,7 +386,8 @@ void main() {
           verify(httpClient.get(captureAny, headers: anyNamed('headers')))
               .captured
               .first;
-      expect(capHttp, mockURLPrefix + '/photos/uuid/thumbnail');
+      expect((capHttp as Uri).toString(),
+          mockURLPrefix + '/photos/uuid/thumbnail');
 
       var capStorage =
           verify(storage.saveThumbailByUUID(captureAny, captureAny)).captured;
@@ -386,6 +398,54 @@ void main() {
     });
   });
 
+  group('netUpdatePhoto', () {
+    setUp(() {
+      httpClient = MockHttpClient();
+      storage = MockStorage();
+      actPhotos = MockActPhotos();
+
+      netPhotos = NetPhotos();
+      netPhotos.setLogger(MockLogger());
+      netPhotos.setHttpClient(httpClient);
+      netPhotos.setActPhotos(actPhotos);
+      netPhotos.setStorage(storage);
+    });
+
+    test('update succ', () async {
+      buildStore({'uuid': getPhotoObject().copyWith(ts: 1606500000000)});
+
+      final responseBody = jsonEncode({
+        'succ': true,
+        'photo': getJsonPhotoObject(),
+      });
+
+      when(httpClient.post(
+        argThat(isA<Uri>()),
+        headers: anyNamed('headers'),
+        body: anyNamed('body'),
+        encoding: Encoding.getByName('utf-8'),
+      )).thenAnswer((_) async {
+        return http.Response(responseBody, 200);
+      });
+
+      await netPhotos.netUpdatePhoto(store, uuid: 'uuid');
+
+      var captured = verify(httpClient.post(
+        captureAny,
+        headers: captureAnyNamed('headers'),
+        body: captureAnyNamed('body'),
+        encoding: Encoding.getByName('utf-8'),
+      )).captured;
+
+      expect((captured[0] as Uri).toString(), mockURLPrefix + '/photos/uuid');
+      expect(captured[1]['Content-Type'], 'application/json');
+      expect(captured[2],
+          jsonEncode(getPhotoObject().copyWith(ts: 1606500000000).toJson()));
+
+      expect(store.state.photoRepo.photos['uuid'].ts, 1606506017000);
+    });
+  });
+
   group('netDeletePhoto', () {
     setUp(() {
       httpClient = MockHttpClient();
@@ -393,6 +453,7 @@ void main() {
       actPhotos = MockActPhotos();
 
       netPhotos = NetPhotos();
+      netPhotos.setLogger(MockLogger());
       netPhotos.setHttpClient(httpClient);
       netPhotos.setActPhotos(actPhotos);
       netPhotos.setStorage(storage);

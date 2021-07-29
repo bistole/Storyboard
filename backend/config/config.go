@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"path"
+	"storyboard/backend/slog"
 
 	"gopkg.in/yaml.v2"
 )
@@ -68,10 +68,10 @@ func (c *Config) LoadFromConfigFile() {
 // SaveToConfigFile save config to configName yaml file
 func (c Config) SaveToConfigFile() {
 	filename := path.Join(c.homedir, configName)
-	log.Println("config file: " + filename)
+	slog.Println("config file: " + filename)
 	data, err := yaml.Marshal(c.props)
 	if err != nil {
-		log.Fatalln("Failed to save config file")
+		slog.Fatalln("Failed to save config file")
 		panic(err)
 	}
 	ioutil.WriteFile(filename, data, 0777)

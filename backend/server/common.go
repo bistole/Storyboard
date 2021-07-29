@@ -11,7 +11,7 @@ import (
 const headerNameClientID = "client-id"
 
 const notifyTypePhoto = "photo"
-const notifyTypeTask = "task"
+const notifyTypeNote = "note"
 
 // ConvertQueryParamToInt get url query
 func ConvertQueryParamToInt(r *http.Request, key string, def int) int {
@@ -41,6 +41,13 @@ func IsStringNotEmpty(content string, errMsg string) error {
 		return nil
 	}
 	return fmt.Errorf(errMsg)
+}
+
+func IsIntValidDirection(direction int32, errMsg string) error {
+	if direction != 0 && direction != 90 && direction != 180 && direction != 270 {
+		return fmt.Errorf(errMsg)
+	}
+	return nil
 }
 
 const beforeTS = 86400 * 365 // a year

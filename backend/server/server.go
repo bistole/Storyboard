@@ -2,10 +2,10 @@ package server
 
 import (
 	"context"
-	"log"
 	"net"
 	"net/http"
 	"storyboard/backend/interfaces"
+	"storyboard/backend/slog"
 	"sync"
 	"time"
 
@@ -20,7 +20,7 @@ type RESTServer struct {
 	ServerIP    string
 	Server      *http.Server
 	Wg          *sync.WaitGroup
-	TaskRepo    interfaces.TaskRepo
+	NoteRepo    interfaces.NoteRepo
 	PhotoRepo   interfaces.PhotoRepo
 	EventServer eventServer
 }
@@ -30,7 +30,7 @@ func NewRESTServer(
 	net interfaces.NetProxy,
 	http interfaces.HTTPProxy,
 	config interfaces.ConfigService,
-	taskRepo interfaces.TaskRepo,
+	noteRepo interfaces.NoteRepo,
 	photoRepo interfaces.PhotoRepo,
 ) *RESTServer {
 	var wg = &sync.WaitGroup{}
@@ -41,7 +41,7 @@ func NewRESTServer(
 		ServerIP:  "",
 		Server:    nil,
 		Wg:        wg,
-		TaskRepo:  taskRepo,
+		NoteRepo:  noteRepo,
 		PhotoRepo: photoRepo,
 	}
 }
@@ -49,14 +49,15 @@ func NewRESTServer(
 func (rs RESTServer) route() *mux.Router {
 	r := mux.NewRouter()
 	r.HandleFunc("/ping", rs.Ping).Methods("GET")
-	r.HandleFunc("/tasks", rs.GetTasks).Methods("GET")
-	r.HandleFunc("/tasks", rs.CreateTask).Methods("POST")
-	r.HandleFunc("/tasks/{id}", rs.GetTask).Methods("GET")
-	r.HandleFunc("/tasks/{id}", rs.UpdateTask).Methods("POST")
-	r.HandleFunc("/tasks/{id}", rs.DeleteTask).Methods("DELETE")
+	r.HandleFunc("/notes", rs.GetNotes).Methods("GET")
+	r.HandleFunc("/notes", rs.CreateNote).Methods("POST")
+	r.HandleFunc("/notes/{id}", rs.GetNote).Methods("GET")
+	r.HandleFunc("/notes/{id}", rs.UpdateNote).Methods("POST")
+	r.HandleFunc("/notes/{id}", rs.DeleteNote).Methods("DELETE")
 	r.HandleFunc("/photos", rs.GetPhotos).Methods("GET")
 	r.HandleFunc("/photos", rs.UploadPhoto).Methods("POST")
 	r.HandleFunc("/photos/{id}", rs.DownloadPhoto).Methods("GET")
+	r.HandleFunc("/photos/{id}", rs.UpdatePhoto).Methods("POST")
 	r.HandleFunc("/photos/{id}", rs.DeletePhoto).Methods("DELETE")
 	r.HandleFunc("/photos/{id}/thumbnail", rs.ThumbnailPhoto).Methods("GET")
 	r.HandleFunc("/photos/{id}/meta", rs.GetPhoto).Methods("GET")
@@ -87,9 +88,9 @@ func (rs *RESTServer) Start() {
 			rs.Wg.Done()
 		}()
 
-		log.Println("Started: ", ip)
+		slog.Println("Started: ", ip)
 		if err := rs.HTTP.ListenAndServe(rs.Server); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("ListenAndServe(): %v", err)
+			slog.Fatalf("ListenAndServe(): %v", err)
 		}
 	}()
 }
@@ -107,12 +108,12 @@ func (rs *RESTServer) Stop() {
 
 	err := rs.HTTP.Shutdown(ctx, rs.Server)
 	if err != nil {
-		log.Fatalf("Shutdown(): %v", err)
+		slog.Fatalf("Shutdown(): %v", err)
 	}
 
 	rs.Wg.Wait()
 
-	log.Println("Stopped")
+	slog.Println("Stopped")
 }
 
 // GetCurrentIP set current ip
@@ -164,7 +165,7 @@ func (rs *RESTServer) getOutboundIP() string {
 	defer rs.Net.ConnClose(conn)
 
 	localIP := rs.Net.ConnLocalAddr(conn).(*net.UDPAddr).IP.String()
-	log.Println("Outbound IP: " + localIP)
+	slog.Println("Outbound IP: " + localIP)
 	return localIP
 }
 
@@ -199,7 +200,7 @@ func (rs *RESTServer) GetServerIPs() map[string]string {
 			var v4 = ip.To4()
 			if v4 != nil {
 				results[i.Name] = v4.String()
-				log.Println("Found IP: " + i.Name + " -> " + v4.String())
+				slog.Println("Found IP: " + i.Name + " -> " + v4.String())
 			}
 		}
 	}

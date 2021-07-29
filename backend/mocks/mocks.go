@@ -9,8 +9,8 @@ import (
 	"storyboard/backend/interfaces"
 )
 
-// Task is defined in interfaces
-type Task = interfaces.Task
+// Note is defined in interfaces
+type Note = interfaces.Note
 
 // Photo is defined in interfaces
 type Photo = interfaces.Photo
@@ -133,43 +133,44 @@ func (d *DatabaseMock) Close() {
 	d.CloseFn()
 }
 
-// TaskRepoMock to mock task repo
-type TaskRepoMock struct {
-	CreateTaskFn    func(Task) (*Task, error)
-	UpdateTaskFn    func(string, Task) (*Task, error)
-	DeleteTaskFn    func(string, int64) (*Task, error)
-	GetTaskByUUIDFn func(string) (*Task, error)
-	GetTasksByTSFn  func(ts int64, limit int, offset int) ([]Task, error)
+// NoteRepoMock to mock note repo
+type NoteRepoMock struct {
+	CreateNoteFn    func(Note) (*Note, error)
+	UpdateNoteFn    func(string, Note) (*Note, error)
+	DeleteNoteFn    func(string, int64) (*Note, error)
+	GetNoteByUUIDFn func(string) (*Note, error)
+	GetNotesByTSFn  func(ts int64, limit int, offset int) ([]Note, error)
 }
 
-// CreateTask mock task repo
-func (t *TaskRepoMock) CreateTask(task Task) (*Task, error) {
-	return t.CreateTaskFn(task)
+// CreateNote mock note repo
+func (t *NoteRepoMock) CreateNote(note Note) (*Note, error) {
+	return t.CreateNoteFn(note)
 }
 
-// UpdateTask mock task repo
-func (t *TaskRepoMock) UpdateTask(UUID string, task Task) (*Task, error) {
-	return t.UpdateTaskFn(UUID, task)
+// UpdateNote mock note repo
+func (t *NoteRepoMock) UpdateNote(UUID string, note Note) (*Note, error) {
+	return t.UpdateNoteFn(UUID, note)
 }
 
-// DeleteTask mock task repo
-func (t *TaskRepoMock) DeleteTask(UUID string, updatedAt int64) (*Task, error) {
-	return t.DeleteTaskFn(UUID, updatedAt)
+// DeleteNote mock note repo
+func (t *NoteRepoMock) DeleteNote(UUID string, updatedAt int64) (*Note, error) {
+	return t.DeleteNoteFn(UUID, updatedAt)
 }
 
-// GetTaskByUUID mock task repo
-func (t *TaskRepoMock) GetTaskByUUID(UUID string) (*Task, error) {
-	return t.GetTaskByUUIDFn(UUID)
+// GetNoteByUUID mock note repo
+func (t *NoteRepoMock) GetNoteByUUID(UUID string) (*Note, error) {
+	return t.GetNoteByUUIDFn(UUID)
 }
 
-// GetTasksByTS mock task repo
-func (t *TaskRepoMock) GetTasksByTS(ts int64, limit int, offset int) ([]Task, error) {
-	return t.GetTasksByTSFn(ts, limit, offset)
+// GetNotesByTS mock note repo
+func (t *NoteRepoMock) GetNotesByTS(ts int64, limit int, offset int) ([]Note, error) {
+	return t.GetNotesByTSFn(ts, limit, offset)
 }
 
 // PhotoRepoMock to mock photo repo
 type PhotoRepoMock struct {
-	AddPhotoFn          func(string, string, string, string, io.Reader, int64) (*Photo, error)
+	AddPhotoFn          func(string, string, string, string, int32, io.Reader, int64) (*Photo, error)
+	UpdatePhotoFn       func(string, Photo) (*Photo, error)
 	DeletePhotoFn       func(string, int64) (*Photo, error)
 	GetPhotoFn          func(string) (io.ReadCloser, error)
 	GetPhotoThumbnailFn func(string) (io.ReadCloser, error)
@@ -178,8 +179,12 @@ type PhotoRepoMock struct {
 }
 
 // AddPhoto mock photo repo
-func (p *PhotoRepoMock) AddPhoto(uuid string, filename string, mime string, size string, src io.Reader, createdAt int64) (*Photo, error) {
-	return p.AddPhotoFn(uuid, filename, mime, size, src, createdAt)
+func (p *PhotoRepoMock) AddPhoto(uuid string, filename string, mime string, size string, direction int32, src io.Reader, createdAt int64) (*Photo, error) {
+	return p.AddPhotoFn(uuid, filename, mime, size, direction, src, createdAt)
+}
+
+func (p *PhotoRepoMock) UpdatePhoto(uuid string, photo Photo) (*Photo, error) {
+	return p.UpdatePhotoFn(uuid, photo)
 }
 
 // DeletePhoto mock photo repo

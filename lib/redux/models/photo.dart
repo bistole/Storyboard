@@ -25,6 +25,7 @@ class Photo {
   final String filename;
   final String mime;
   final String size;
+  final int direction;
   final PhotoStatus hasOrigin;
   final PhotoStatus hasThumb;
   final int deleted;
@@ -37,6 +38,7 @@ class Photo {
     this.filename,
     this.mime,
     this.size,
+    this.direction,
     this.hasOrigin,
     this.hasThumb,
     this.deleted,
@@ -50,6 +52,7 @@ class Photo {
     String filename,
     String mime,
     String size,
+    int direction,
     PhotoStatus hasOrigin,
     PhotoStatus hasThumb,
     int deleted,
@@ -62,6 +65,7 @@ class Photo {
       filename: filename ?? this.filename,
       mime: mime ?? this.mime,
       size: size ?? this.size,
+      direction: direction ?? this.direction,
       hasOrigin: hasOrigin ?? this.hasOrigin,
       hasThumb: hasThumb ?? this.hasThumb,
       deleted: deleted ?? this.deleted,
@@ -77,6 +81,7 @@ class Photo {
       filename.hashCode ^
       mime.hashCode ^
       size.hashCode ^
+      direction.hashCode ^
       hasOrigin.hashCode ^
       hasThumb.hashCode ^
       deleted.hashCode ^
@@ -92,6 +97,7 @@ class Photo {
             filename == other.filename &&
             mime == other.mime &&
             size == other.size &&
+            direction == other.direction &&
             hasOrigin == other.hasOrigin &&
             hasThumb == other.hasThumb &&
             deleted == other.deleted &&
@@ -104,7 +110,7 @@ class Photo {
   @override
   String toString() {
     return "Photo{uuid: $uuid, filename: $filename, mime: $mime, " +
-        "size: $size, hasOrigin: $hasOrigin, hasThumb: $hasThumb, " +
+        "size: $size, direction: $direction, hasOrigin: $hasOrigin, hasThumb: $hasThumb, " +
         "deleted: $deleted, updatedAt: $updatedAt, createdAt: $createdAt}";
   }
 
@@ -114,6 +120,7 @@ class Photo {
       filename: json['filename'],
       mime: json['mime'],
       size: json['size'],
+      direction: json['direction'] ?? 0,
       hasOrigin: decodeStatus(json['hasOrigin']),
       hasThumb: decodeStatus(json['hasThumb']),
       deleted: json['deleted'],
@@ -129,6 +136,7 @@ class Photo {
     map['filename'] = this.filename;
     map['mime'] = this.mime;
     map['size'] = this.size;
+    map['direction'] = this.direction;
     map['hasOrigin'] = this.hasOrigin.toString();
     map['hasThumb'] = this.hasThumb.toString();
     map['deleted'] = this.deleted;
@@ -149,6 +157,7 @@ Map<String, Photo> buildPhotoMap(List<dynamic> json) {
       filename: element['filename'],
       mime: element['mime'],
       size: element['size'],
+      direction: element['direction'] ?? 0,
       hasOrigin: decodeStatus(element['hasOrigin']),
       hasThumb: decodeStatus(element['hasThumb']),
       deleted: element['deleted'],

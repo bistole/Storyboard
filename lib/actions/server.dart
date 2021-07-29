@@ -5,7 +5,7 @@ import 'package:storyboard/redux/actions/actions.dart';
 import 'package:storyboard/redux/models/app.dart';
 
 class ActServer {
-  String _LOG_TAG = (ActServer).toString();
+  String _logTag = (ActServer).toString();
   Logger _logger;
   void setLogger(Logger logger) {
     _logger = logger;
@@ -19,7 +19,7 @@ class ActServer {
   void actChangeServerKey(Store<AppState> store, String serverKey) {
     // only update serverKey when it is different
     if (serverKey != store.state.setting.serverKey) {
-      _logger.info(_LOG_TAG, "actChangeServerKey");
+      _logger.info(_logTag, "actChangeServerKey");
       store.onChange
           .any((state) => state.setting.serverKey == serverKey)
           .then((_) => {_netSSE.reconnect(store)});
