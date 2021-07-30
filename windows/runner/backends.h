@@ -20,6 +20,7 @@ private:
 	void setCurrentIP(std::string& ip);
 	std::string getCurrentIP();
 	std::map<EncodableValue, EncodableValue> getServerIPs();
+    std::string getDataFolder();
 
     void methodChannelHandler(
         const MethodCall<EncodableValue>& call,

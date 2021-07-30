@@ -81,6 +81,12 @@ std::map<EncodableValue, EncodableValue> Backends::getServerIPs() {
 	return map;
 }
 
+std::string Backends::getDataFolder() {
+	char* folder = Backend_GetDataFolder();
+	std::string folderstr(folder);
+	return folderstr;
+}
+
 void Backends::methodChannelHandler(
     const MethodCall<EncodableValue>& call,
     std::unique_ptr<MethodResult<EncodableValue>>& result)
@@ -88,22 +94,22 @@ void Backends::methodChannelHandler(
     const std::string& method_name = call.method_name();
     if (method_name.compare(BK_GET_DATAHOME) == 0) {
         printf("BK_GET_DATAHOME\n");
-        std::string path = GetHomeDir();
+        std::string path = this->getDataFolder();
         result->Success(path);
     } else if (method_name.compare(BK_GET_CURRENT_IP) == 0) {
         printf("BK_GET_CURRENT_IP\n");
-		std::string ipstr = this->getCurrentIP();
-		result->Success(ipstr);
+        std::string ipstr = this->getCurrentIP();
+        result->Success(ipstr);
     } else if (method_name.compare(BK_SET_CURRENT_IP) == 0) {
-		printf("BK_SET_CURRENT_IP\n");
-		const EncodableValue* value = call.arguments();
-		if (std::holds_alternative<std::string>(*value)) {
-			std::string ip = std::get<std::string>(*value);
-			this->setCurrentIP(ip);
-		}
+        printf("BK_SET_CURRENT_IP\n");
+        const EncodableValue* value = call.arguments();
+        if (std::holds_alternative<std::string>(*value)) {
+            std::string ip = std::get<std::string>(*value);
+            this->setCurrentIP(ip);
+        }
     } else if (method_name.compare(BK_GET_SERVER_IPS) == 0) {
-		printf("BK_GET_SERVER_IPS\n");
-		std::map<EncodableValue, EncodableValue> map = this->getServerIPs();
-		result->Success(map);
-	}
+        printf("BK_GET_SERVER_IPS\n");
+        std::map<EncodableValue, EncodableValue> map = this->getServerIPs();
+        result->Success(map);
+    }
 }

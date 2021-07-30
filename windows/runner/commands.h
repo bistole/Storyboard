@@ -19,10 +19,6 @@ private:
     BinaryMessenger* binary_messenger_;
     MethodChannel<EncodableValue>* method_channel_;
 
-	void setCurrentIP(std::string& ip);
-	std::string getCurrentIP();
-	std::map<EncodableValue, EncodableValue> getServerIPs();
-
     std::vector<EncodableValue> parseOpenFileDialogResult(IFileOpenDialog* pFileOpen);
     std::vector<EncodableValue> setupOpenFileDialog(IFileOpenDialog* pFileOpen, std::string& title, std::vector<std::string>& types);
 	std::vector<EncodableValue> openFileDialog(std::string& title, std::vector<std::string>& types);
