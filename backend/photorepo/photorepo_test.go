@@ -31,6 +31,7 @@ func initDB(suffix string) interfaces.DatabaseService {
 	db := database.NewDatabaseService(conf)
 	folder := db.GetDataFolder()
 	os.Remove(path.Join(folder, "photos"))
+	os.Remove(path.Join(folder, "thumbnails"))
 
 	db.Init()
 	return db
@@ -42,6 +43,7 @@ func destoyDB(suffix string, db interfaces.DatabaseService) {
 	folder := db.GetDataFolder()
 	os.Remove(path.Join(folder, testDBName+suffix+".db"))
 	os.Remove(path.Join(folder, "photos"))
+	os.Remove(path.Join(folder, "thumbnails"))
 	os.Remove(folder)
 }
 

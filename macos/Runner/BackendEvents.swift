@@ -23,8 +23,11 @@ class BackendEvents : NSObject {
         NSLog(call.method);
         switch(call.method) {
         case self.BK_GET_DATAHOME:
-            let dir = getDataHome()
-            result(dir)
+            if let dirRaw = Backend_GetDataFolder() {
+                let dir = String(cString: dirRaw, encoding: String.Encoding.ascii);
+                result(dir)
+                free(dirRaw)
+            }
             break
         case self.BK_GET_CURRENT_IP:
             if let ipRaw = Backend_GetCurrentIP() {

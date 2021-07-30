@@ -101,6 +101,12 @@ func Backend_GetAvailableIPs() *C.char {
 	return C.CString(ipsStr)
 }
 
+//export Backend_GetDataFolder
+func Backend_GetDataFolder() *C.char {
+	var folder = c.GetHomeDir()
+	return C.CString(folder)
+}
+
 func console() {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Println("Press 'q' and 'enter' to quit")

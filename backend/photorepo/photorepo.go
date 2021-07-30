@@ -45,6 +45,17 @@ func (p PhotoRepo) createPhotoFolder() (string, bool) {
 	return folderPath, true
 }
 
+func (p PhotoRepo) createThumbnailFolder() (string, bool) {
+	folderPath := path.Join(p.db.GetDataFolder(), "thumbnails")
+	_, err := os.Stat(folderPath)
+	if os.IsNotExist(err) {
+		os.MkdirAll(folderPath, 0755)
+		os.Create(folderPath)
+		return folderPath, false
+	}
+	return folderPath, true
+}
+
 var validMimeType = []string{"image/jpeg", "image/png", "image/gif"}
 
 func isMimeTypeValid(mimeType string) bool {
@@ -354,9 +365,13 @@ func (p PhotoRepo) _createThumbnail(UUID string, mimeType string) {
 
 func (p PhotoRepo) _getFileHandler(UUID string, thumbnail bool) (writer io.WriteCloser, err error) {
 	p.createPhotoFolder()
-	localPath := path.Join(p.db.GetDataFolder(), "photos", UUID)
+	p.createThumbnailFolder()
+
+	var localPath string
 	if thumbnail {
-		localPath += "_thumbnail"
+		localPath = path.Join(p.db.GetDataFolder(), "thumbnails", UUID)
+	} else {
+		localPath = path.Join(p.db.GetDataFolder(), "photos", UUID)
 	}
 
 	f, err := os.Create(localPath)
@@ -377,9 +392,11 @@ func (p PhotoRepo) _writeToDisk(src io.Reader, dst io.Writer) (err error) {
 
 func (p PhotoRepo) _readFromDisk(UUID string, thumbnail bool) (reader io.ReadCloser, err error) {
 
-	localPath := path.Join(p.db.GetDataFolder(), "photos", UUID)
+	var localPath string
 	if thumbnail {
-		localPath += "_thumbnail"
+		localPath = path.Join(p.db.GetDataFolder(), "thumbnails", UUID)
+	} else {
+		localPath = path.Join(p.db.GetDataFolder(), "photos", UUID)
 	}
 
 	_, err = os.Stat(localPath)
@@ -399,7 +416,7 @@ func (p PhotoRepo) _removeFromDisk(UUID string) (err error) {
 	originPath := path.Join(p.db.GetDataFolder(), "photos", UUID)
 	os.Remove(originPath)
 
-	thumbnailPath := path.Join(p.db.GetDataFolder(), "photos", UUID+"_thumbnail")
+	thumbnailPath := path.Join(p.db.GetDataFolder(), "thumbnails", UUID)
 	os.Remove(thumbnailPath)
 	return nil
 }
